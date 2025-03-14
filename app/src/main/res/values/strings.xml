@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">HODOS_FINAL_ANDROID</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_for_location">Search for location</string>
+    <string name="a_vietnamese_flag_waves_proudly_near_a_central_landmark_adding_cultural_identity_the_style_is_playful_clean">A Vietnamese flag waves proudly near a central landmark, adding cultural identity. The style is playful, clean,</string>
+    <string name="explore_the_beautiful_place">EXPLORE THE BEAUTIFUL PLACE</string>
+</resources>

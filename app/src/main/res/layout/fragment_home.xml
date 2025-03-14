@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragment.home.HomeFragment">
+
+
+
+
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      >
+      <com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          >
+
+          <ImageView
+              android:id="@+id/imageView2"
+              android:layout_width="match_parent"
+              android:layout_height="400sp"
+              android:scaleType="fitXY"
+              android:src="@drawable/home_banner" />
+
+          <View
+              android:layout_width="match_parent"
+              android:layout_height="400sp"
+              android:background="@color/black_trans"
+              app:layout_anchor="@+id/imageView2"
+              app:layout_anchorGravity="center" />
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="10sp">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="fill_horizontal"
+                  android:gravity="center_vertical">
+
+                  <com.google.android.material.card.MaterialCardView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:clickable="true"
+                      app:cardCornerRadius="100dp"
+                      app:rippleColor="@color/bright_blue"
+                      app:strokeColor="@color/transparent">
+
+                      <LinearLayout
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:background="@drawable/rounded_bg"
+                          android:gravity="center_vertical"
+                          android:orientation="horizontal"
+                          android:paddingHorizontal="10dp"
+                          android:paddingVertical="4dp"
+
+                          >
+
+                          <ImageView
+                              android:layout_width="20dp"
+                              android:layout_height="20dp"
+                              android:src="@drawable/location_icon" />
+
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="TP. Hồ Chí Minh"
+                              android:textStyle="bold"
+                              android:typeface="sans" />
+                      </LinearLayout>
+
+                  </com.google.android.material.card.MaterialCardView>
+
+                  <LinearLayout
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="end">
+
+                      <com.google.android.material.button.MaterialButton
+                          style="@style/Widget.MaterialComponents.Button.Icon"
+                          android:layout_width="52dp"
+                          android:layout_height="50dp"
+                          android:layout_gravity="center"
+                          android:background="@color/transparent"
+                          android:backgroundTint="@color/transparent"
+                          android:clickable="true"
+                          android:focusable="true"
+                          android:gravity="center"
+                          android:text=""
+                          app:cornerRadius="100dp"
+                          app:icon="@drawable/bell_icon"
+                          app:iconSize="30dp"
+                          app:rippleColor="@color/bright_blue" />
+
+
+                  </LinearLayout>
+              </LinearLayout>
+
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:shadowColor="@color/black"
+                  android:shadowDx="10"
+                  android:shadowDy="10"
+                  android:shadowRadius="8"
+                  android:text="@string/explore_the_beautiful_place"
+                  android:textColor="@color/primary"
+                  android:textSize="30sp"
+                  android:textStyle="bold" />
+
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/a_vietnamese_flag_waves_proudly_near_a_central_landmark_adding_cultural_identity_the_style_is_playful_clean"
+                  android:textColor="@color/background"
+                  android:textSize="18sp"
+                  android:textStyle="bold" />
+
+              <com.google.android.material.card.MaterialCardView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="20dp"
+                  android:clickable="true"
+                  android:focusable="true"
+                  app:cardCornerRadius="100dp"
+                  app:rippleColor="@color/primary"
+                  app:strokeColor="@color/transparent"
+
+                  >
+
+                  <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center_vertical"
+                      android:background="@drawable/rounded_bg"
+                      android:gravity="center_vertical"
+                      android:orientation="horizontal"
+                      android:paddingVertical="10dp"
+                      android:paddingHorizontal="20dp"
+                      >
+
+                      <TextView
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="1"
+                          android:text="@string/search_for_location"
+                          android:textColor="@color/icon_default" />
+
+
+                      <com.google.android.material.button.MaterialButton
+                          style="@style/Widget.MaterialComponents.Button.Icon"
+                          android:layout_width="40dp"
+                          android:layout_height="50dp"
+                          android:layout_gravity="center"
+                          android:clickable="true"
+                          android:focusable="true"
+                          android:gravity="center"
+                          app:background="@color/primary"
+                          app:backgroundTint="@color/primary"
+                          app:cornerRadius="100dp"
+                          app:icon="@drawable/search_icon"
+                          app:iconSize="20dp"
+                          app:rippleColor="@color/bright_blue" />
+                  </LinearLayout>
+              </com.google.android.material.card.MaterialCardView>
+
+
+
+              <LinearLayout
+                  android:layout_marginTop="20sp"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_vertical"
+                  android:layout_gravity="center_vertical"
+                  android:background="@drawable/rounded_bg"
+                  android:padding="10sp"
+                  >
+
+
+                  <LinearLayout
+                      android:layout_weight="1"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      >
+
+                      <com.google.android.material.card.MaterialCardView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:clickable="true"
+                          android:focusable="true"
+                          app:cardCornerRadius="100dp"
+                          app:rippleColor="@color/primary"
+                          app:strokeColor="@color/transparent">
+                          <ImageView
+                              android:layout_width="40sp"
+                              android:layout_height="40sp"
+                              android:src="@drawable/classcifical_feature" />
+                      </com.google.android.material.card.MaterialCardView>
+
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="Classcifical"
+                          android:textStyle="bold"
+                          android:textSize="10sp"
+
+                          />
+                  </LinearLayout>
+
+                  <LinearLayout
+                      android:layout_weight="1"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      >
+
+                      <com.google.android.material.card.MaterialCardView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:clickable="true"
+                          android:focusable="true"
+                          app:cardCornerRadius="100dp"
+                          app:rippleColor="@color/primary"
+                          app:strokeColor="@color/transparent">
+                          <ImageView
+                              android:layout_width="40sp"
+                              android:layout_height="40sp"
+                              android:src="@drawable/planning_fea" />
+                      </com.google.android.material.card.MaterialCardView>
+
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="Planning"
+                          android:textStyle="bold"
+                          android:textSize="10sp"
+
+                          />
+                  </LinearLayout>
+
+                  <LinearLayout
+                      android:layout_weight="1"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      >
+
+                      <com.google.android.material.card.MaterialCardView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:clickable="true"
+                          android:focusable="true"
+                          app:cardCornerRadius="100dp"
+                          app:rippleColor="@color/primary"
+                          app:strokeColor="@color/transparent">
+                          <ImageView
+                              android:layout_width="40sp"
+                              android:layout_height="40sp"
+                              android:src="@drawable/chat_ai_fea"
+                              />
+                      </com.google.android.material.card.MaterialCardView>
+
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="Assitant"
+                          android:textStyle="bold"
+                          android:textSize="10sp"
+                          />
+                  </LinearLayout>
+
+                  <LinearLayout
+                      android:layout_weight="1"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      >
+
+                      <com.google.android.material.card.MaterialCardView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:clickable="true"
+                          android:focusable="true"
+                          app:cardCornerRadius="100dp"
+                          app:rippleColor="@color/primary"
+                          app:strokeColor="@color/transparent">
+                          <ImageView
+                              android:layout_width="40sp"
+                              android:layout_height="40sp"
+                              android:src="@drawable/more_feature" />
+                      </com.google.android.material.card.MaterialCardView>
+
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="More"
+                          android:textStyle="bold"
+                          android:textSize="10sp"
+                          />
+                  </LinearLayout>
+
+
+
+
+
+
+              </LinearLayout>
+
+
+          </LinearLayout>
+
+
+
+
+
+      </com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout>
+
+      <androidx.viewpager2.widget.ViewPager2
+          android:id="@+id/slide_img"
+          android:layout_width="match_parent"
+          android:layout_height="150sp"
+          android:paddingStart="20dp"
+          android:paddingEnd="20dp"
+          android:layout_marginTop="20dp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0.5"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+  </LinearLayout>
+</ScrollView>
+</FrameLayout>
