@@ -65,11 +65,15 @@ val md_theme_dark_surfaceTint = Color(0xFF6CDBB5)
 val md_theme_dark_outlineVariant = Color(0xFF404943)
 val md_theme_dark_scrim = Color(0xFF000000)
 
+
+
 // App Colors
-val Primary = Color(0xFF1E88E5)
+val Primary = Color(0xFF1A2C37)
 val BrightBlue = Color(0xFFE8F4FE)
 val IconDefault = Color(0xFF757575)
 val BlackTransparent = Color(0x80000000)
 val White = Color(0xFFFFFFFF)
 val Transparent = Color.Transparent
+val dark_tran = Color(0x50000000)
+
 

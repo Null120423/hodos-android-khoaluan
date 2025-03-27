@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.navigateWithAnimation
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -130,8 +132,13 @@ fun TripCard(
     trip: Trip,
     onClick: () -> Unit
 ) {
+    val navController = LocalNavController.current
+
+
     Card(
-        onClick = onClick,
+        onClick = {
+            navController.navigateWithAnimation(Screen.PlanningDetail.route)
+        },
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),

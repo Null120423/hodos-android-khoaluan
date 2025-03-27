@@ -30,6 +30,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hodos_final_android.R
+import com.example.hodos_final_android.helper.getScreenHeight
 
 
 @Composable
@@ -44,7 +45,7 @@ fun InfoDialog(
 
         Box(
             modifier = Modifier
-                .height(460.dp)
+                .height((getScreenHeight() / 1.78) .dp)
         ) {
             Column(
                 modifier = Modifier

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.hodos_final_android.theme
 
 
@@ -22,7 +24,8 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = White,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
-    tertiary = Color.Gray
+    tertiary = Color.Gray,
+    scrim = dark_tran
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -34,7 +37,8 @@ private val DarkColorScheme = darkColorScheme(
     onSecondary = White,
     onBackground = White,
     onSurface = White,
-    tertiary = Color.White
+    tertiary = Color.White,
+    scrim = dark_tran
 )
 
 @Composable

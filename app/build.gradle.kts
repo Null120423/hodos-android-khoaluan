@@ -44,6 +44,8 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
+
+
 }
 
 
@@ -55,6 +57,9 @@ dependencies {
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    implementation(libs.play.services.maps)
+    implementation(libs.core)
+    implementation(libs.litert)
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -97,6 +102,25 @@ dependencies {
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     implementation("com.airbnb.android:lottie-compose:4.2.0")
     implementation("androidx.navigation:navigation-compose:2.7.4")
+
+    implementation("com.google.maps.android:maps-compose:6.4.1")
+
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.6.1")
+
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+
+    // UI components for StyledPlayerView
+    implementation("androidx.media3:media3-ui:1.3.1")
+
+    implementation("com.google.android.exoplayer:exoplayer:2.16.1")
+
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation("com.intuit.sdp:sdp-android:1.0.6")
+
 
 
     implementation(libs.androidx.core.splashscreen)

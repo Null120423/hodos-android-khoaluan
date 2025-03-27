@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Hodos"
 include(":app")
+include(":app:assets")
  

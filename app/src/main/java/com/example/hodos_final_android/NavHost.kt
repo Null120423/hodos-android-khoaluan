@@ -29,18 +29,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.hodos_final_android.component.LoadingDialog
 import com.example.hodos_final_android.screen.MainScreen
+import com.example.hodos_final_android.screen.auth.EmailVerificationScreen
 import com.example.hodos_final_android.screen.auth.LoginScreen
 import com.example.hodos_final_android.screen.auth.RegisterScreen
+import com.example.hodos_final_android.screen.home.PredictScreen
+import com.example.hodos_final_android.screen.main.chat.ChatDashboard
+import com.example.hodos_final_android.screen.main.chat.ChatRoomScreen
 import com.example.hodos_final_android.screen.main.planing.CreatePlanning
+import com.example.hodos_final_android.screen.main.planing.EditPlanning
 import com.example.hodos_final_android.screen.main.planing.PlanningDetail
 import com.example.hodos_final_android.screen.main.planing.PlanningScreen
 import com.example.hodos_final_android.screen.main.planing.ReviewSummaryCreatePlanningScreen
 import com.example.hodos_final_android.screen.main.planing.SuggestTripScreen
+import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.screen.start.CollectInformationScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
+    object EmailVerification : Screen("EmailVerification")
     object Main : Screen("home")
     object Planning : Screen("planning")
     object CollectInfo : Screen("collectInfo")
@@ -48,6 +55,11 @@ sealed class Screen(val route: String) {
     object CreatePlanning : Screen("createPlanning")
     object ReviewSummaryCreatePlanningScreen : Screen("reviewSummaryCreatePlanningScreen")
     object SuggestTrip : Screen("suggestTrip")
+    object EditPlanning : Screen("editPlanning")
+    object ChatAiDashBoard : Screen("ChatAiDashBoard")
+    object ChatAiRoom : Screen("ChatAiRoom")
+    object SearchScreen : Screen("SearchScreen")
+    object PredictScreen : Screen("PredictScreen")
 }
 
 data class ScreenConfig(
@@ -98,10 +110,16 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.PlanningDetail.route) { PlanningDetail() },
         ScreenConfig(Screen.CreatePlanning.route) { CreatePlanning() },
         ScreenConfig(Screen.ReviewSummaryCreatePlanningScreen.route) { ReviewSummaryCreatePlanningScreen() },
-        ScreenConfig(Screen.SuggestTrip.route) { SuggestTripScreen() }
+        ScreenConfig(Screen.SuggestTrip.route) { SuggestTripScreen() },
+        ScreenConfig(Screen.EditPlanning.route) { EditPlanning() },
+        ScreenConfig(Screen.ChatAiDashBoard.route) { ChatDashboard() },
+        ScreenConfig(Screen.ChatAiRoom.route) { ChatRoomScreen() },
+        ScreenConfig(Screen.SearchScreen.route) { SearchScreen() },
+        ScreenConfig(Screen.EmailVerification.route) { EmailVerificationScreen() },
+        ScreenConfig(Screen.PredictScreen.route) { PredictScreen() },
     )
 
-    NavHost(navController = navController, startDestination = Screen.CreatePlanning.route) {
+    NavHost(navController = navController, startDestination = Screen.Main.route) {
         screens.forEach { screen ->
             animatedComposable(
                 route = screen.route,

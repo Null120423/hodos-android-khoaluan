@@ -18,9 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.BorderColor
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,22 +32,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.ParentScreen
+import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.CustomBottomSheet
 import com.example.hodos_final_android.component.ImageCarousel
 import com.example.hodos_final_android.component.VideoPlayerScreen
 import com.example.hodos_final_android.component.rememberBottomSheetController
+import com.example.hodos_final_android.navigateWithAnimation
 
+
+@Preview()
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PlanningDetail() {
@@ -56,9 +62,6 @@ fun PlanningDetail() {
         "https://hotelwoodlandnainital.com/wp-content/uploads/2024/09/Plan-Your-Trip.png"
     )
     val bottomSheetController = rememberBottomSheetController()
-
-
-
     ParentScreen {
         Box{
 
@@ -74,7 +77,6 @@ fun PlanningDetail() {
                         .height(280.dp)
                         .padding(0.dp)
                 ) {
-
 
                     ImageCarousel(
                         lstImgUrl = imageUrls,
@@ -258,82 +260,29 @@ fun PlanningDetail() {
                     )
                 }
             }
+
+
+            FloatingActionButton(
+                onClick = {
+                    navController.navigateWithAnimation(Screen.EditPlanning.route)
+                },
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                modifier = Modifier
+                    .padding(30.dp)
+                    .align(Alignment.BottomEnd),
+                shape = RoundedCornerShape(100),
+                containerColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.BorderColor,
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
 
-@Composable
-fun ImageGrid() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        val (image1, image2, image3, image4, playButton, people) = createRefs()
-
-
-        // Main image (top left)
-        TravelImage(
-            imgUrl = "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-        // Main image (top left)
-        TravelImage(
-            imgUrl = "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        ) // Main image (top left)
-        TravelImage(
-            imgUrl = "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-        // Main image (top left)
-        TravelImage(
-            imgUrl = "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-        // Main image (top left)
-        TravelImage(
-            imgUrl = "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-        // Main image (top left)
-        TravelImage(
-            imgUrl = "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-
-
-
-
-        // Play button (center)
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF4FC3F7))
-                .zIndex(10f),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = "Play",
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable

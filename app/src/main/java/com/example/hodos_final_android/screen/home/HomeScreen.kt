@@ -46,6 +46,8 @@ import com.example.hodos_final_android.component.AuthButtons
 import com.example.hodos_final_android.component.FloatingActionGroup
 import com.example.hodos_final_android.component.InfoDialog
 import com.example.hodos_final_android.component.TravelCard
+import com.example.hodos_final_android.mock.Locations
+import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.theme.HodosTheme
 
@@ -55,6 +57,7 @@ import com.example.hodos_final_android.theme.HodosTheme
 fun HomeScreen() {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val navController = LocalNavController.current
+    val locations = Locations.fromJson()
 
     HodosTheme {
         Box(
@@ -74,11 +77,13 @@ fun HomeScreen() {
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds
                 )
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black.copy(alpha = 0.3f))
                 )
+
             }
             LazyColumn(
                 modifier = Modifier
@@ -111,14 +116,11 @@ fun HomeScreen() {
 
                 item {
                     Box(modifier = Modifier.padding(horizontal = 10.dp)){
-                        SearchBar()
+                        SearchBar(onClick = {
+                            navController.navigateWithAnimation(Screen.SearchScreen.route)
+                        })
                     }
                 }
-
-
-                //stickyHeader {
-                  //  FeatureIconsRow()
-                //}
 
                 item {
                     Box(modifier = Modifier.padding(horizontal = 10.dp)){
@@ -129,7 +131,7 @@ fun HomeScreen() {
                 // Phần nội dung cuộn tiếp tục bình thường
                 item {
                     Box(modifier = Modifier.padding(horizontal = 10.dp)){
-                        TravelCardGrid()
+                        TravelCardGrid(locations = locations)
                     }
 
                 }
@@ -144,23 +146,23 @@ fun HomeScreen() {
 }
 
 @Composable
-fun TravelCardGrid() {
-    val items = List(20) { "Item $it" }
-
+fun TravelCardGrid(
+    locations: List<Location>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp, start = 0.dp, end = 0.dp)
     ) {
-        for (i in items.indices step 2) {
+        for (i in locations.indices step 2) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                TravelCard()
+                TravelCard(data = locations[i]) // Phần tử đầu tiên
 
-                if (i + 1 < items.size) {
-                    TravelCard()
+                if (i + 1 < locations.size) {
+                    TravelCard(data = locations[i + 1]) // Phần tử tiếp theo nếu tồn tại
                 } else {
                     Spacer(modifier = Modifier.weight(1f)) // Giữ khoảng trống nếu số phần tử lẻ
                 }
@@ -170,6 +172,7 @@ fun TravelCardGrid() {
         }
     }
 }
+
 
 
 
@@ -283,11 +286,15 @@ fun FeatureIconsRow() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            FeatureItem(R.drawable.classcifical_feature, "Classical", {})
+            FeatureItem(R.drawable.classcifical_feature, "Classical", {
+                navController.navigateWithAnimation(Screen.PredictScreen.route)
+            })
             FeatureItem(R.drawable.planning_fea, "Planning" , {
                 navController.navigateWithAnimation(Screen.Planning.route)
             })
-            FeatureItem(R.drawable.chat_ai_fea, "Assistant", {})
+            FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
+                navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
+            })
             FeatureItem(R.drawable.more_feature, "More", {})
         }
     }

@@ -30,15 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-/**
- * A composable function that creates a bottom sheet with customizable content.
- *
- * @param isVisible Boolean that controls the visibility of the bottom sheet
- * @param onDismiss Function to call when the bottom sheet is dismissed
- * @param title Optional title to display at the top of the bottom sheet
- * @param showCloseButton Whether to show a close button in the header
- * @param content The content to display in the bottom sheet
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomBottomSheet(

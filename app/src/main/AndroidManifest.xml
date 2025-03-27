@@ -4,6 +4,11 @@
     tools:ignore="MissingLeanbackLauncher">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
+    <uses-permission-sdk-23 android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission-sdk-23 android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -23,13 +28,6 @@
         android:theme="@style/Theme.HODOS_FINAL_ANDROID"
         tools:targetApi="31">
         <activity
-            android:name=".activity.app.home.HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.base.BaseActivity"
-            android:exported="false"
-            android:theme="@style/Theme.HODOS_FINAL_ANDROID" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -38,7 +36,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.app.onboaring.OnboardingActivity" />
     </application>
 
 </manifest>
