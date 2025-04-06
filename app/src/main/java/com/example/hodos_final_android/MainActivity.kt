@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -27,17 +28,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hodos_final_android.helper.OnboardingUtils
 import com.example.hodos_final_android.screen.OnboardingScreen
 import com.example.hodos_final_android.theme.HodosTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 val LocalNavController = staticCompositionLocalOf<NavHostController> {
     error("NavController not provided")
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val onboardingUtils by lazy { OnboardingUtils(this) }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         installSplashScreen()
 

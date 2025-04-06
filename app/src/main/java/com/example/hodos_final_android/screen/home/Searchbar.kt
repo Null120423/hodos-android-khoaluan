@@ -52,14 +52,14 @@ fun SearchBar(
             IconButton(
                 onClick = { /* Handle search click */ },
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(30.dp)
                     .clip(RoundedCornerShape(100.dp))
                     .background(MaterialTheme.colorScheme.primary)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.search_icon),
                     contentDescription = "Search",
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.background
                 )
             }

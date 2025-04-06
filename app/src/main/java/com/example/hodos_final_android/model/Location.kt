@@ -19,5 +19,5 @@ data class Location(
     val coordinates: String,
     val type: String,
     val img: String,
-    var value: Any? = null  // Dùng `Any?` nếu muốn linh hoạt, hoặc kiểu dữ liệu cụ thể
+    var value: Any? = null
 )

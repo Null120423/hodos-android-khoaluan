@@ -13,7 +13,7 @@ fun Txt(
     color: Color = Color.Black,
     size: Int = 14,
     fontWeight: FontWeight = FontWeight.Normal,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Start,
 ) {
     Text(
         text = value,
@@ -28,10 +28,12 @@ fun Txt(
 
 @Composable()
 fun Title(
-    size: Int = 18,
     value: String,
-    fontWeight: FontWeight
+    fontWeight: FontWeight = FontWeight.Normal,
+    size: Int = 18,
+    color : Color = Color.Black,
+    textAlign: TextAlign = TextAlign.Start,
 ) {
-    Txt(size = size, value = value, fontWeight =  fontWeight)
+    Txt(size = size, value = value, fontWeight =  fontWeight, color = color, textAlign = textAlign)
 }
 

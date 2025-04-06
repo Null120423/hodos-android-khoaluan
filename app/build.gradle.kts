@@ -3,6 +3,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -30,12 +32,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
 
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget =  "17"
     }
     buildFeatures {
         viewBinding = true
@@ -48,10 +50,11 @@ android {
 
 }
 
-
+hilt {
+    enableAggregatingTask = false
+}
 
 dependencies {
-
     implementation(libs.navigation.compose)
     implementation(libs.androidx.storage)
     implementation(libs.androidx.media3.common.ktx)
@@ -60,6 +63,9 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.core)
     implementation(libs.litert)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.espresso.core)
+
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -120,6 +126,24 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("com.intuit.sdp:sdp-android:1.0.6")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Dependency Injection
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    implementation("com.google.dagger:hilt-android:2.48") // Thư viện chính của Hilt
+    kapt("com.google.dagger:hilt-compiler:2.48")
+
+    implementation("io.github.shashank02051997:FancyToast:2.0.2")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+
 
 
 

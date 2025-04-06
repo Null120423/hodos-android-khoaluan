@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,19 +41,24 @@ import com.example.hodos_final_android.component.BtnPrimary
 import com.example.hodos_final_android.component.ColumnCenter
 import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.MainLayout
+import com.example.hodos_final_android.component.NoResultDialog
+import com.example.hodos_final_android.component.PredictDialog
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.helper.getScreenHeight
 import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.helper.toSdp
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.service.AIModelHelper
+import kotlinx.coroutines.delay
 
 @Composable
 fun PredictScreen() {
-    val showBottomSheet = remember { mutableStateOf(false) }
-    var location: MutableState<Location?> = remember { mutableStateOf(null) }
+    val isShowBottomSheet = remember { mutableStateOf(false) }
+    val isShowDialogNotFoundLocation = remember { mutableStateOf(false) }
+    val location: MutableState<Location?> = remember { mutableStateOf(null) }
     val context = LocalContext.current
     val aiHelper = remember { AIModelHelper(context) }
+    val isSearching = remember { mutableStateOf(false) }
 
     // Bitmap state
     val bitmapState = remember { mutableStateOf<Bitmap?>(null) }
@@ -61,7 +67,22 @@ fun PredictScreen() {
     // Classify image logic
     LaunchedEffect(bitmapState.value) {
         bitmapState.value?.let {
-            location.value = aiHelper.classifyImage(it)!!
+            isSearching.value = true
+            isShowBottomSheet.value = false
+            val data = aiHelper.classifyImage(it)
+
+            delay(3000)
+            if (data != null) {
+                location.value = data
+                Toast.makeText(context, "Predict success" + data.name, Toast.LENGTH_SHORT).show()
+                isShowBottomSheet.value = true
+            } else {
+                Log.e("PredictScreen", "Classification data is null")
+                Toast.makeText(context, "Location not found", Toast.LENGTH_SHORT).show()
+                isShowDialogNotFoundLocation.value = true
+            }
+
+            isSearching.value = false
         }
     }
 
@@ -131,9 +152,9 @@ fun PredictScreen() {
     MainLayout(
         backgroundImg = R.drawable.predict_bg,
         isBgBlur = true,
-        isVisibleBottomSheet = showBottomSheet,
+        isVisibleBottomSheet = isShowBottomSheet,
         onCloseBottomSheet = {
-            showBottomSheet.value = false
+            isShowBottomSheet.value = false
         },
         bottomSheetContent = {
             if(location.value == null) {
@@ -190,7 +211,7 @@ fun PredictScreen() {
                             title = "Close",
                             onClick = {
                                 location.value = null
-                                showBottomSheet.value = false
+                                isShowBottomSheet.value = false
                             }
                         )
                     }
@@ -204,10 +225,26 @@ fun PredictScreen() {
             ) {
                 AnalysisFeature(
                     onPredict = {
-                        showBottomSheet.value = true
+                        isShowBottomSheet.value = true
                     }
                 )
+            }
 
+            if(isSearching.value ) {
+                PredictDialog(
+                    onDismiss ={
+                        isSearching.value = false
+                    }
+                )
+            }
+
+            if(isShowDialogNotFoundLocation.value) {
+                NoResultDialog(
+                    title = "Location not found by Image!",
+                    onDismiss = {
+                        isShowDialogNotFoundLocation.value = false
+                    }
+                )
             }
 
         }

@@ -125,11 +125,13 @@ class AIModelHelper(private val context: Context) {
             val label = classes[maxPos]
             val location = getLocationByLabel(label)
 
+            Log.i("LABEL", label)
+
 
             location?.let {
                 return location
             } ?: run {
-                Toast.makeText(context, "Location not found", Toast.LENGTH_SHORT).show()
+
             }
         }
 

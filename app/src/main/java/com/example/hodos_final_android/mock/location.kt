@@ -1319,7 +1319,7 @@ class Locations(private val data: List<Location>) {
         """.trimIndent()
             val listType = object : TypeToken<List<Location>>() {}.type
             val locations: List<Location> = Gson().fromJson(jsonString, listType)
-            return locations.take(10)
+            return locations
         }
     }
 }

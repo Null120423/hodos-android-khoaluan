@@ -24,7 +24,8 @@ fun MainLayout(
     onCloseBottomSheet: ()-> Unit = {},
     isBgBlur: Boolean? = false,
     bottomSheetContent: @Composable (ColumnScope.() -> Unit)? = null,
-    modifier: Modifier = Modifier.padding(20.dp)
+    modifier: Modifier = Modifier.padding(20.dp),
+    isLoading : Boolean = false
 ) {
     Box {
         backgroundImg?.let { imgRes ->
@@ -56,5 +57,9 @@ fun MainLayout(
                 )
             }
         }
+
+        LoadingDialog(
+            isLoading = isLoading
+        )
     }
 }

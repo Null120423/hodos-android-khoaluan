@@ -91,7 +91,8 @@ fun TextBtn(
     title : String = "",
     color: Color = Color.Black,
     size: Int = 12,
-    fontWeight: FontWeight = FontWeight.Normal
+    fontWeight: FontWeight = FontWeight.Normal,
+    disabled: Boolean = false
 ) {
     TextButton(onClick = onClick) {
         Text(
@@ -116,7 +117,8 @@ fun BtnPrimary(
     height : Int = 50,
     size : Int = 16,
     fontWeight: FontWeight = FontWeight.Medium,
-    minWidth : Int =  100
+    minWidth : Int =  100,
+    disabled : Boolean = false
 ) {
     Button(
         onClick = onClick,
@@ -127,7 +129,8 @@ fun BtnPrimary(
         shape = RoundedCornerShape(rounded.sdp),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor
-        )
+        ),
+        enabled = !disabled
     ) {
         Text(
             text = title,
@@ -146,12 +149,13 @@ fun IconBtn(
     contentDescription: String? = "",
     onClick: () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    size: Int = 20
 ) {
     IconButton(
         onClick = onClick,
         modifier = modifier
-            .size(30.dp)
+            .size(size.dp)
             .clip(CircleShape)
             .background(backgroundColor)
     ) {

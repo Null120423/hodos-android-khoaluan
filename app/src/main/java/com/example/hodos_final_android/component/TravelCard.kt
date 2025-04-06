@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -22,8 +20,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.hodos_final_android.R
+import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.model.Location
+import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.theme.HodosTheme
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -31,13 +31,17 @@ import com.example.hodos_final_android.theme.HodosTheme
 fun TravelCard(
     data : Location
 ) {
+    val navController = LocalNavController.current
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
    HodosTheme {
        Card(
+           onClick = {
+               navController.navigateWithAnimation(Screen.LocationDetailScreen.route)
+           },
            shape = RoundedCornerShape(16.dp),
            modifier = Modifier
-               .width(screenWidth/2 - 10.dp)
+               .width(screenWidth/2 - 20.dp)
                .padding(0.dp)
                .clickable {
                },
@@ -52,10 +56,6 @@ fun TravelCard(
                            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
                    )
 
-                   IconBtn(
-                       icon = R.drawable.save_loca_icon,
-                       modifier = Modifier.size(24.dp).offset(x = (screenWidth/2) - 50.dp, y = 20.dp)
-                   )
                    Box(
                        modifier = Modifier
                            .align(Alignment.BottomStart)

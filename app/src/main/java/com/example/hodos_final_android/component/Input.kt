@@ -90,7 +90,7 @@ fun TextInput(
     ) {
         if(label  !== "") {
             Text(
-                text = "Email",
+                text = label,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )

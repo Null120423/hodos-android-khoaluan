@@ -13,6 +13,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,11 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
@@ -41,19 +45,49 @@ import com.example.hodos_final_android.component.TextInput
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.model.RegisterModel
+import com.example.hodos_final_android.view_model.AuthViewModel
+import com.shashank.sony.fancytoastlib.FancyToast
 
-@Preview()
 @Composable
-fun RegisterScreen() {
+@Preview()
+fun RegisterScreen(
+    viewModel: AuthViewModel = hiltViewModel(),
+) {
+    val context = LocalContext.current
     val navController = LocalNavController.current
+    val signUpState by viewModel.signUpState.collectAsState()
 
-    var name by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var acceptTerms by remember { mutableStateOf(false) }
 
+    LaunchedEffect(signUpState.response) {
+        signUpState.response?.let {
+            FancyToast.makeText(context, signUpState.response!!.message, FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
+            val registerModel = RegisterModel(
+                username = username,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword
+            )
+            navController.navigateWithAnimation(Screen.EmailVerification.createRoute(registerModel))
+
+        }
+    }
+
+    LaunchedEffect(signUpState.error) {
+        if (signUpState.error != null) {
+            FancyToast.makeText(context, signUpState.error!!.message, FancyToast.LENGTH_LONG, FancyToast.ERROR, true).show()
+        }
+    }
+
+
+
    MainLayout(
+       isLoading = signUpState.isLoading,
        content = {
            ColumnCenter(
                modifier = Modifier
@@ -89,8 +123,8 @@ fun RegisterScreen() {
 
                TextInput(
                    label = "Name",
-                   value = name,
-                   onChange = { name = it },
+                   value = username,
+                   onChange = { username = it },
                    placeholder = "Enter your full name",
                )
 
@@ -152,11 +186,17 @@ fun RegisterScreen() {
                BtnPrimary(
                    title = "Sign Up",
                    onClick = {
-                       navController.navigateWithAnimation(Screen.EmailVerification.route)
+                       viewModel.signUp(
+                           email,
+                           password,
+                           username,
+                           confirmPassword
+                       )
                    },
                    modifier = Modifier
                        .fillMaxWidth()
-                       .clip(RoundedCornerShape(8.dp))
+                       .clip(RoundedCornerShape(8.dp)),
+                   disabled = signUpState.isLoading or email.isEmpty() or password.isEmpty() or username.isEmpty()
                )
 
                Seprate(height = 24)
@@ -181,8 +221,10 @@ fun RegisterScreen() {
 
                Seprate(height = 8)
            }
-           // App Logo
+
 
        }
    )
 }
+
+

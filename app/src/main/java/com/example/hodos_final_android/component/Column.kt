@@ -53,7 +53,7 @@ fun ColumnStart(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 10.dp),
             horizontalAlignment = Alignment.Start
         ) {
             content()
@@ -62,7 +62,7 @@ fun ColumnStart(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 10.dp),
             horizontalAlignment = Alignment.Start
         ) {
             content()

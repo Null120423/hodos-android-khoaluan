@@ -17,6 +17,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -74,7 +75,7 @@ fun ImageCarousel(
             Card(
                 modifier = Modifier
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(0.dp)
+                shape = RoundedCornerShape(15.dp)
             ) {
                 GlideImage(
                     model = lstImgUrl[page],
@@ -130,7 +131,9 @@ fun PagerState.scrollToPage(page: Int) {
 
 // Example usage
 @Composable
-fun CarouselExample() {
+fun CarouselExample(
+    height : Int? = 220
+) {
     val imageUrls = listOf(
         "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
         "https://images.unsplash.com/photo-1583417319070-4a69db38a482",
@@ -139,12 +142,16 @@ fun CarouselExample() {
         "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70"
     )
 
-    ImageCarousel(
-        lstImgUrl = imageUrls,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp),
-        autoScrollDuration = 5000,
-        enableAutoScroll = true
-    )
+    if (height != null) {
+        ImageCarousel(
+            lstImgUrl = imageUrls,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height.dp),
+            autoScrollDuration = 5000,
+            enableAutoScroll = true,
+            activeIndicatorColor = MaterialTheme.colorScheme.primary,
+            inactiveIndicatorColor = MaterialTheme.colorScheme.secondary
+        )
+    }
 }

@@ -1,0 +1,46 @@
+package com.example.hodos_final_android.view_model
+
+import Resource
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.hodos_final_android.model.Location
+import com.example.hodos_final_android.repository.LocationRepository
+import com.example.hodos_final_android.service.api.parseJsonError
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val repository: LocationRepository
+) : ViewModel() {
+
+    private val _homeState = MutableStateFlow(ResponseDataState<List<Location>>(isLoading = true))
+    val homeState: StateFlow<ResponseDataState<List<Location>>> = _homeState
+
+    fun fetchTop10Locations() {
+        repository.locationTop10()
+            .onEach { result ->
+                _homeState.value = when (result) {
+
+                    is Resource.Success -> {
+                        delay(1000)
+                        ResponseDataState(data = result.data)
+                    }
+                    is Resource.Error -> {
+                        val error = result.message?.let { parseJsonError(it) }
+                        ResponseDataState(error = error)
+                    }
+                    is Resource.Loading -> ResponseDataState(isLoading = true)
+                    else -> {
+                        ResponseDataState()
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+}

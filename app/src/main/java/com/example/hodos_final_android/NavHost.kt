@@ -2,6 +2,7 @@ package com.example.hodos_final_android
 
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -43,11 +44,20 @@ import com.example.hodos_final_android.screen.main.planing.ReviewSummaryCreatePl
 import com.example.hodos_final_android.screen.main.planing.SuggestTripScreen
 import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.screen.start.CollectInformationScreen
+import com.example.hodos_final_android.model.RegisterModel
+import com.example.hodos_final_android.screen.location.LocationDetailScreen
+import com.google.gson.Gson
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
-    object EmailVerification : Screen("EmailVerification")
+    object EmailVerification : Screen("emailVerification/{registerModel}") {
+        fun createRoute(registerModel: RegisterModel): String {
+            val json = Gson().toJson(registerModel)
+            Log.i("JSON", json)
+            return "emailVerification/$json"
+        }
+    }
     object Main : Screen("home")
     object Planning : Screen("planning")
     object CollectInfo : Screen("collectInfo")
@@ -60,11 +70,12 @@ sealed class Screen(val route: String) {
     object ChatAiRoom : Screen("ChatAiRoom")
     object SearchScreen : Screen("SearchScreen")
     object PredictScreen : Screen("PredictScreen")
+    object LocationDetailScreen : Screen("LocationDetailScreen")
 }
 
 data class ScreenConfig(
     val route: String,
-    val content: @Composable () -> Unit
+    val content: @Composable (NavBackStackEntry) -> Unit
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -115,7 +126,19 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.ChatAiDashBoard.route) { ChatDashboard() },
         ScreenConfig(Screen.ChatAiRoom.route) { ChatRoomScreen() },
         ScreenConfig(Screen.SearchScreen.route) { SearchScreen() },
-        ScreenConfig(Screen.EmailVerification.route) { EmailVerificationScreen() },
+        ScreenConfig(Screen.EmailVerification.route) { backStackEntry ->
+            val registerModelJson = backStackEntry.arguments?.getString("registerModel") ?: ""
+
+            EmailVerificationScreen(
+            registerModelJson = registerModelJson,
+        ) },
+        ScreenConfig(Screen.LocationDetailScreen.route) { backStackEntry ->
+            val locationId = backStackEntry.arguments?.getString("locationId") ?: ""
+            LocationDetailScreen(
+                navController = navController,
+                locationId = locationId,
+            )
+        },
         ScreenConfig(Screen.PredictScreen.route) { PredictScreen() },
     )
 
@@ -127,8 +150,10 @@ fun AppNavHost(navController: NavHostController) {
                 exitTransition = exitTransition,
                 popEnterTransition = popEnterTransition,
                 popExitTransition = popExitTransition
-            ) {
-                screen.content()
+            ) {backStackEntry ->
+                screen.content(
+                    backStackEntry
+                )
             }
         }
     }
