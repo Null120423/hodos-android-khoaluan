@@ -182,7 +182,7 @@ fun CoxsBazarBeachInfo() {
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        CarouselExample( height = 300)
+        CarouselExample( height = 300, rounded = 0)
         // Header section with beach name and location
         ColumnStart(modifier = Modifier.padding(10.dp)) {
             Text(

@@ -2,8 +2,13 @@ package com.example.hodos_final_android.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,11 +24,17 @@ fun Header(
     RowBetween(modifier = Modifier.padding(top = 20.dp, bottom = 10.dp, end = 20.dp , start = 20.dp).background(
         Color.Transparent
     )) {
-        IconBtn(
-            imgVector = Icons.Filled.ArrowBackIosNew,
-            onClick = {
-                navController.popBackStack()
-            }
-        )
+        IconButton(
+            onClick = { navController.navigateUp() },
+            modifier = Modifier
+                .size(40.dp)
+                .background(Color(0x88000000), CircleShape)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White
+            )
+        }
     }
 }

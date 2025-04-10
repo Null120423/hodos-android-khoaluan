@@ -86,29 +86,29 @@ fun AppNavHost(navController: NavHostController) {
     val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition)? = {
         slideInHorizontally(
             initialOffsetX = { it }, // Move from right to left
-            animationSpec = tween(500, easing = FastOutSlowInEasing)
-        ) + fadeIn(animationSpec = tween(500))
+            animationSpec = tween(700)
+        )
     }
 
     val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition)? = {
         slideOutHorizontally(
             targetOffsetX = { -it }, // Move from left to right
-            animationSpec = tween(400, easing = FastOutSlowInEasing)
-        ) + fadeOut(animationSpec = tween(400))
+            animationSpec = tween(700)
+        )
     }
 
     val popEnterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition)? = {
         slideInHorizontally(
             initialOffsetX = { -it }, // Move from left to right on back navigation
-            animationSpec = tween(500, easing = FastOutSlowInEasing)
-        ) + fadeIn(animationSpec = tween(500))
+            animationSpec = tween(700)
+        )
     }
 
     val popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition)? = {
         slideOutHorizontally(
             targetOffsetX = { it }, // Move from right to left on back navigation
-            animationSpec = tween(400, easing = FastOutSlowInEasing)
-        ) + fadeOut(animationSpec = tween(400))
+            animationSpec = tween(700)
+        )
     }
 
     // List of screen configurations

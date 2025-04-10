@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -12,6 +11,11 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -22,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -40,7 +45,6 @@ class MainActivity : ComponentActivity() {
     private val onboardingUtils by lazy { OnboardingUtils(this) }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
@@ -49,7 +53,11 @@ class MainActivity : ComponentActivity() {
 
             HodosTheme {
                 CompositionLocalProvider(LocalNavController provides navController) {
-                    Surface(color = MaterialTheme.colorScheme.background) {
+                    Surface(color = MaterialTheme.colorScheme.background,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(WindowInsets.statusBars.asPaddingValues()),
+                        ) {
                         if (onboardingUtils.isOnboardingCompleted()) {
                             AppNavHost(navController)
                         } else {

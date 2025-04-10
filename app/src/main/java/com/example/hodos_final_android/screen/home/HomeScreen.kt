@@ -203,14 +203,14 @@ fun HomeScreen(
                             color = MaterialTheme.colorScheme.secondary,
                             shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                         ).heightIn(min = getScreenHeight().dp)){
-                            ColumnCenter(modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 10.dp )){
+                            ColumnCenter(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 10.dp )){
                                 SearchBar(onClick = {
                                     navController.navigateWithAnimation(Screen.SearchScreen.route)
                                 })
                                 FeatureIconsRow()
 
                                 Seprate( height = 10)
-                                CarouselExample()
+                                CarouselExample(rounded = 20)
                                 Seprate( height = 10)
 
                                 if( isFetched.value && homeState.data != null) {

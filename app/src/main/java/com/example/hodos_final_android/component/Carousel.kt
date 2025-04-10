@@ -45,7 +45,8 @@ fun ImageCarousel(
     showIndicator: Boolean = true,
     activeIndicatorColor: Color = Color(0xFF2196F3),
     inactiveIndicatorColor: Color = Color.LightGray,
-    contentDescription: String? = null
+    contentDescription: String? = null,
+    rounded: Int? = 20
 ) {
     if (lstImgUrl.isEmpty()) return
 
@@ -72,19 +73,21 @@ fun ImageCarousel(
             state = pagerState,
             modifier = Modifier.fillMaxWidth()
         ) { page ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                GlideImage(
-                    model = lstImgUrl[page],
-                    contentDescription = contentDescription ?: "Carousel image $page",
+            if (rounded != null) {
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp),
-                    contentScale = ContentScale.Crop
-                )
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(rounded.dp)
+                ) {
+                    GlideImage(
+                        model = lstImgUrl[page],
+                        contentDescription = contentDescription ?: "Carousel image $page",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
 
@@ -132,7 +135,8 @@ fun PagerState.scrollToPage(page: Int) {
 // Example usage
 @Composable
 fun CarouselExample(
-    height : Int? = 220
+    height : Int? = 220,
+    rounded: Int? = 20
 ) {
     val imageUrls = listOf(
         "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
@@ -144,6 +148,7 @@ fun CarouselExample(
 
     if (height != null) {
         ImageCarousel(
+            rounded = rounded,
             lstImgUrl = imageUrls,
             modifier = Modifier
                 .fillMaxWidth()

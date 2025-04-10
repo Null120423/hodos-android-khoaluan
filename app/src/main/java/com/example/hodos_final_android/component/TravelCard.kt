@@ -41,7 +41,7 @@ fun TravelCard(
            },
            shape = RoundedCornerShape(16.dp),
            modifier = Modifier
-               .width(screenWidth/2 - 20.dp)
+               .width(screenWidth/2 - 30.dp)
                .padding(0.dp)
                .clickable {
                },
@@ -52,7 +52,7 @@ fun TravelCard(
                        url = data.img,
                        modifier = Modifier
                            .fillMaxWidth()
-                           .height(200.dp)
+                           .height(180.dp)
                            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
                    )
 
