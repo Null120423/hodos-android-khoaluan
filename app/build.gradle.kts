@@ -20,17 +20,24 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+
     }
+
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -111,7 +118,8 @@ dependencies {
 
     implementation("com.google.maps.android:maps-compose:6.4.1")
 
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.6.1")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+
 
     implementation("androidx.media3:media3-exoplayer:1.3.1")
 

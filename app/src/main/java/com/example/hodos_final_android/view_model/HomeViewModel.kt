@@ -1,6 +1,7 @@
 package com.example.hodos_final_android.view_model
 
 import Resource
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hodos_final_android.model.Location
@@ -32,6 +33,7 @@ class HomeViewModel @Inject constructor(
                         ResponseDataState(data = result.data)
                     }
                     is Resource.Error -> {
+                        result.message?.let { Log.i("API", it) }
                         val error = result.message?.let { parseJsonError(it) }
                         ResponseDataState(error = error)
                     }

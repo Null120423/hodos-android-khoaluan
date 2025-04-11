@@ -181,6 +181,7 @@ class AuthViewModel @Inject constructor(
                     _userInfoSate.value = ResponseDataState(data = result.data)
                 }
                 is Resource.Error -> {
+                    result.message?.let { Log.i("API", it) }
                     val error = result.message?.let { parseJsonError(it) }
                     _userInfoSate.value = ResponseDataState(error = error)
                 }

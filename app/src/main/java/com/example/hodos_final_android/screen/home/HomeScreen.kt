@@ -2,6 +2,7 @@ package com.example.hodos_final_android.screen.home
 
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -138,6 +139,8 @@ fun HomeScreen(
             isFetched.value = true
         }
     }
+
+    Log.i("LOG", "accessToken")
 
     HodosTheme {
         Box(
