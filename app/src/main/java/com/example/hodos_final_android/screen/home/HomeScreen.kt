@@ -98,7 +98,6 @@ fun HomeScreen(
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val navController = LocalNavController.current
 
-    val isFetched = remember { mutableStateOf(true) }
 
     // Add pull-to-refresh state
     val refreshScope = rememberCoroutineScope()
@@ -108,7 +107,6 @@ fun HomeScreen(
             refreshing = true
             homeViewModel.fetchTop10Locations()
             delay(1500)
-            isFetched.value = true
             refreshing = false
         }
 
@@ -138,7 +136,6 @@ fun HomeScreen(
         if(homeState.data == null && homeState.isLoading)  {
             homeViewModel.fetchTop10Locations()
             delay(1500)
-            isFetched.value = true
         }
     }
 
@@ -218,7 +215,7 @@ fun HomeScreen(
                                 CarouselExample(rounded = 20)
                                 Seprate( height = 10)
 
-                                if( isFetched.value && homeState.data != null) {
+                                if(  homeState.data != null) {
                                     TravelCardGrid(locations = homeState.data!!)
                                 }
 
@@ -232,7 +229,7 @@ fun HomeScreen(
             }
 
             FloatingActionGroup()
-            LoadingDialog(isLoading = !isFetched.value or homeState.isLoading)
+            LoadingDialog(isLoading = homeState.isLoading)
 
         }
     }
