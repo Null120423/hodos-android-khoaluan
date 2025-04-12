@@ -80,7 +80,6 @@ import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnStart
 import com.example.hodos_final_android.model.LocationDetail
 import com.example.hodos_final_android.screen.main.planing.AsyncImage
-import com.example.hodos_final_android.view_model.LocationDetailViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +87,6 @@ import com.example.hodos_final_android.view_model.LocationDetailViewModel
 fun LocationDetailScreen(
     navController: NavController,
     locationId: String? = null,
-    viewModel: LocationDetailViewModel = hiltViewModel()
 ) {
     // In a real app, you would fetch the location details based on the locationId
     // For this example, we'll use a mock location

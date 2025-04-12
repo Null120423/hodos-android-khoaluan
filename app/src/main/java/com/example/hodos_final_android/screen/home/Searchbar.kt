@@ -26,7 +26,7 @@ import com.example.hodos_final_android.R
 
 @Composable
 fun SearchBar(
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         onClick = onClick,
@@ -46,7 +46,7 @@ fun SearchBar(
             Text(
                 text = "Search for location...",
                 color = Color.Gray,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
 
             IconButton(

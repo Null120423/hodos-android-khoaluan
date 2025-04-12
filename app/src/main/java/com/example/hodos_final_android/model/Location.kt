@@ -21,3 +21,18 @@ data class Location(
     val img: String,
     var value: Any? = null
 )
+
+data class PaginationLocation(
+    val name: String,
+    val type: String
+)
+
+data class PaginationLocationRes(
+    val data: List<Location>,
+    val total: Int,
+    val nextSkip: Int,
+    val hasNext: Boolean,
+    val take: Int
+)
+
+

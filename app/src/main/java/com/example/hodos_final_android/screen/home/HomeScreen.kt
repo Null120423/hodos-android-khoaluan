@@ -60,7 +60,7 @@ import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnCenter
 import com.example.hodos_final_android.component.FloatingActionGroup
 import com.example.hodos_final_android.component.InfoDialog
-import com.example.hodos_final_android.component.Loading
+import com.example.hodos_final_android.component.LoadingDialog
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.TravelCard
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
@@ -97,6 +97,7 @@ fun HomeScreen(
     val homeState by homeViewModel.homeState.collectAsState()
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val navController = LocalNavController.current
+
     val isFetched = remember { mutableStateOf(true) }
 
     // Add pull-to-refresh state
@@ -115,9 +116,10 @@ fun HomeScreen(
 
 
     LaunchedEffect(authState) {
+
         val accessToken = authState?.accessToken
 
-        if (accessToken == null) {
+        if (accessToken == null && homeState.isLoading) {
             val tokenManager = TokenManager.getInstance()
             val getUserInfoModel = tokenManager.getAccessToken()?.let {
                 GetUserInfoModel(
@@ -133,7 +135,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(homeState) {
-        if(homeState.data == null)  {
+        if(homeState.data == null && homeState.isLoading)  {
             homeViewModel.fetchTop10Locations()
             delay(1500)
             isFetched.value = true
@@ -220,20 +222,18 @@ fun HomeScreen(
                                     TravelCardGrid(locations = homeState.data!!)
                                 }
 
-                                if(!isFetched.value or homeState.isLoading) {
-                                    Loading()
-                                }
                             }
                         }
                     }
                 }
-
 
                 PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 
             }
 
             FloatingActionGroup()
+            LoadingDialog(isLoading = !isFetched.value or homeState.isLoading)
+
         }
     }
 }

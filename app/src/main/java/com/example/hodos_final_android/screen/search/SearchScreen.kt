@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,9 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,138 +46,160 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.component.CustomPullRefreshIndicator
+import com.example.hodos_final_android.helper.rememberDebouncedState
+import com.example.hodos_final_android.model.Location
+import com.example.hodos_final_android.model.Pagination
+import com.example.hodos_final_android.model.PaginationLocation
+import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.view_model.LocationViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-data class Hotel(
-    val id: String,
-    val name: String,
-    val location: String,
-    val price: String,
-    val rating: Float,
-    val reviews: String,
-    val imageUrl: String
-)
-
-
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchScreen() {
+fun SearchScreen(
+    viewModel: LocationViewModel = hiltViewModel()
+) {
+    val paginationState by viewModel.paginationState.collectAsState()
     val navController = LocalNavController.current
     var searchQuery by remember { mutableStateOf("") }
+    var isLoadingMore by remember { mutableStateOf(false) }
+    val isRefreshing = paginationState.isLoading && paginationState.data != null
+    // Debounce search query
+    val debouncedSearchQuery by rememberDebouncedState(searchQuery, debounceMillis = 500)
 
-    val hotels = remember {
-        listOf(
-            Hotel(
-                id = "1",
-                name = "Landmark Hotel",
-                location = "Victoria Island Lagos",
-                price = "50,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
-            ),
-            Hotel(
-                id = "2",
-                name = "Oriental Hotel",
-                location = "Victoria Island Lagos",
-                price = "60,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
-            ),
-            Hotel(
-                id = "3",
-                name = "Four Point Hotel",
-                location = "Victoria Island Lagos",
-                price = "50,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
-            ),
-            Hotel(
-                id = "4",
-                name = "Eko Hotel",
-                location = "Victoria Island Lagos",
-                price = "50,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
-            ),
-            Hotel(
-                id = "5",
-                name = "Eko Hotel",
-                location = "Victoria Island Lagos",
-                price = "50,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
-            ),
-            Hotel(
-                id = "7",
-                name = "Eko Hotel",
-                location = "Victoria Island Lagos",
-                price = "50,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
-            ),
-            Hotel(
-                id = "6",
-                name = "Eko Hotel",
-                location = "Victoria Island Lagos",
-                price = "50,000",
-                rating = 4.9f,
-                reviews = "3k",
-                imageUrl = "https://vielimousine.com/wp-content/uploads/2023/11/bai-sau-vung-tau.jpg"
+
+    val isFetched = remember { mutableStateOf(true) }
+
+    // Add pull-to-refresh state
+    val refreshScope = rememberCoroutineScope()
+    var refreshing by remember { mutableStateOf(false) }
+    fun refresh() =
+        refreshScope.launch {
+            refreshing = true
+            viewModel.pagination(
+                Pagination(
+                    skip = 0,
+                    take = 20,
+                    where = PaginationLocation(
+                        name = debouncedSearchQuery,
+                        type = ""
+                    )
+                )
+            )
+            delay(1500)
+            isFetched.value = true
+            refreshing = false
+        }
+
+    val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
+    // Call API on search query change
+    LaunchedEffect(debouncedSearchQuery) {
+        viewModel.pagination(
+            Pagination(
+                skip = 0,
+                take = 20,
+                where = PaginationLocation(
+                    name = debouncedSearchQuery,
+                    type = ""
+                )
             )
         )
     }
 
-    val filteredHotels = remember(searchQuery) {
-        if (searchQuery.isEmpty()) {
-            hotels
-        } else {
-            hotels.filter {
-                it.name.contains(searchQuery, ignoreCase = true) ||
-                        it.location.contains(searchQuery, ignoreCase = true)
-            }
-        }
-    }
+   Box{
+       Column(modifier = Modifier.fillMaxSize()) {
+           HotelSearchBar(
+               query = searchQuery,
+               onQueryChange = { query ->
+                   searchQuery = query
+               },
+               onBack = {
+                   navController.popBackStack()
+               }
+           )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F7FA))
-    ) {
-        // Search Bar
-        HotelSearchBar(
-            query = searchQuery,
-            onQueryChange = { searchQuery = it }
-        )
+           CustomPullRefreshIndicator(refreshing = refreshing)
 
-        // Hotel List
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(filteredHotels) { hotel ->
-                HotelItem(
-                    hotel = hotel,
-                    onClick = {
-                        // Navigate to hotel details
-                    }
-                )
-            }
-        }
-    }
+           when {
+               paginationState.isLoading && paginationState.data == null -> {
+                   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                       Text("Đang tải dữ liệu...")
+                   }
+               }
+
+               paginationState.error != null -> {
+                   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                       Text("Lỗi: ${paginationState.error?.message ?: "Không rõ lỗi"}")
+                   }
+               }
+
+               else -> {
+                   val locations = paginationState.data?.data ?: emptyList()
+
+                   LazyColumn(
+                       modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState),
+                       contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                       verticalArrangement = Arrangement.spacedBy(12.dp),
+
+                       ) {
+                       items(locations) { location ->
+                           LocationItem(data = location, onClick = {
+                               navController.navigateWithAnimation(Screen.LocationDetailScreen.route)
+                           })
+                       }
+
+                       if (paginationState.data?.hasNext == true) {
+                           item {
+                               Box(
+                                   modifier = Modifier
+                                       .fillMaxWidth()
+                                       .padding(16.dp),
+                                   contentAlignment = Alignment.Center
+                               ) {
+                                   Text("Đang tải thêm...")
+                               }
+
+                               // Trigger load more
+                               LaunchedEffect(Unit) {
+                                   if (!isLoadingMore) {
+                                       isLoadingMore = true
+                                       viewModel.pagination(
+                                           Pagination(
+                                               skip = paginationState.data?.nextSkip ?: 0,
+                                               take = paginationState.data?.take ?: 20,
+                                               where = PaginationLocation(
+                                                   name = debouncedSearchQuery,
+                                                   type = ""
+                                               )
+                                           )
+                                       )
+                                       isLoadingMore = false
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
+           }
+       }
+   }
+
+
 }
+
 
 @Composable
 fun HotelSearchBar(
     query: String,
-    onQueryChange: (String) -> Unit
+    onQueryChange: (String) -> Unit,
+    onBack: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -181,7 +208,7 @@ fun HotelSearchBar(
             .padding(16.dp)
     ) {
         Row {
-            IconButton(onClick = { /* Open filters */ }) {
+            IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBackIosNew,
                     contentDescription = "Filters",
@@ -225,10 +252,11 @@ fun HotelSearchBar(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
+
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun HotelItem(
-    hotel: Hotel,
+fun LocationItem(
+    data: Location,
     onClick: () -> Unit
 ) {
     Card(
@@ -237,7 +265,7 @@ fun HotelItem(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Color.Transparent
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 0.dp
@@ -251,8 +279,8 @@ fun HotelItem(
         ) {
             // Hotel Image
             GlideImage(
-                model = hotel.imageUrl,
-                contentDescription = hotel.name,
+                model = data.img,
+                contentDescription = data.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -268,11 +296,13 @@ fun HotelItem(
                     .padding(start = 12.dp)
                     .weight(1f)
             ) {
-                Text(
-                    text = hotel.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                data?.name?.let {
+                    Text(
+                        text = it,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -285,41 +315,17 @@ fun HotelItem(
                         modifier = Modifier.size(16.dp)
                     )
 
-                    Text(
-                        text = hotel.location,
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
+                    data?.address?.let {
+                        Text(
+                            text = it,
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
                 }
 
-                Text(
-                    text = "${hotel.price}/Night",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF0D6EFD)
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Rating",
-                        tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(16.dp)
-                    )
-
-                    Text(
-                        text = "${hotel.rating}/${hotel.reviews} reviews",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
             }
         }
     }
 }
-
