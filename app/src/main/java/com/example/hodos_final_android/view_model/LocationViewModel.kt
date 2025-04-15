@@ -1,8 +1,10 @@
 package com.example.hodos_final_android.view_model
 
 import Resource
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
 import com.example.hodos_final_android.model.PaginationLocationRes
@@ -24,6 +26,12 @@ class LocationViewModel @Inject constructor(
     private val _paginationState = MutableStateFlow(ResponseDataState<PaginationLocationRes>(isLoading = true))
     val paginationState: StateFlow<ResponseDataState<PaginationLocationRes>> = _paginationState
 
+    private val _locationFindByLabelState = MutableStateFlow(ResponseDataState<Location>(isLoading = true))
+    val locationFindByLabelState : StateFlow<ResponseDataState<Location>> = _locationFindByLabelState
+
+    private val _locationDetailState = MutableStateFlow(ResponseDataState<Location>(isLoading = true))
+    val locationDetailState : StateFlow<ResponseDataState<Location>> = _locationDetailState
+
     fun pagination(body: Pagination<PaginationLocation>) {
         repository.pagination(body)
             .onEach { result ->
@@ -42,6 +50,54 @@ class LocationViewModel @Inject constructor(
 
                     is Resource.Loading -> {
                         ResponseDataState(isLoading = true, data = _paginationState.value.data)
+                    }
+
+                    else -> ResponseDataState()
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun findByLabel(label: String) {
+        repository.findByLabel(label)
+            .onEach { result ->
+                _locationFindByLabelState.value = when (result) {
+                    is Resource.Success -> {
+                        ResponseDataState(data = result.data)
+                    }
+
+                    is Resource.Error -> {
+                        val error = result.message?.let { parseJsonError(it) }
+                        ResponseDataState(error = error)
+                    }
+
+                    is Resource.Loading -> {
+                        ResponseDataState(isLoading = true)
+                    }
+
+                    else -> ResponseDataState()
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun detail(id: String) {
+        repository.detail(id)
+            .onEach { result ->
+                _locationDetailState.value = when (result) {
+                    is Resource.Success -> {
+                        result.data?.let { Log.i("API", it.name) }
+                        ResponseDataState(data = result.data)
+                    }
+
+                    is Resource.Error -> {
+                        result.message?.let { Log.d("API_ERROR", it) }
+                        val error = result.message?.let { parseJsonError(it) }
+                        ResponseDataState(error = error)
+                    }
+
+                    is Resource.Loading -> {
+                        ResponseDataState(isLoading = true)
                     }
 
                     else -> ResponseDataState()

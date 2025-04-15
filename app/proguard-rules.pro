@@ -19,3 +19,27 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Retrofit
+-dontwarn okio.**
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+# Retrofit API interfaces
+-keep interface com.example.hodos_final_android.service.** { *; }
+
+# Gson
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapter
+-keep class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Hilt
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-dontwarn dagger.hilt.**
+-dontwarn javax.inject.**
+-keep class com.example.hodos_final_android.MyApplication { *; }

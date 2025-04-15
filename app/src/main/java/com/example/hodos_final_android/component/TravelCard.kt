@@ -37,7 +37,7 @@ fun TravelCard(
    HodosTheme {
        Card(
            onClick = {
-               navController.navigateWithAnimation(Screen.LocationDetailScreen.route)
+               navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(data.id))
            },
            shape = RoundedCornerShape(16.dp),
            modifier = Modifier

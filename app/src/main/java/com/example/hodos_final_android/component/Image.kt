@@ -23,7 +23,8 @@ fun ImgWithUrl(
     size: Int = 30,
     isAvatar: Boolean = false,
     modifier: Modifier = Modifier,
-    rounded: Int = 8
+    rounded: Int = 8,
+    contentScale : ContentScale = ContentScale.Crop
 ) {
     val roundedCus: Int = if (isAvatar) 10000 else rounded
     GlideImage(
@@ -34,8 +35,11 @@ fun ImgWithUrl(
             .height(size.dp)
             .width(size.dp)
             .clip(RoundedCornerShape(roundedCus.dp)),
-        contentScale = ContentScale.Crop
-    )
+        contentScale = contentScale
+    ) {
+        it.placeholder(android.R.drawable.ic_menu_gallery)
+            .error(android.R.drawable.ic_menu_report_image)
+    }
 }
 
 @Composable()

@@ -2,7 +2,6 @@ package com.example.hodos_final_android.screen.home
 
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -58,9 +57,8 @@ import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.AuthButtons
 import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnCenter
-import com.example.hodos_final_android.component.FloatingActionGroup
 import com.example.hodos_final_android.component.InfoDialog
-import com.example.hodos_final_android.component.LoadingDialog
+import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.TravelCard
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
@@ -93,7 +91,6 @@ fun HomeScreen(
     }
 
     val authState by userViewModel.authState.collectAsState()
-    val getUserInfoState by authViewModel.userInfoSate.collectAsState()
     val homeState by homeViewModel.homeState.collectAsState()
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val navController = LocalNavController.current
@@ -139,8 +136,6 @@ fun HomeScreen(
         }
     }
 
-    Log.i("LOG", "accessToken")
-
     HodosTheme {
         Box(
             modifier = Modifier
@@ -175,7 +170,7 @@ fun HomeScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    if (authState?.accessToken == null && !getUserInfoState.isLoading) {
+                    if (authState?.accessToken == null) {
                         stickyHeader {
                             Box(
                                 modifier = Modifier
@@ -212,11 +207,15 @@ fun HomeScreen(
                                 FeatureIconsRow()
 
                                 Seprate( height = 10)
-                                CarouselExample(rounded = 20)
+                                CarouselExample(rounded = 20, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
                                 Seprate( height = 10)
 
-                                if(  homeState.data != null) {
-                                    TravelCardGrid(locations = homeState.data!!)
+                                if(homeState.data != null) {
+                                    TravelCardGrid(locations = homeState.data!!.locationData.lst)
+                                }
+
+                                if(homeState.isLoading) {
+                                    Loading()
                                 }
 
                             }
@@ -226,10 +225,11 @@ fun HomeScreen(
 
                 PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 
+
+
             }
 
-            FloatingActionGroup()
-            LoadingDialog(isLoading = homeState.isLoading)
+//            FloatingActionGroup()
 
         }
     }
@@ -381,12 +381,14 @@ fun FeatureIconsRow() {
                 navController.navigateWithAnimation(Screen.PredictScreen.route)
             })
             FeatureItem(R.drawable.planning_fea, "Planning" , {
-                navController.navigateWithAnimation(Screen.Planning.route)
+                navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
             })
             FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
                 navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
             })
-            FeatureItem(R.drawable.more_feature, "More", {})
+            FeatureItem(R.drawable.more_feature, "More", {
+                navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
+            })
         }
     }
 }

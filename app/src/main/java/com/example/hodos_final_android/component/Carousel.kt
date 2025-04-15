@@ -131,24 +131,17 @@ fun PagerState.scrollToPage(page: Int) {
         }
     }
 }
-
-// Example usage
 @Composable
 fun CarouselExample(
-    height : Int? = 220,
-    rounded: Int? = 20
+    height: Int? = 220,
+    rounded: Int? = 20,
+    banners: List<String>? = null
 ) {
-    val imageUrls = listOf(
-        "https://images.unsplash.com/photo-1540390769625-2fc3f8b1d50c",
-        "https://images.unsplash.com/photo-1583417319070-4a69db38a482",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
-        "https://images.unsplash.com/photo-1548123378-bde4eca81d2d",
-        "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70"
-    )
+    val imageUrls = banners ?: emptyList()
 
     if (height != null) {
         ImageCarousel(
-            rounded = rounded,
+            rounded = rounded ?: 0,
             lstImgUrl = imageUrls,
             modifier = Modifier
                 .fillMaxWidth()

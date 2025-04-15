@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -41,11 +42,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.hodos_final_android.R
+import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.screen.BottomBar
 import com.example.hodos_final_android.theme.HodosTheme
 import kotlin.math.cos
@@ -100,21 +103,35 @@ fun CustomBottomNavigation(nav: NavController) {
                     painterResource(R.drawable.profile_svgrepo_com) to BottomBar.Profile.route
                 )
 
-                icons.forEach { (icon, route) ->
+                val titles = listOf(
+                    "Home", "Search", "Activity", "Profile"
+                )
+
+                icons.forEachIndexed { index, (icon, route) ->
                     val isActive = currentRoute == route
 
-                    IconButton(onClick = {
-                        nav.navigate(route)
-                    }) {
-                        Icon(
-                            painter = icon,
-                            contentDescription = null,
-                            tint = if (isActive) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(32.dp)
-                        )
+                    ColumnCenter(
+                        modifier = Modifier.width((getScreenWidth()/4-10).dp)
+                    ) {
+                        IconButton(onClick = {
+                            nav.navigate(route)
+                        }) {
+                            Icon(
+                                painter = icon,
+                                contentDescription = null,
+                                tint = if (isActive) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.tertiary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        if (isActive) {
+                            Txt(value = titles[index], fontWeight = FontWeight.Bold)
+                        }else {
+                            Txt(value = titles[index])
+                        }
                     }
                 }
+
 
             }
         }

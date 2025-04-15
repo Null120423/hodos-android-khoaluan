@@ -8,6 +8,7 @@ import com.example.hodos_final_android.model.PaginationLocationRes
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 
 interface LocationService {
@@ -16,5 +17,16 @@ interface LocationService {
 
     @POST("location/pagination")
     suspend fun pagination(@Body() pagination: Pagination<PaginationLocation>): PaginationLocationRes
+
+    @GET("location/find-by-label/{label}")
+    suspend fun findByLabel(
+        @Path("label") label: String,
+    ): Location
+
+    @GET("location/{id}")
+    suspend fun detail(
+        @Path("id") id: String,
+    ): Location
+
 }
 

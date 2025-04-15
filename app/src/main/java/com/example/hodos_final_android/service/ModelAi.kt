@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
 import com.example.hodos_final_android.mock.getLocationByLabel
-import com.example.hodos_final_android.model.Location
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -64,7 +63,7 @@ class AIModelHelper(private val context: Context) {
     }
 
 
-    fun classifyImage(image: Bitmap?): Location? {
+    fun classifyImage(image: Bitmap?): String? {
         if (image == null) {
             Toast.makeText(context, "Image is null", Toast.LENGTH_SHORT).show()
             return null
@@ -127,15 +126,12 @@ class AIModelHelper(private val context: Context) {
 
             Log.i("LABEL", label)
 
-
-            location?.let {
-                return location
-            } ?: run {
-
+            if(label == "Unknown") {
+                return null
             }
-        }
 
-        return null
+            return label
+        }
     }
 
     private fun preprocessImage(bitmap: Bitmap): ByteBuffer {

@@ -43,8 +43,8 @@ import com.example.hodos_final_android.component.TextInput
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.helper.getScreenWidth
-import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.model.LoginModel
+import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 
@@ -75,6 +75,8 @@ fun LoginScreen(
     LaunchedEffect(loginState.data) {
         loginState.data?.let {
             FancyToast.makeText(context, "Login successfully!", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
+            navController.clearBackStack<Boolean>(true)
+
             navController.navigateWithAnimation(Screen.Main.route)
         }
     }

@@ -44,8 +44,8 @@ import com.example.hodos_final_android.component.TextBtn
 import com.example.hodos_final_android.component.TextInput
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
-import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.model.RegisterModel
+import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 
@@ -74,6 +74,7 @@ fun RegisterScreen(
                 confirmPassword = confirmPassword
             )
             navController.navigateWithAnimation(Screen.EmailVerification.createRoute(registerModel))
+            viewModel.clear()
 
         }
     }

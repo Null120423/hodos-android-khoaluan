@@ -151,7 +151,7 @@ fun SearchScreen(
                        ) {
                        items(locations) { location ->
                            LocationItem(data = location, onClick = {
-                               navController.navigateWithAnimation(Screen.LocationDetailScreen.route)
+                               navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(location.id))
                            })
                        }
 

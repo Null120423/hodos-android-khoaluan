@@ -47,6 +47,15 @@ class AuthViewModel @Inject constructor(
     private val _userInfoSate = MutableStateFlow<ResponseDataState<AuthData>>(ResponseDataState(isLoading = true))
     val userInfoSate: StateFlow<ResponseDataState<AuthData>> = _userInfoSate
 
+
+    fun clear() {
+        _loginState.value = ResponseDataState()
+        _resendCodeState.value = ResponseState()
+        _verifyState.value = ResponseState()
+        _signUpState.value = ResponseState()
+    }
+
+
     fun signUp(email: String, password: String, username: String, confirmPassword: String) {
         val registerModel = RegisterModel(username, email, password, confirmPassword)
 

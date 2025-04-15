@@ -4,8 +4,8 @@ import Resource
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hodos_final_android.model.Location
-import com.example.hodos_final_android.repository.LocationRepository
+import com.example.hodos_final_android.model.DashboardModel
+import com.example.hodos_final_android.repository.CommonRepository
 import com.example.hodos_final_android.service.api.parseJsonError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -17,17 +17,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: LocationRepository
+    private val repository: CommonRepository
 ) : ViewModel() {
 
-    private val _homeState = MutableStateFlow(ResponseDataState<List<Location>>(isLoading = true))
-    val homeState: StateFlow<ResponseDataState<List<Location>>> = _homeState
+    private val _homeState = MutableStateFlow(ResponseDataState<DashboardModel>(isLoading = true))
+    val homeState: StateFlow<ResponseDataState<DashboardModel>> = _homeState
 
     fun fetchTop10Locations() {
-        repository.locationTop10()
+        repository.dashboard()
             .onEach { result ->
                 _homeState.value = when (result) {
-
                     is Resource.Success -> {
                         delay(1000)
                         ResponseDataState(data = result.data)

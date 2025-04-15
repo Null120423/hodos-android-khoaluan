@@ -18,14 +18,15 @@ import com.example.hodos_final_android.screen.home.BottomSheetContent
 
 @Composable
 fun MainLayout(
-    content: @Composable ColumnScope.() -> Unit,
-    backgroundImg: Int? = null,
-    isVisibleBottomSheet: MutableState<Boolean>? = null,
-    onCloseBottomSheet: ()-> Unit = {},
-    isBgBlur: Boolean? = false,
-    bottomSheetContent: @Composable (ColumnScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit, // Bắt buộc
     modifier: Modifier = Modifier.padding(20.dp),
-    isLoading : Boolean = false
+    backgroundImg: Int? = null,
+    isBgBlur: Boolean = false,
+    isLoading: Boolean = false,
+    isVisibleBottomSheet: MutableState<Boolean>? = null,
+    onCloseBottomSheet: () -> Unit = {},
+    bottomSheetContent: @Composable (ColumnScope.() -> Unit)? = null,
+            title: String? = null
 ) {
     Box {
         backgroundImg?.let { imgRes ->
@@ -36,30 +37,33 @@ fun MainLayout(
                 contentScale = ContentScale.Crop
             )
         }
-        if(isBgBlur == true) {
+
+        if (isBgBlur) {
             Box(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.scrim)
             )
         }
-        Header()
-        ColumnCenter(
-            modifier = modifier
-        ) {
+
+        Header(title = title)
+
+        // Main Content
+        ColumnCenter(modifier = modifier) {
             Seprate(height = 60)
             content()
         }
 
-        if (isVisibleBottomSheet != null) {
-            if (isVisibleBottomSheet.value) {
-                BottomSheetContent(
-                    onDismiss = onCloseBottomSheet,
-                    bottomSheetContent = bottomSheetContent
-                )
-            }
+        // Optional Bottom Sheet
+        if (isVisibleBottomSheet?.value == true) {
+            BottomSheetContent(
+                onDismiss = onCloseBottomSheet,
+                bottomSheetContent = bottomSheetContent
+            )
         }
 
-        LoadingDialog(
-            isLoading = isLoading
-        )
+        // Optional Loading Dialog
+        LoadingDialog(isLoading = isLoading)
     }
 }
+

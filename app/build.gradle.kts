@@ -153,6 +153,7 @@ dependencies {
     implementation("io.github.shashank02051997:FancyToast:2.0.2")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
 
 

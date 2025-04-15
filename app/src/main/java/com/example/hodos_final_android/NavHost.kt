@@ -28,6 +28,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.hodos_final_android.Screen.EmailVerification.route
 import com.example.hodos_final_android.component.LoadingDialog
 import com.example.hodos_final_android.screen.MainScreen
 import com.example.hodos_final_android.screen.auth.EmailVerificationScreen
@@ -45,10 +46,17 @@ import com.example.hodos_final_android.screen.main.planing.SuggestTripScreen
 import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.screen.start.CollectInformationScreen
 import com.example.hodos_final_android.model.RegisterModel
+import com.example.hodos_final_android.screen.ComingSoonScreen
+import com.example.hodos_final_android.screen.GalleryFullScreen
+import com.example.hodos_final_android.screen.home.PredictResultScreen
+import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.net.URLEncoder
 
 sealed class Screen(val route: String) {
+    object Main : Screen("Main")
     object Login : Screen("login")
     object Register : Screen("register")
     object EmailVerification : Screen("emailVerification/{registerModel}") {
@@ -58,7 +66,7 @@ sealed class Screen(val route: String) {
             return "emailVerification/$json"
         }
     }
-    object Main : Screen("home")
+    object Gallery : Screen("Gallery")
     object Planning : Screen("planning")
     object CollectInfo : Screen("collectInfo")
     object PlanningDetail : Screen("planningDetail")
@@ -70,7 +78,19 @@ sealed class Screen(val route: String) {
     object ChatAiRoom : Screen("ChatAiRoom")
     object SearchScreen : Screen("SearchScreen")
     object PredictScreen : Screen("PredictScreen")
-    object LocationDetailScreen : Screen("LocationDetailScreen")
+    object LocationDetailScreen : Screen("LocationDetailScreen/{locationId}") {
+        fun createRoute(id: String): String {
+            return "LocationDetailScreen/${URLEncoder.encode(id, "UTF-8")}"
+        }
+    }
+    object PredictResultScreen : Screen("predict_result_screen/{label}") {
+        fun createRoute(label: String): String {
+            return "predict_result_screen/${URLEncoder.encode(label, "UTF-8")}"
+        }
+    }
+    object ComingSoonScreen : Screen("ComingSoonScreen")
+    object Direction : Screen("Direction")
+
 }
 
 data class ScreenConfig(
@@ -139,7 +159,26 @@ fun AppNavHost(navController: NavHostController) {
                 locationId = locationId,
             )
         },
-        ScreenConfig(Screen.PredictScreen.route) { PredictScreen() },
+        ScreenConfig(Screen.PredictScreen.route) { PredictScreen(navController = navController) },
+        ScreenConfig(Screen.PredictResultScreen.route) { backStackEntry ->
+            val label = backStackEntry.arguments?.getString("label") ?: ""
+            Log.i("API", label)
+            PredictResultScreen(
+                navController = navController,
+                label = label
+            )
+        },
+        ScreenConfig(Screen.ComingSoonScreen.route) {
+            ComingSoonScreen() },
+        ScreenConfig(Screen.Gallery.route ) { backStackEntry ->
+            GalleryFullScreen()
+        }
+            ,
+        ScreenConfig(Screen.Direction.route ) { backStackEntry ->
+            DirectionScreen()
+        }
+
+
     )
 
     NavHost(navController = navController, startDestination = Screen.Main.route) {

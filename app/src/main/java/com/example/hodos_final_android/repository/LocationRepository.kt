@@ -18,8 +18,18 @@ class LocationRepository @Inject constructor(
     fun locationTop10(): Flow<Resource<List<Location>>> =
         safeApiCall { service.locationTop10() }
 
+    fun findByLabel(label: String) : Flow<Resource<Location>> =
+        safeApiCall {
+            service.findByLabel(label)
+        }
+
     fun pagination(body: Pagination<PaginationLocation>) : Flow<Resource<PaginationLocationRes>> =
         safeApiCall {
             service.pagination(body)
+        }
+
+    fun detail(id: String) : Flow<Resource<Location>> =
+        safeApiCall {
+            service.detail(id)
         }
 }

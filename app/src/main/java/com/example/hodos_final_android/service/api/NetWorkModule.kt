@@ -11,6 +11,7 @@ import android.util.Log
 import com.airbnb.lottie.BuildConfig
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.service.AuthService
+import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -137,7 +138,8 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.2:3000/") // Replace with your actual base URL
+            .baseUrl("https://hodos-api.genny.id.vn/")
+            //.baseUrl("http://192.168.1.2:3000/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -152,6 +154,11 @@ object NetworkModule {
     @Singleton
     fun provideLocationService(retrofit: Retrofit): LocationService {
         return retrofit.create(LocationService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideCommonService(retrofit: Retrofit): CommonService {
+        return retrofit.create(CommonService::class.java)
     }
 }
 
