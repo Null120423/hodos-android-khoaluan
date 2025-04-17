@@ -2,6 +2,7 @@ package com.example.hodos_final_android.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -27,10 +28,10 @@ fun MainScreen(viewModel: LoadingViewModel = viewModel()) {
     HodosTheme {
         Scaffold(
             bottomBar = { BottomBarComponent(navController) },
-            modifier = Modifier.background(Color.Green)
-        ) { paddingValues ->
+            modifier = Modifier.background(Color.Transparent).fillMaxSize()
+        ) { innerPadding ->
             ParentScreen {
-                Box(modifier = Modifier.padding(paddingValues)) {
+                Box(modifier = Modifier.padding()) {
                     NavigationGraph(navController)
                 }
             }
@@ -38,11 +39,12 @@ fun MainScreen(viewModel: LoadingViewModel = viewModel()) {
     }
 }
 
-sealed class BottomBar(val route: String) {
-    object Home : BottomBar("home")
-    object Activity : BottomBar("activity")
-    object Search : BottomBar("search")
-    object Profile : BottomBar("profile")
+sealed class BottomBarRoute(val route: String) {
+    object Home : BottomBarRoute("home")
+    object Activity : BottomBarRoute("activity")
+    object Trip : BottomBarRoute("trip")
+    object Event : BottomBarRoute("Event")
+    object Profile : BottomBarRoute("Profile")
 }
 
 
@@ -52,10 +54,11 @@ fun NavigationGraph(navController: NavHostController) {
         navController = navController,
         startDestination = "home"
     ) {
-        composable(BottomBar.Home.route) { HomeScreen() }
-        composable(BottomBar.Activity.route) { ComingSoonScreen() }
-        composable(BottomBar.Search.route) { ComingSoonScreen(
+        composable(BottomBarRoute.Home.route) { HomeScreen() }
+        composable(BottomBarRoute.Activity.route) { ComingSoonScreen() }
+        composable(BottomBarRoute.Trip.route) { ComingSoonScreen(
         ) }
-        composable(BottomBar.Profile.route) { ProfileScreen() }
+        composable(BottomBarRoute.Event.route) { ComingSoonScreen() }
+        composable(BottomBarRoute.Profile.route) { ProfileScreen() }
     }
 }

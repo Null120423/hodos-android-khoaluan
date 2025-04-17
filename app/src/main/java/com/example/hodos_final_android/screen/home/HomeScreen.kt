@@ -2,6 +2,7 @@ package com.example.hodos_final_android.screen.home
 
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,18 +10,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -44,30 +54,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
-import com.example.hodos_final_android.component.AuthButtons
 import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnCenter
-import com.example.hodos_final_android.component.InfoDialog
-import com.example.hodos_final_android.component.Loading
+import com.example.hodos_final_android.component.ImgWithUrl
+import com.example.hodos_final_android.component.RowBetween
 import com.example.hodos_final_android.component.Seprate
+import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.TravelCard
+import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.helper.getScreenHeight
+import com.example.hodos_final_android.helper.getScreenWidth
+import com.example.hodos_final_android.model.Category
 import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.Location
+import com.example.hodos_final_android.model.categories
 import com.example.hodos_final_android.navigateWithAnimation
-import com.example.hodos_final_android.theme.HodosTheme
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.example.hodos_final_android.view_model.HomeViewModel
 import dagger.hilt.android.EntryPointAccessors
@@ -92,7 +103,6 @@ fun HomeScreen(
 
     val authState by userViewModel.authState.collectAsState()
     val homeState by homeViewModel.homeState.collectAsState()
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val navController = LocalNavController.current
 
 
@@ -136,32 +146,11 @@ fun HomeScreen(
         }
     }
 
-    HodosTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(screenHeight)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.home_banner),
-                    contentDescription = "Home Banner",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.FillBounds
-                )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.3f))
-                )
-            }
-
-            // Add nestedScroll modifier for pull-to-refresh
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -170,226 +159,255 @@ fun HomeScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    if (authState?.accessToken == null) {
-                        stickyHeader {
-                            Box(
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .padding(20.dp)
-                            ) {
-                                AuthButtons(
-                                    onRegisterClick = {
-                                        navController.navigateWithAnimation(Screen.Register.route)
-                                    },
-                                    onSignInClick = {
-                                        navController.navigateWithAnimation(Screen.Login.route)
+                    stickyHeader {
+                        Box(modifier = Modifier
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(horizontal = 15.dp)
+                            .padding(WindowInsets.statusBars.asPaddingValues())){
+                            RowBetween{
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(36.dp)
+                                        .weight(0.8f)
+                                        .clickable {
+                                            navController.navigateWithAnimation(Screen.SearchScreen.route)
+                                        },
+                                    shape = RoundedCornerShape(100.dp),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                    colors = CardDefaults.outlinedCardColors(
+                                        containerColor = Color.Transparent,
+                                        contentColor = MaterialTheme.colorScheme.tertiary
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 12.dp), // Optional: inner spacing
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Search,
+                                            contentDescription = "Search",
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Text(
+                                            text = "Search",
+                                            maxLines = 1
+                                        )
                                     }
-                                )
+                                }
+
+
+
+                                IconButton(
+                                    modifier = Modifier.weight(0.1f),
+                                    onClick = { /* handle click */ }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Notifications,
+                                        contentDescription = "Notifications",
+                                        tint = MaterialTheme.colorScheme.tertiary
+                                    )
+                                }
+
+
                             }
                         }
                     }
-
                     item {
-                        Box(modifier = Modifier.padding(horizontal = 10.dp)){
-                            HeaderHomeWithoutSearch()
-                        }
+                        FeatureIconsRow()
                     }
 
                     item {
-                        Box(modifier = Modifier.background(
-                            color = MaterialTheme.colorScheme.secondary,
-                            shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-                        ).heightIn(min = getScreenHeight().dp)){
-                            ColumnCenter(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 10.dp )){
-                                SearchBar(onClick = {
-                                    navController.navigateWithAnimation(Screen.SearchScreen.route)
-                                })
-                                FeatureIconsRow()
-
-                                Seprate( height = 10)
-                                CarouselExample(rounded = 20, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
+                        Column(modifier = Modifier.heightIn(min = getScreenHeight().dp)
+                            .background(MaterialTheme.colorScheme.secondary)
+                            ,
+                        ){
+                            ColumnCenter(modifier = Modifier
+                                .padding(top = 0.dp, bottom = 10.dp )){
+                                CarouselExample(rounded = 0, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
                                 Seprate( height = 10)
 
                                 if(homeState.data != null) {
-                                    TravelCardGrid(locations = homeState.data!!.locationData.lst)
+                                    CategoriesView(categories)
+                                    LocationCardGrid(locations = homeState.data!!.locationData.lst)
+                                    FoodCardGrid(locations = homeState.data!!.foodData.lst)
                                 }
 
-                                if(homeState.isLoading) {
-                                    Loading()
-                                }
+                                Seprate(height = 100)
 
                             }
                         }
                     }
                 }
 
-                PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
-
-
-
+                PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter), backgroundColor = MaterialTheme.colorScheme.primary)
             }
 
-//            FloatingActionGroup()
-
-        }
     }
 }
 
 @Composable
-fun TravelCardGrid(
+fun LocationCardGrid(
     locations: List<Location>
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, start = 0.dp, end = 0.dp)
-
     ) {
-        for (i in locations.indices step 2) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                TravelCard(data = locations[i]) // Phần tử đầu tiên
+        Seprate(height = 10)
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Title(value = "Locations for you", size = 16, fontWeight = FontWeight.Bold)
+            Txt(value = "Watch more", size = 12)
+        }
 
-                if (i + 1 < locations.size) {
-                    TravelCard(data = locations[i + 1]) // Phần tử tiếp theo nếu tồn tại
-                } else {
-                    Spacer(modifier = Modifier.weight(1f)) // Giữ khoảng trống nếu số phần tử lẻ
-                }
+        Seprate(height = 10)
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(horizontal = 10.dp)
+        ) {
+            items(locations) { location ->
+                TravelCard(data = location)
             }
-
-            Spacer(modifier = Modifier.height(20.dp)) // Khoảng cách giữa các hàng
         }
     }
 }
 
 
-
-
 @Composable
-fun HeaderHomeWithoutSearch() {
-    val infoDialog = remember { mutableStateOf(false) }
-
+fun FoodCardGrid(
+    locations: List<Location>
+) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
     ) {
-        Spacer(modifier = Modifier.height(25.dp))
-        // Location & Notification
+        Seprate(height = 10)
         Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Title(value = "Foods for you", size = 16, fontWeight = FontWeight.Bold)
+            Txt(value = "Watch more", size = 12)
+        }
+
+        Seprate(height = 10)
+        LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(horizontal = 10.dp)
         ) {
-            LocationCard(onClick = {
-                infoDialog.value = true
-            } )
-            NotificationButton()
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-
-
-        // Main Text
-        Text(
-            text = "Explore the Beautiful Places",
-            color = Color.White,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.ExtraBold,
-            lineHeight = 40.sp,
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-
-    }
-
-    if (infoDialog.value) {
-        InfoDialog(
-            title = "Turn on Location Service",
-            desc = "Explore the world without getting lost and keep the track of your location.",
-            onDismiss = {
-                infoDialog.value = false
+            items(locations) { location ->
+                TravelCard(data = location)
             }
-        )
+        }
     }
 }
 
 @Composable
-fun LocationCard(onClick: () -> Unit) {
-    Card(
+fun CategoriesView(
+    categories: List<Category>
+) {
+    Column(
         modifier = Modifier
-            .clip(CircleShape)
-            .clickable { /* Handle location click */ },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = CircleShape,
-        onClick = onClick
+            .fillMaxWidth()
+    ) {
+        Seprate(height = 10)
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Title(value = "Categories", size = 16, fontWeight = FontWeight.Bold)
+            Txt(value = "Watch more", size = 12)
+        }
+
+        Seprate(height = 10)
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(horizontal = 10.dp)
+        ) {
+            items(categories) { cate ->
+                CategoryHomeItem(cate)
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryHomeItem(
+    categorie: Category,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .height(60.dp)
+            .widthIn(min = (getScreenWidth()/2 -20 ).dp)
+            .clip(RoundedCornerShape(1000.dp))
+            .clickable { /* TODO: handle click */ },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.background)
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = 10.dp).fillMaxWidth()
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.location_icon),
-                contentDescription = "Location",
-                modifier = Modifier.size(20.dp),
-                tint = Color.Unspecified
+            ImgWithUrl(
+                url = categorie.thumbnail,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
             )
-            Text(
-                text = "TP. Hồ Chí Minh",
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 4.dp)
+
+            Seprate(width = 30)
+
+            Txt(
+                value = categorie.title
             )
         }
     }
 }
 
-@Composable
-fun NotificationButton() {
-    IconButton(
-        onClick = { /* Handle notification click */ },
-        modifier = Modifier.size(52.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.bell_icon),
-            contentDescription = "Notifications",
-            modifier = Modifier.size(30.dp),
-            tint = Color.Unspecified
-        )
-    }
-}
+
+
+
 @Composable
 fun FeatureIconsRow() {
     val navController = LocalNavController.current
-
-
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
-        shape = RoundedCornerShape(1000.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 20.dp, horizontal = 15.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FeatureItem(R.drawable.classcifical_feature, "Classical", {
-                navController.navigateWithAnimation(Screen.PredictScreen.route)
-            })
-            FeatureItem(R.drawable.planning_fea, "Planning" , {
-                navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
-            })
-            FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
-                navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
-            })
-            FeatureItem(R.drawable.more_feature, "More", {
-                navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
-            })
-        }
+        FeatureItem(R.drawable.classcifical_feature, "Classical", {
+            navController.navigateWithAnimation(Screen.PredictScreen.route)
+        })
+        FeatureItem(R.drawable.planning_fea, "Planning" , {
+            navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
+        })
+        FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
+            navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
+        })
+        FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
+            navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
+        })
+        FeatureItem(R.drawable.more_feature, "More", {
+            navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
+        })
     }
 }
 

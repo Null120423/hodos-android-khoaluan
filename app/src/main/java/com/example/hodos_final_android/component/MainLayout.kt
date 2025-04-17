@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.hodos_final_android.screen.home.BottomSheetContent
+import com.example.hodos_final_android.screen.predict.BottomSheetContent
 
 
 @Composable
@@ -28,7 +28,9 @@ fun MainLayout(
     bottomSheetContent: @Composable (ColumnScope.() -> Unit)? = null,
             title: String? = null
 ) {
-    Box {
+    Box(
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    ) {
         backgroundImg?.let { imgRes ->
             Image(
                 painter = painterResource(id = imgRes),
@@ -46,11 +48,10 @@ fun MainLayout(
             )
         }
 
-        Header(title = title)
+
 
         // Main Content
         ColumnCenter(modifier = modifier) {
-            Seprate(height = 60)
             content()
         }
 
@@ -64,6 +65,8 @@ fun MainLayout(
 
         // Optional Loading Dialog
         LoadingDialog(isLoading = isLoading)
+
+        Header(title = title)
     }
 }
 

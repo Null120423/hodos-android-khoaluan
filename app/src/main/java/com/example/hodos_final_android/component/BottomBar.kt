@@ -1,22 +1,21 @@
 package com.example.hodos_final_android.component
 
 
+import android.view.animation.OvershootInterpolator
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,117 +25,126 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.hodos_final_android.R
-import com.example.hodos_final_android.helper.getScreenWidth
-import com.example.hodos_final_android.screen.BottomBar
+import com.example.hodos_final_android.component.BottomBar.BellColorButton
+import com.example.hodos_final_android.component.BottomBar.ButtonBackground
+import com.example.hodos_final_android.component.BottomBar.ColorButtonAnimation
+import com.example.hodos_final_android.screen.BottomBarRoute
 import com.example.hodos_final_android.theme.HodosTheme
+import com.exyte.animatednavbar.AnimatedNavigationBar
+import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
+import com.exyte.animatednavbar.animation.indendshape.Height
+import com.exyte.animatednavbar.animation.indendshape.shapeCornerRadius
+import com.exyte.animatednavbar.items.dropletbutton.DropletButton
 import kotlin.math.cos
 import kotlin.math.sin
 
 
+const val Duration = 500
+const val DoubleDuration = 1000
+
+@Stable
+data class Item(
+    @DrawableRes val icon: Int,
+    var isSelected: Boolean,
+    @StringRes val description: Int,
+    val animationType: ColorButtonAnimation = BellColorButton(
+        tween(500),
+        background = ButtonBackground(R.drawable.plus)
+    ),
+    val route: String
+)
+
+val dropletButtons = listOf(
+    Item(
+        icon = R.drawable.home,
+        isSelected = false,
+        description = R.string.Home,
+        route = BottomBarRoute.Home.route
+    ),
+    Item(
+        icon = R.drawable.trip,
+        isSelected = false,
+        description = R.string.Bell,
+        route = BottomBarRoute.Trip.route
+
+    ),
+    Item(
+        icon = R.drawable.activity,
+        isSelected = false,
+        description = R.string.Message,
+        route = BottomBarRoute.Activity.route
+
+    ),
+    Item(
+        icon = R.drawable.event,
+        isSelected = false,
+        description = R.string.Heart,
+        route = BottomBarRoute.Event.route
+
+    ),
+    Item(
+        icon = R.drawable.person,
+        isSelected = false,
+        description = R.string.Person,
+        route = BottomBarRoute.Profile.route
+
+    ),
+)
+
 @Composable
 fun BottomBarComponent(navController: NavController) {
-
-
-    NavComponent(
-        nav = navController,
-
-    )
-}
-
-
-@Composable
-fun NavComponent(
-    nav: NavController,
-
-) {
-    CustomBottomNavigation(nav)
-
-}
-
-
-@Composable
-fun CustomBottomNavigation(nav: NavController) {
-    val currentRoute = nav.currentBackStackEntryAsState().value?.destination?.route
-
-    HodosTheme {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(80.dp)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .fillMaxWidth()
-            ) {
-                val icons = listOf(
-                    painterResource(R.drawable.home_alt_svgrepo_com) to BottomBar.Home.route,
-                    painterResource(R.drawable.search_alt_svgrepo_com) to BottomBar.Search.route,
-                    painterResource(R.drawable.fellow_activity_21_svgrepo_com) to BottomBar.Activity.route,
-                    painterResource(R.drawable.profile_svgrepo_com) to BottomBar.Profile.route
+    var selectedItem by remember { mutableStateOf(0) }
+    AnimatedNavigationBar(
+        modifier = Modifier
+            .padding(horizontal = 0.dp, vertical = 0.dp)
+            .height(85.dp),
+        selectedIndex = selectedItem,
+        ballColor = Color.White,
+        cornerRadius = shapeCornerRadius(25.dp),
+        ballAnimation = Parabolic(tween(Duration, easing = LinearOutSlowInEasing)),
+        indentAnimation = Height(
+            indentWidth = 56.dp,
+            indentHeight = 15.dp,
+            animationSpec = tween(
+                DoubleDuration,
+                easing = { OvershootInterpolator().getInterpolation(it) })
+        )
+    ) {
+            dropletButtons.forEachIndexed { index, it ->
+                DropletButton(
+                    modifier = Modifier.fillMaxSize(),
+                    isSelected = selectedItem == index,
+                    onClick = {
+                        selectedItem = index
+                        navController.navigate(it.route)
+                    },
+                    icon = it.icon,
+                    dropletColor = MaterialTheme.colorScheme.primary,
+                    animationSpec = tween(durationMillis = Duration, easing = LinearEasing),
                 )
-
-                val titles = listOf(
-                    "Home", "Search", "Activity", "Profile"
-                )
-
-                icons.forEachIndexed { index, (icon, route) ->
-                    val isActive = currentRoute == route
-
-                    ColumnCenter(
-                        modifier = Modifier.width((getScreenWidth()/4-10).dp)
-                    ) {
-                        IconButton(onClick = {
-                            nav.navigate(route)
-                        }) {
-                            Icon(
-                                painter = icon,
-                                contentDescription = null,
-                                tint = if (isActive) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        if (isActive) {
-                            Txt(value = titles[index], fontWeight = FontWeight.Bold)
-                        }else {
-                            Txt(value = titles[index])
-                        }
-                    }
-                }
-
-
             }
-        }
     }
 }
+
 
 
 

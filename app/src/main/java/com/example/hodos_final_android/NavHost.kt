@@ -9,10 +9,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -28,13 +25,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.hodos_final_android.Screen.EmailVerification.route
 import com.example.hodos_final_android.component.LoadingDialog
 import com.example.hodos_final_android.screen.MainScreen
 import com.example.hodos_final_android.screen.auth.EmailVerificationScreen
 import com.example.hodos_final_android.screen.auth.LoginScreen
 import com.example.hodos_final_android.screen.auth.RegisterScreen
-import com.example.hodos_final_android.screen.home.PredictScreen
+import com.example.hodos_final_android.screen.predict.PredictScreen
 import com.example.hodos_final_android.screen.main.chat.ChatDashboard
 import com.example.hodos_final_android.screen.main.chat.ChatRoomScreen
 import com.example.hodos_final_android.screen.main.planing.CreatePlanning
@@ -48,11 +44,10 @@ import com.example.hodos_final_android.screen.start.CollectInformationScreen
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.screen.ComingSoonScreen
 import com.example.hodos_final_android.screen.GalleryFullScreen
-import com.example.hodos_final_android.screen.home.PredictResultScreen
+import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.net.URLEncoder
 
 sealed class Screen(val route: String) {

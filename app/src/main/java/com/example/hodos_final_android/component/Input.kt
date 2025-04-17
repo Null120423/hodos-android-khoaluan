@@ -1,5 +1,6 @@
 package com.example.hodos_final_android.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,12 +61,15 @@ fun PasswordInput(
             placeholder = { Text(placeholder) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(1000.dp)) // Apply rounding to the whole component
+                .background(MaterialTheme.colorScheme.secondary), // Set the background color
+            shape = RoundedCornerShape(1000.dp), // Ensure the border is rounded
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Color.LightGray,
-                focusedBorderColor = MaterialTheme.colorScheme.primary
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
             ),
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
@@ -73,6 +78,7 @@ fun PasswordInput(
                 }
             }
         )
+
     }
 }
 
@@ -102,14 +108,19 @@ fun TextInput(
             value = value,
             onValueChange = onChange,
             placeholder = { Text(placeholder) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(1000.dp))
+                .background(MaterialTheme.colorScheme.secondary)
+            , // Rounded corners
+            shape = RoundedCornerShape(1000.dp), // Specify shape for the border
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Color.LightGray,
                 focusedBorderColor = Color.Gray
             )
         )
+
     }
 }
 

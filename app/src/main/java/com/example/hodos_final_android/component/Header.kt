@@ -23,7 +23,7 @@ fun Header(
 ) {
     val navController = LocalNavController.current
 
-    RowBetween(modifier = Modifier.padding(top = 20.dp, bottom = 10.dp, end = 20.dp , start = 20.dp).background(
+    RowBetween(modifier = Modifier.padding(top = 50.dp, bottom = 10.dp, end = 20.dp , start = 20.dp).background(
         Color.Transparent
     )) {
         IconButton(

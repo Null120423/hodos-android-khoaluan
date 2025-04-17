@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.screen.home
+package com.example.hodos_final_android.screen.predict
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight

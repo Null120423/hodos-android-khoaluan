@@ -11,4 +11,10 @@
     <string name="search_for_location">Search for location</string>
     <string name="a_vietnamese_flag_waves_proudly_near_a_central_landmark_adding_cultural_identity_the_style_is_playful_clean">A Vietnamese flag waves proudly near a central landmark, adding cultural identity. The style is playful, clean,</string>
     <string name="explore_the_beautiful_place">EXPLORE THE BEAUTIFUL PLACE</string>
+
+    <string name="Home">Home</string>
+    <string name="Bell">Bell</string>
+    <string name="Message">Message</string>
+    <string name="Heart">Heart</string>
+    <string name="Person">Person</string>
 </resources>

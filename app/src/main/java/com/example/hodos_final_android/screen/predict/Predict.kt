@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.screen.home
+package com.example.hodos_final_android.screen.predict
 
 
 import android.Manifest
@@ -47,6 +47,7 @@ import com.example.hodos_final_android.helper.getScreenHeight
 import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.helper.toSdp
 import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.screen.home.AnalysisFeature
 import com.example.hodos_final_android.service.AIModelHelper
 import kotlinx.coroutines.delay
 

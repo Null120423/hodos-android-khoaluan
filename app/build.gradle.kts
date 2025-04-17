@@ -155,6 +155,8 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
+    implementation("com.exyte:animated-navigation-bar:1.0.0")
+
 
 
     implementation(libs.androidx.core.splashscreen)
