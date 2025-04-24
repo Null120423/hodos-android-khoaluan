@@ -1,6 +1,7 @@
 package com.example.hodos_final_android
 
 
+import GalleryFullScreen
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -43,10 +44,10 @@ import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.screen.start.CollectInformationScreen
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.screen.ComingSoonScreen
-import com.example.hodos_final_android.screen.GalleryFullScreen
 import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
+import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
 
@@ -85,7 +86,7 @@ sealed class Screen(val route: String) {
     }
     object ComingSoonScreen : Screen("ComingSoonScreen")
     object Direction : Screen("Direction")
-
+    object PostDetailScreen : Screen("PostDetailScreen")
 }
 
 data class ScreenConfig(
@@ -101,28 +102,28 @@ fun AppNavHost(navController: NavHostController) {
     val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition)? = {
         slideInHorizontally(
             initialOffsetX = { it }, // Move from right to left
-            animationSpec = tween(700)
+            animationSpec = tween(500)
         )
     }
 
     val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition)? = {
         slideOutHorizontally(
             targetOffsetX = { -it }, // Move from left to right
-            animationSpec = tween(700)
+            animationSpec = tween(500)
         )
     }
 
     val popEnterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition)? = {
         slideInHorizontally(
             initialOffsetX = { -it }, // Move from left to right on back navigation
-            animationSpec = tween(700)
+            animationSpec = tween(500)
         )
     }
 
     val popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition)? = {
         slideOutHorizontally(
             targetOffsetX = { it }, // Move from right to left on back navigation
-            animationSpec = tween(700)
+            animationSpec = tween(500)
         )
     }
 
@@ -168,9 +169,14 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.Gallery.route ) { backStackEntry ->
             GalleryFullScreen()
         }
+
             ,
         ScreenConfig(Screen.Direction.route ) { backStackEntry ->
             DirectionScreen()
+        },
+
+        ScreenConfig(Screen.PostDetailScreen.route ) { backStackEntry ->
+            PostDetailScreen()
         }
 
 

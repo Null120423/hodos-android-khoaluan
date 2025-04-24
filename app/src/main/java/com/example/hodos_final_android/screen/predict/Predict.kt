@@ -15,10 +15,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -29,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -199,8 +202,11 @@ fun PredictScreen(
         backgroundImg = R.drawable.predict_bg,
         isBgBlur = true,
         isVisibleBottomSheet = isShowBottomSheet,
+        onCloseBottomSheet = {
+            isShowBottomSheet.value = false
+        },
         bottomSheetContent = {
-           Box(modifier = Modifier.height(200.dp)){
+           Box(modifier = Modifier.height(200.dp).background(MaterialTheme.colorScheme.background)){
                     ColumnCenter(
                         modifier = Modifier.padding(20.dp)
                     ){
@@ -268,13 +274,22 @@ fun PredictScreen(
 fun BottomSheetContent(
     bottomSheetContent: @Composable (ColumnScope.() -> Unit)? = null,
     onDismiss : () ->  Unit
-
 ) {
     val modalBottomSheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
-        sheetState = modalBottomSheetState
+        sheetState = modalBottomSheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .height(4.dp)
+                    .width(36.dp)
+                    .background(Color.Gray, shape = MaterialTheme.shapes.medium)
+            )
+        }
     ) {
         if (bottomSheetContent != null) {
             bottomSheetContent()

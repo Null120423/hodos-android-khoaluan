@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.hodos_final_android.R
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -24,7 +25,7 @@ fun ImgWithUrl(
     isAvatar: Boolean = false,
     modifier: Modifier = Modifier,
     rounded: Int = 8,
-    contentScale : ContentScale = ContentScale.Crop
+    contentScale : ContentScale = ContentScale.Crop,
 ) {
     val roundedCus: Int = if (isAvatar) 10000 else rounded
     GlideImage(
@@ -35,10 +36,10 @@ fun ImgWithUrl(
             .height(size.dp)
             .width(size.dp)
             .clip(RoundedCornerShape(roundedCus.dp)),
-        contentScale = contentScale
+        contentScale = contentScale,
     ) {
-        it.placeholder(android.R.drawable.ic_menu_gallery)
-            .error(android.R.drawable.ic_menu_report_image)
+        it.placeholder(R.drawable.img_placeholder)
+            .error(R.drawable.img_placeholder)
     }
 }
 

@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,8 +28,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,29 +41,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
-import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.component.ImgWithUrl
+import com.example.hodos_final_android.component.Loading
+import com.example.hodos_final_android.component.Title
+import com.example.hodos_final_android.component.Txt
+import com.example.hodos_final_android.model.SuggestQuestion
+import com.example.hodos_final_android.view_model.ChatViewModel
 
 
 @Composable
-fun ChatDashboard() {
-    val navController = LocalNavController.current
+fun ChatDashboard(
+    chatViewModel: ChatViewModel = hiltViewModel()
+) {
+    val suggestQuestion by chatViewModel.suggestQuestionState.collectAsState()
+    var inputText by remember { mutableStateOf("") }
 
-    val travelOptions = List(9) { index ->
-        "Travel option ${index + 1}"
+    val navController = LocalNavController.current
+    fun onSendMessage(message: String) {
+        navController.currentBackStackEntry?.savedStateHandle?.set("message", message)
+        navController.navigate(Screen.ChatAiRoom.route)
     }
 
-    var inputText by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        chatViewModel.chatDashboard()
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
+            .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
         // Header
         ChatbotHeader()
@@ -74,12 +95,15 @@ fun ChatDashboard() {
                     .padding(16.dp)
             ) {
                 // Bot message
-                BotMessage(message = "Hôm nay bạn muốn đi đâu?")
+                BotMessage(message = "Question suggestion?")
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                if(suggestQuestion.isLoading) {
+                    Loading()
+                }
                 // Travel options grid
-                TravelOptionsGrid(options = travelOptions)
+                suggestQuestion.data?.let { TravelOptionsGrid(options = it) }
             }
         }
 
@@ -88,9 +112,8 @@ fun ChatDashboard() {
             value = inputText,
             onValueChange = { inputText = it },
             onSend = {
-                // Handle send action
                 inputText = ""
-                navController.navigateWithAnimation(Screen.ChatAiRoom.route)
+                onSendMessage(inputText)
             }
         )
     }
@@ -101,10 +124,9 @@ fun ChatbotHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Bot avatar
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -126,7 +148,7 @@ fun ChatbotHeader() {
         // Bot name and status
         Column {
             Text(
-                text = "TRIPBot",
+                text = "HodosLite",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -184,64 +206,68 @@ fun BotMessage(message: String) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Text(
-            text = message,
-            fontSize = 18.sp,
+        Title(
+            value = message,
+            size = 18,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF00BCD4),
-            modifier = Modifier.padding(8.dp)
         )
     }
 }
 
 @Composable
-fun TravelOptionsGrid(options: List<String>) {
+fun TravelOptionsGrid(options: List<SuggestQuestion>) {
     LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(options) { option ->
-            TravelOptionCard()
+            TravelOptionCard(option)
         }
     }
 }
 
 @Composable
-fun TravelOptionCard() {
+fun TravelOptionCard(options: SuggestQuestion) {
+    val navController = LocalNavController.current
+    fun onSendMessage(message: String) {
+        navController.currentBackStackEntry?.savedStateHandle?.set("message", message)
+        navController.navigate(Screen.ChatAiRoom.route)
+    }
     Card(
+        onClick = {
+            onSendMessage(options.message)
+        },
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4DD0E1)
+            containerColor = MaterialTheme.colorScheme.secondary
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "travel",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
+            ImgWithUrl(
+                url = options.img,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Bạn muốn đến đâu hôm nay?",
-                color = Color.White,
-                fontSize = 10.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 4.dp)
+            Txt(
+                value = options.message,
             )
         }
     }
 }
+

@@ -157,6 +157,7 @@ dependencies {
 
     implementation("com.exyte:animated-navigation-bar:1.0.0")
 
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.35.0-alpha")
 
 
     implementation(libs.androidx.core.splashscreen)

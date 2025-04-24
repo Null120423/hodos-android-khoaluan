@@ -65,8 +65,10 @@ import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnCenter
 import com.example.hodos_final_android.component.ImgWithUrl
+import com.example.hodos_final_android.component.PostItem
 import com.example.hodos_final_android.component.RowBetween
 import com.example.hodos_final_android.component.Seprate
+import com.example.hodos_final_android.component.SkeletonList
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.TravelCard
 import com.example.hodos_final_android.component.Txt
@@ -77,10 +79,15 @@ import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.model.Category
 import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.Location
+import com.example.hodos_final_android.model.Post
 import com.example.hodos_final_android.model.categories
+import com.example.hodos_final_android.model.posts
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.example.hodos_final_android.view_model.HomeViewModel
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -227,13 +234,34 @@ fun HomeScreen(
                         ){
                             ColumnCenter(modifier = Modifier
                                 .padding(top = 0.dp, bottom = 10.dp )){
-                                CarouselExample(rounded = 0, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
+
+                                // skeleton for home page
+                                if(homeState.isLoading ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(300.dp)
+                                            .placeholder(
+                                                visible = true,
+                                                highlight = PlaceholderHighlight.shimmer(),
+                                                color = Color.LightGray
+                                            )
+                                    )
+                                    Seprate( height = 10)
+                                    CategoriesView(categories)
+                                    SkeletonList(title = "Locations for you")
+                                    SkeletonList(title = "Foods for you")
+                                    SkeletonList(title = "Post helpful!")
+                                }
+
+                                CarouselExample(rounded = 0, height = 300, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
                                 Seprate( height = 10)
 
                                 if(homeState.data != null) {
                                     CategoriesView(categories)
                                     LocationCardGrid(locations = homeState.data!!.locationData.lst)
                                     FoodCardGrid(locations = homeState.data!!.foodData.lst)
+                                    PostList(posts = posts)
                                 }
 
                                 Seprate(height = 100)
@@ -243,7 +271,12 @@ fun HomeScreen(
                     }
                 }
 
-                PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter), backgroundColor = MaterialTheme.colorScheme.primary)
+                PullRefreshIndicator(refreshing,
+                    pullRefreshState,
+                    Modifier.align(Alignment.TopCenter),
+                    backgroundColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.primary
+                    )
             }
 
     }
@@ -282,6 +315,38 @@ fun LocationCardGrid(
 
 
 @Composable
+fun PostList(
+    posts: List<Post>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Seprate(height = 10)
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Title(value = "Post helpful!", size = 16, fontWeight = FontWeight.Bold)
+        }
+
+        Seprate(height = 10)
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(horizontal = 10.dp)
+        ) {
+            items(posts) { post ->
+                PostItem(data = post)
+            }
+        }
+    }
+}
+
+
+
+@Composable
 fun FoodCardGrid(
     locations: List<Location>
 ) {
@@ -311,6 +376,8 @@ fun FoodCardGrid(
         }
     }
 }
+
+
 
 @Composable
 fun CategoriesView(
@@ -345,13 +412,13 @@ fun CategoriesView(
 
 @Composable
 fun CategoryHomeItem(
-    categorie: Category,
+    category: Category,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .height(60.dp)
-            .widthIn(min = (getScreenWidth()/2 -20 ).dp)
+            .widthIn(min = (getScreenWidth()/2 -30 ).dp)
             .clip(RoundedCornerShape(1000.dp))
             .clickable { /* TODO: handle click */ },
         shape = RoundedCornerShape(16.dp),
@@ -364,17 +431,17 @@ fun CategoryHomeItem(
             modifier = Modifier.padding(end = 10.dp).fillMaxWidth()
         ) {
             ImgWithUrl(
-                url = categorie.thumbnail,
+                url = category.thumbnail,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
             )
 
-            Seprate(width = 30)
+            Seprate(width = 25)
 
             Txt(
-                value = categorie.title
+                value = category.title
             )
         }
     }
@@ -397,7 +464,7 @@ fun FeatureIconsRow() {
             navController.navigateWithAnimation(Screen.PredictScreen.route)
         })
         FeatureItem(R.drawable.planning_fea, "Planning" , {
-            navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
+            navController.navigateWithAnimation(Screen.Planning.route)
         })
         FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
             navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)

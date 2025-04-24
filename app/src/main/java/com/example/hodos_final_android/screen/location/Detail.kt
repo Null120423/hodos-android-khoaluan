@@ -2,7 +2,6 @@ package com.example.hodos_final_android.screen.location
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,8 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,18 +58,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.component.BtnPrimary
 import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnStart
 import com.example.hodos_final_android.component.Header
-import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.Loading
-import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.Title
+import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.LocationDetailModel
+import com.example.hodos_final_android.model.Route
+import com.example.hodos_final_android.model.exampleRouteData
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.LocationViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun LocationDetailScreen(
@@ -88,30 +98,25 @@ fun LocationDetailScreen(
         }
     }
 
-
     Box {
-        Column { if(locationDetailState.isLoading) {
-            Column {
-                Title(value = "Loading", fontWeight = FontWeight.Bold)
-                Seprate(height = 10)
-                Loading()
-            }
-        }
-        else if(locationDetailState.error !== null) {
+        if(locationDetailState.error !== null) {
             Column {
                 Title(value = locationDetailState.error!!.message, fontWeight = FontWeight.Bold)
             }
         }
 
-            if(locationDetailState.data != null) {
-                CoxsBazarBeachInfo(data = locationDetailState.data!!)
-            }
-
+        if(locationDetailState.data != null) {
+            CoxsBazarBeachInfo(data = locationDetailState.data!!)
         }
 
-        Header()
-
     }
+    if(locationDetailState.isLoading ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Loading()
+        }
+    }
+
+    Header()
 
 
 }
@@ -120,13 +125,35 @@ fun LocationDetailScreen(
 @Composable
 fun CoxsBazarBeachInfo(data: Location) {
     val scrollState = rememberScrollState()
+    val navController = LocalNavController.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        CarouselExample(rounded = 0, height = 300, banners = data.lstImgs.take(4))
+        Box{
+            CarouselExample(rounded = 0, height = 300, banners = data.lstImgs.take(4))
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BtnPrimary(
+                    onClick = {
+                        navController.currentBackStackEntry?.savedStateHandle?.set("images", data.lstImgs)
+                        navController.navigateWithAnimation(Screen.Gallery.route)
+                    },
+                    title = "Gallery",
+                    textColor = MaterialTheme.colorScheme.tertiary,
+                    backgroundColor = Color.White
+                )
+            }
+        }
         // Header section with beach name and location
         ColumnStart(modifier = Modifier.padding(10.dp)) {
             Text(
@@ -134,7 +161,6 @@ fun CoxsBazarBeachInfo(data: Location) {
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                color = MaterialTheme.colorScheme.primary
             )
 
             Row(
@@ -144,7 +170,6 @@ fun CoxsBazarBeachInfo(data: Location) {
                 Icon(
                     Icons.Filled.Place,
                     contentDescription = "Location",
-                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -246,23 +271,19 @@ fun OverviewContent(data: LocationDetailModel,description: String, imgs: List<St
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.titleMedium,
+                Txt(
+                    value = description,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = data.about,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                Txt(
+                    value = data.about,
                 )
             }
         }
@@ -367,18 +388,16 @@ fun ReviewsContent(data : LocationDetailModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(16.dp).fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = data.rating.toString(),
-                    style = MaterialTheme.typography.displayMedium,
+                Txt(
+                    value = data.rating.toString(),
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Row {
@@ -392,10 +411,8 @@ fun ReviewsContent(data : LocationDetailModel) {
                     }
                 }
 
-                Text(
-                    text = "Based on " + data.totalReview+ "reviews",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                Txt(
+                    value = "Based on " + data.totalReview+ "reviews",
                 )
             }
         }
@@ -403,9 +420,8 @@ fun ReviewsContent(data : LocationDetailModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Sample reviews
-        Text(
-            text = "Recent Reviews",
-            style = MaterialTheme.typography.titleLarge,
+        Txt(
+            value = "Recent Reviews",
             fontWeight = FontWeight.Bold
         )
 
@@ -424,8 +440,34 @@ fun ReviewsContent(data : LocationDetailModel) {
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationContent(data: LocationDetailModel, location: Location) {
+    val locationPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    LaunchedEffect(Unit) {
+        if (!locationPermissionState.status.isGranted) {
+            locationPermissionState.launchPermissionRequest()
+        }
+    }
+
+    val hasLocationPermission = locationPermissionState.status.isGranted
+
+    val gson = Gson()
+    val route: Route = gson.fromJson(exampleRouteData, Route::class.java)
+
+    val steps = route.routes.first().legs.first().steps
+    val polylinePoints = route.routes.first().overview_polyline.points
+    val startLocation = route.routes.first().legs.first().start_location
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(
+            LatLng(startLocation.lat, startLocation.lng),
+            14f
+        )
+    }
     Column {
         // Map preview (placeholder)
         Box(
@@ -435,29 +477,21 @@ fun LocationContent(data: LocationDetailModel, location: Location) {
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
-            // In a real app, you would use Google Maps or another map provider here
-//            Column(
-//                modifier = Modifier.fillMaxSize(),
-//                verticalArrangement = Arrangement.Center,
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Icon(
-//                    Icons.Filled.Map,
-//                    contentDescription = null,
-//                    modifier = Modifier.size(48.dp),
-//                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//                Text(
-//                    text = "Map View",
-//                    style = MaterialTheme.typography.titleMedium,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//                Text(
-//                    text = "21.5833°N 92.0167°E",
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//            }
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    isMyLocationEnabled = hasLocationPermission
+                )
+            ) {
+                Polyline(
+                    points = decodePolyline(polylinePoints),
+                    color = MaterialTheme.colorScheme.primary,
+                    width = 20f
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -527,17 +561,15 @@ fun WeatherContent(data: LocationDetailModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Current Weather",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                Txt(
+                    value = "Current Weather",
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -556,23 +588,19 @@ fun WeatherContent(data: LocationDetailModel) {
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Column {
-                        Text(
-                            text = data.weather.current.wind,
-                            style = MaterialTheme.typography.headlineLarge,
+                        Txt(
+                            value = data.weather.current.wind,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = data.weather.current.condition,
-                            style = MaterialTheme.typography.bodyLarge
+                        Txt(
+                            value = data.weather.current.condition,
                         )
-                        Text(
-                            text = data.weather.current.uvIndex,
-                            style = MaterialTheme.typography.bodyMedium,
+                        Txt(
+                            value = data.weather.current.uvIndex,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Text(
-                            text = data.weather.current.humidity,
-                            style = MaterialTheme.typography.bodyMedium,
+                        Txt(
+                            value = data.weather.current.humidity,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -585,9 +613,8 @@ fun WeatherContent(data: LocationDetailModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Weather forecast
-        Text(
-            text = "5-Day Forecast",
-            style = MaterialTheme.typography.titleLarge,
+        Title(
+            value = "5-Day Forecast",
             fontWeight = FontWeight.Bold
         )
 
@@ -604,29 +631,12 @@ fun WeatherContent(data: LocationDetailModel) {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Best time to visit
-        Text(
-            text = "Best Time to Visit",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        Text(
-//            text = "The best time to visit Cox's Bazar is from November to March when the weather is dry and pleasant. The temperature ranges from 15°C to 32°C during this period, making it ideal for beach activities and sightseeing.",
-//            style = MaterialTheme.typography.bodyMedium,
-//            color = MaterialTheme.colorScheme.onSurface
-//        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Seasonal information
-        Text(
-            text = "Seasonal Information",
-            style = MaterialTheme.typography.titleLarge,
+        Title(
+            value = "Seasonal Information",
             fontWeight = FontWeight.Bold
         )
 
@@ -718,7 +728,6 @@ fun InfoSection(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -857,14 +866,12 @@ fun NearbyAttraction(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.titleMedium,
+                Txt(
+                    value = name,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium,
+                Txt(
+                    value = description,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -876,33 +883,13 @@ fun NearbyAttraction(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             ) {
-             Text(text = distance)
+             Txt(value = distance)
+
            }
         }
     }
 }
 
-@Composable
-fun WeatherDetail(
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier.padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "$label: ",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
 
 @Composable
 fun ForecastDay(
@@ -920,9 +907,8 @@ fun ForecastDay(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp).widthIn(min = 300.dp)
         ) {
-            Text(
-                text = day,
-                style = MaterialTheme.typography.titleSmall,
+            Txt(
+                value = day,
                 fontWeight = FontWeight.Bold
             )
 
@@ -931,15 +917,13 @@ fun ForecastDay(
             Title(value = icon)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = high,
-                style = MaterialTheme.typography.bodyMedium,
+            Txt(
+                value = high,
                 fontWeight = FontWeight.Bold
             )
 
-            Text(
-                text = low,
-                style = MaterialTheme.typography.bodySmall,
+            Txt(
+                value = low,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -957,22 +941,18 @@ fun SeasonInfo(
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = season,
-                style = MaterialTheme.typography.titleMedium,
+            Txt(
+                value = season,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+            Txt(
+                value = description,
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -981,48 +961,16 @@ fun SeasonInfo(
                 Icon(
                     Icons.Filled.Recommend,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(16.dp)
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))
 
-                Text(
-                    text = recommendation,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontStyle = FontStyle.Italic,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                Txt(
+                    value = recommendation,
                 )
             }
         }
-    }
-}
-
-@Composable
-fun ProfileImage(url: String) {
-    Box(
-        modifier = Modifier
-            .size(32.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .border(1.dp, MaterialTheme.colorScheme.background, CircleShape)
-    ) {
-        ImgWithUrl(
-            url = url,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-fun GalleryImage(url: String, modifier: Modifier = Modifier) {
-    Box(modifier = modifier) {
-        ImgWithUrl(
-            url = url,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
     }
 }
 

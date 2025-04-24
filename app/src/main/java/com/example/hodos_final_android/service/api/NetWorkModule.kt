@@ -11,6 +11,7 @@ import android.util.Log
 import com.airbnb.lottie.BuildConfig
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.service.AuthService
+import com.example.hodos_final_android.service.ChatBotService
 import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
 import com.google.gson.Gson
@@ -159,6 +160,12 @@ object NetworkModule {
     @Singleton
     fun provideCommonService(retrofit: Retrofit): CommonService {
         return retrofit.create(CommonService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatBotService(retrofit: Retrofit): ChatBotService {
+        return retrofit.create(ChatBotService::class.java)
     }
 }
 

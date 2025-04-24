@@ -43,7 +43,7 @@ fun TravelCard(
            },
            shape = RoundedCornerShape(16.dp),
            modifier = Modifier
-               .width(screenWidth/2 - 20.dp)
+               .width(screenWidth/2)
                .padding(0.dp)
                .clickable {
                },

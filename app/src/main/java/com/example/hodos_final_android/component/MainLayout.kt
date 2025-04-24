@@ -26,7 +26,8 @@ fun MainLayout(
     isVisibleBottomSheet: MutableState<Boolean>? = null,
     onCloseBottomSheet: () -> Unit = {},
     bottomSheetContent: @Composable (ColumnScope.() -> Unit)? = null,
-            title: String? = null
+            title: String? = null,
+    header: Boolean? = true
 ) {
     Box(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -66,7 +67,9 @@ fun MainLayout(
         // Optional Loading Dialog
         LoadingDialog(isLoading = isLoading)
 
-        Header(title = title)
+        if(header == true) {
+            Header(title = title)
+        }
     }
 }
 

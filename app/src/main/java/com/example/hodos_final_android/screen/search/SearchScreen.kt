@@ -2,15 +2,16 @@ package com.example.hodos_final_android.screen.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +53,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.CustomPullRefreshIndicator
+import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.helper.rememberDebouncedState
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.Pagination
@@ -113,90 +115,91 @@ fun SearchScreen(
         )
     }
 
-   Box{
-       Column(modifier = Modifier.fillMaxSize()) {
-           HotelSearchBar(
-               query = searchQuery,
-               onQueryChange = { query ->
-                   searchQuery = query
-               },
-               onBack = {
-                   navController.popBackStack()
-               }
-           )
+    Box{
+        Column(modifier = Modifier.fillMaxSize().padding(WindowInsets.statusBars.asPaddingValues()).background(MaterialTheme.colorScheme.secondary)) {
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { query ->
+                    searchQuery = query
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
 
-           CustomPullRefreshIndicator(refreshing = refreshing)
+            CustomPullRefreshIndicator(refreshing = refreshing)
 
-           when {
-               paginationState.isLoading && paginationState.data == null -> {
-                   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                       Text("Đang tải dữ liệu...")
-                   }
-               }
+            when {
+                paginationState.error != null -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Lỗi: ${paginationState.error?.message ?: "Không rõ lỗi"}")
+                    }
+                }
 
-               paginationState.error != null -> {
-                   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                       Text("Lỗi: ${paginationState.error?.message ?: "Không rõ lỗi"}")
-                   }
-               }
+                else -> {
+                    val locations = paginationState.data?.data ?: emptyList()
 
-               else -> {
-                   val locations = paginationState.data?.data ?: emptyList()
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState),
+                        ) {
+                        items(locations) { location ->
+                            LocationItem(data = location, onClick = {
+                                navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(location.id))
+                            })
+                        }
 
-                   LazyColumn(
-                       modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState),
-                       contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                       verticalArrangement = Arrangement.spacedBy(12.dp),
+                        if (paginationState.data?.hasNext == true) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Đang tải thêm...")
+                                }
 
-                       ) {
-                       items(locations) { location ->
-                           LocationItem(data = location, onClick = {
-                               navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(location.id))
-                           })
-                       }
+                                // Trigger load more
+                                LaunchedEffect(Unit) {
+                                    if (!isLoadingMore) {
+                                        isLoadingMore = true
+                                        viewModel.pagination(
+                                            Pagination(
+                                                skip = paginationState.data?.nextSkip ?: 0,
+                                                take = paginationState.data?.take ?: 20,
+                                                where = PaginationLocation(
+                                                    name = debouncedSearchQuery,
+                                                    type = ""
+                                                )
+                                            )
+                                        )
+                                        isLoadingMore = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
-                       if (paginationState.data?.hasNext == true) {
-                           item {
-                               Box(
-                                   modifier = Modifier
-                                       .fillMaxWidth()
-                                       .padding(16.dp),
-                                   contentAlignment = Alignment.Center
-                               ) {
-                                   Text("Đang tải thêm...")
-                               }
 
-                               // Trigger load more
-                               LaunchedEffect(Unit) {
-                                   if (!isLoadingMore) {
-                                       isLoadingMore = true
-                                       viewModel.pagination(
-                                           Pagination(
-                                               skip = paginationState.data?.nextSkip ?: 0,
-                                               take = paginationState.data?.take ?: 20,
-                                               where = PaginationLocation(
-                                                   name = debouncedSearchQuery,
-                                                   type = ""
-                                               )
-                                           )
-                                       )
-                                       isLoadingMore = false
-                                   }
-                               }
-                           }
-                       }
-                   }
-               }
-           }
-       }
-   }
+            }
+
+
+        }
+
+        if(paginationState.isLoading ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Loading()
+            }
+        }
+    }
 
 
 }
 
 
 @Composable
-fun HotelSearchBar(
+fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     onBack: () -> Unit
@@ -231,7 +234,7 @@ fun HotelSearchBar(
                         Icon(
                             painter = painterResource(id = android.R.drawable.ic_menu_sort_by_size),
                             contentDescription = "Filters",
-                            tint = Color(0xFF0D6EFD)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -263,9 +266,9 @@ fun LocationItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = MaterialTheme.colorScheme.background
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 0.dp
