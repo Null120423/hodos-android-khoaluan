@@ -9,15 +9,15 @@ import com.example.hodos_final_android.model.ChatWithBotBody
 import com.example.hodos_final_android.model.SuggestQuestion
 import com.example.hodos_final_android.repository.ChatBotRepository
 import com.example.hodos_final_android.service.api.parseJsonError
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@HiltViewModel
+@Singleton
 class ChatViewModel @Inject constructor(
     private val repository: ChatBotRepository
 ) : ViewModel() {

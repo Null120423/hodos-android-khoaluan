@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +37,8 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarView(
-    selectedDate: LocalDate?,
+    startDate: LocalDate?,
+    endDate: LocalDate?,
     onDateSelected: (LocalDate) -> Unit
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
@@ -56,10 +56,8 @@ fun CalendarView(
                 Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous month")
             }
 
-            Text(
-                currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()) +
-                        " " + currentMonth.year,
-                style = MaterialTheme.typography.titleMedium
+            Txt(
+                "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${currentMonth.year}",
             )
 
             IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
@@ -67,23 +65,23 @@ fun CalendarView(
             }
         }
 
-        // Weekday headers
+        // Week headers
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            val daysOfWeek = listOf("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
-            daysOfWeek.forEach { day ->
-                Text(
-                    text = day,
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
+            listOf("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa").forEach { day ->
+                Box(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Txt(
+                        value = day,
+                    )
+                }
             }
         }
 
-        // Calendar grid
+        // Days grid
         val firstDayOfMonth = currentMonth.atDay(1)
         val daysInMonth = currentMonth.lengthOfMonth()
         val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
@@ -92,31 +90,37 @@ fun CalendarView(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Empty cells for days before the first day of the month
             items(firstDayOfWeek) {
                 Box(modifier = Modifier.padding(8.dp))
             }
 
-            // Days of the month
-            items(daysInMonth) { day ->
-                val date = currentMonth.atDay(day + 1)
-                val isSelected = date == selectedDate
+            items(daysInMonth) { index ->
+                val day = index + 1
+                val date = currentMonth.atDay(day)
+                val isSelected = date == startDate || date == endDate
+                val isInRange = startDate != null && endDate != null && date > startDate && date < endDate
 
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
                         .aspectRatio(1f)
                         .background(
-                            if (isSelected) Color(0xFF2196F3) else Color.Transparent,
+                            when {
+                                isSelected -> MaterialTheme.colorScheme.primary
+                                isInRange -> MaterialTheme.colorScheme.secondary
+                                else -> Color.Transparent
+                            },
                             shape = MaterialTheme.shapes.small
                         )
                         .clickable { onDateSelected(date) },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = (day + 1).toString(),
-                        color = if (isSelected) Color.White else Color.Black,
-                        style = MaterialTheme.typography.bodyMedium,
+                    Txt(
+                        value = day.toString(),
+                        color = when {
+                            isSelected -> MaterialTheme.colorScheme.background
+                            else -> MaterialTheme.colorScheme.tertiary
+                        },
                         textAlign = TextAlign.Center
                     )
                 }
@@ -124,4 +128,3 @@ fun CalendarView(
         }
     }
 }
-

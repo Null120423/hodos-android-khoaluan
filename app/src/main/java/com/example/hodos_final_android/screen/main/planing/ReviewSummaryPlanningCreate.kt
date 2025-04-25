@@ -247,8 +247,8 @@ fun ReviewSummaryCreatePlanningScreen(
 
                         }
                         "DATE" -> {
-                            // Display date picker
-                            DateSelectionQuestion()
+//                            // Display date picker
+//                            DateSelectionQuestion()
                             // Add your date picker UI here
                         }
                         "MULTI" -> {

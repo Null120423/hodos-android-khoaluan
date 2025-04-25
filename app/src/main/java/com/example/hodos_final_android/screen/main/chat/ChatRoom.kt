@@ -52,12 +52,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.component.AnimateImg
@@ -65,9 +65,10 @@ import com.example.hodos_final_android.component.IconBtn
 import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.RowBetween
 import com.example.hodos_final_android.component.Txt
+import com.example.hodos_final_android.di.ChatViewModelEntryPoint
 import com.example.hodos_final_android.model.ChatWithBotBody
 import com.example.hodos_final_android.model.Recommendation
-import com.example.hodos_final_android.view_model.ChatViewModel
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
 data class ChatMessage(
@@ -79,8 +80,13 @@ data class ChatMessage(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatRoomScreen(
-    chatViewModel: ChatViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val chatViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, ChatViewModelEntryPoint::class.java)
+            .chatViewModel()
+    }
     val chatState by chatViewModel.chatState.collectAsState()
     val focusManager = LocalFocusManager.current
     val navController = LocalNavController.current
@@ -94,8 +100,8 @@ fun ChatRoomScreen(
     val messages = remember {
         mutableStateListOf(
             ChatMessage(
-                message = "Hello Nice",
-                isFromUser = false,
+                message = message,
+                isFromUser = true,
             )
         )
     }

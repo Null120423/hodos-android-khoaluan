@@ -14,6 +14,7 @@ import com.example.hodos_final_android.service.AuthService
 import com.example.hodos_final_android.service.ChatBotService
 import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
+import com.example.hodos_final_android.service.PlanTripService
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import dagger.Module
@@ -167,9 +168,13 @@ object NetworkModule {
     fun provideChatBotService(retrofit: Retrofit): ChatBotService {
         return retrofit.create(ChatBotService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun providePlanTripService(retrofit: Retrofit): PlanTripService {
+        return retrofit.create(PlanTripService::class.java)
+    }
 }
-
-
 
 data class ErrorRes(
     val message: String,
@@ -187,7 +192,6 @@ fun parseJsonError(errorString: String): ErrorRes? {
     }
 
 }
-
 
 inline fun <T> safeApiCall(
     crossinline apiCall: suspend () -> T
