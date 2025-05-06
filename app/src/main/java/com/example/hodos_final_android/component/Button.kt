@@ -118,7 +118,7 @@ fun BtnPrimary(
     size : Int = 16,
     fontWeight: FontWeight = FontWeight.Medium,
     minWidth : Int =  100,
-    disabled : Boolean = false
+    disabled : Boolean = false,
 ) {
     Button(
         onClick = onClick,

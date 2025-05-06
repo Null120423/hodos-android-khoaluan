@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
+import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.AnimateImg
 import com.example.hodos_final_android.component.IconBtn
 import com.example.hodos_final_android.component.ImgWithUrl
@@ -68,6 +69,7 @@ import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.ChatViewModelEntryPoint
 import com.example.hodos_final_android.model.ChatWithBotBody
 import com.example.hodos_final_android.model.Recommendation
+import com.example.hodos_final_android.navigateWithAnimation
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
@@ -312,7 +314,11 @@ fun ChatMessageItem(message: ChatMessage) {
 @Composable
 fun RecommendationCard(recommendation: Recommendation) {
     Log.i("API", recommendation.reason)
+    val navController = LocalNavController.current
     Card(
+        onClick = {
+            navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(recommendation.id))
+        },
         modifier = Modifier
             .width(180.dp)
             .height(200.dp),

@@ -54,6 +54,7 @@ import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.ChatViewModelEntryPoint
 import com.example.hodos_final_android.model.SuggestQuestion
+import com.example.hodos_final_android.navigateWithAnimation
 import dagger.hilt.android.EntryPointAccessors
 
 
@@ -128,6 +129,7 @@ fun ChatDashboard(
 
 @Composable
 fun ChatbotHeader() {
+    val navController = LocalNavController.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,7 +186,7 @@ fun ChatbotHeader() {
 
         // Chat button
         Button(
-            onClick = { /* Open chat */ },
+            onClick = { navController.navigateWithAnimation(Screen.ChatAiRoom.route) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFE0E0E0),
                 contentColor = Color(0xFF2196F3)

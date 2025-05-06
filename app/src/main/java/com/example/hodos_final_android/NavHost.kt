@@ -47,6 +47,7 @@ import com.example.hodos_final_android.screen.ComingSoonScreen
 import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
+import com.example.hodos_final_android.screen.location.TourScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
@@ -87,6 +88,7 @@ sealed class Screen(val route: String) {
     object ComingSoonScreen : Screen("ComingSoonScreen")
     object Direction : Screen("Direction")
     object PostDetailScreen : Screen("PostDetailScreen")
+    object TourScreen : Screen("TourScreen")
 }
 
 data class ScreenConfig(
@@ -177,8 +179,11 @@ fun AppNavHost(navController: NavHostController) {
 
         ScreenConfig(Screen.PostDetailScreen.route ) { backStackEntry ->
             PostDetailScreen()
-        }
+        },
 
+        ScreenConfig(Screen.TourScreen.route ) { backStackEntry ->
+            TourScreen()
+        }
 
     )
 

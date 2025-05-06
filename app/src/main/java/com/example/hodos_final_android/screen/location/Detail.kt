@@ -57,11 +57,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.BtnPrimary
 import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnStart
 import com.example.hodos_final_android.component.Header
+import com.example.hodos_final_android.component.IconBtn
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
@@ -140,8 +142,8 @@ fun CoxsBazarBeachInfo(data: Location) {
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(20.dp), // Cách đều 20dp
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 BtnPrimary(
                     onClick = {
@@ -152,7 +154,15 @@ fun CoxsBazarBeachInfo(data: Location) {
                     textColor = MaterialTheme.colorScheme.tertiary,
                     backgroundColor = Color.White
                 )
+
+                IconBtn(
+                    icon = R.drawable.ar,
+                    onClick = {
+                        navController.navigateWithAnimation(Screen.TourScreen.route)
+                    }
+                )
             }
+
         }
         // Header section with beach name and location
         ColumnStart(modifier = Modifier.padding(10.dp)) {

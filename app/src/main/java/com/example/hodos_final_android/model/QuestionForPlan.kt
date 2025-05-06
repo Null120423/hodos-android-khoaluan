@@ -6,7 +6,7 @@ data class OptionForPlan(
     val label: String,
     val desc: String,
     val icon: String,
-    val value: String
+    var value: String
 )
 
 data class PlanTripQuestionResponse(
