@@ -129,146 +129,153 @@ fun CoxsBazarBeachInfo(data: Location) {
     val scrollState = rememberScrollState()
     val navController = LocalNavController.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Box{
-            CarouselExample(rounded = 0, height = 300, banners = data.lstImgs.take(4))
 
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp), // Cách đều 20dp
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                BtnPrimary(
-                    onClick = {
-                        navController.currentBackStackEntry?.savedStateHandle?.set("images", data.lstImgs)
-                        navController.navigateWithAnimation(Screen.Gallery.route)
-                    },
-                    title = "Gallery",
-                    textColor = MaterialTheme.colorScheme.tertiary,
-                    backgroundColor = Color.White
-                )
 
-                IconBtn(
-                    icon = R.drawable.ar,
-                    onClick = {
-                        navController.navigateWithAnimation(Screen.TourScreen.route)
-                    }
-                )
-            }
+   Box{
+       Column(
+           modifier = Modifier
+               .fillMaxSize()
+               .verticalScroll(scrollState)
+               .background(MaterialTheme.colorScheme.background)
+       ) {
+           Box{
+               CarouselExample(rounded = 0, height = 300, banners = data.lstImgs.take(4))
 
-        }
-        // Header section with beach name and location
-        ColumnStart(modifier = Modifier.padding(10.dp)) {
-            Text(
-                text = data.name,
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-            )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Place,
-                    contentDescription = "Location",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = data.address,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 16.sp
-                )
-            }
 
-            // Rating and visitors section
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Filled.Star,
-                        contentDescription = "Rating",
-                        tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    data.detail?.rating?.toString()?.let {
-                        Text(
-                            text = it,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
-                    Text(
-                        text = "/5",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 2.dp)
-                    )
-                }
-            }
+           }
+           // Header section with beach name and location
+           ColumnStart(modifier = Modifier.padding(10.dp)) {
+               Text(
+                   text = data.name,
+                   style = MaterialTheme.typography.headlineMedium.copy(
+                       fontWeight = FontWeight.Bold
+                   ),
+               )
 
-            // Tab navigation
-            var selectedTab by remember { mutableStateOf("Overview") }
-            val tabs = listOf("Overview", "Details", "Reviews", "Location", "Weather")
+               Row(
+                   verticalAlignment = Alignment.CenterVertically,
+                   modifier = Modifier.padding(vertical = 8.dp)
+               ) {
+                   Icon(
+                       Icons.Filled.Place,
+                       contentDescription = "Location",
+                       modifier = Modifier.size(18.dp)
+                   )
+                   Spacer(modifier = Modifier.width(4.dp))
+                   Text(
+                       text = data.address,
+                       color = MaterialTheme.colorScheme.onSurfaceVariant,
+                       fontSize = 16.sp
+                   )
+               }
 
-            ScrollableTabRow(
-                selectedTabIndex = tabs.indexOf(selectedTab),
-                edgePadding = 0.dp,
-                backgroundColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.primary,
-                divider = {},
-                indicator = { tabPositions ->
-                    Box(
-                        modifier = Modifier
-                            .tabIndicatorOffset(tabPositions[tabs.indexOf(selectedTab)])
-                            .height(3.dp)
-                            .padding(horizontal = 16.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
-                            )
-                    )
-                }
-            ) {
-                tabs.forEach { tab ->
-                    Tab(
-                        selected = selectedTab == tab,
-                        onClick = { selectedTab = tab },
-                        text = {
-                            Text(
-                                text = tab,
-                                fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
-                                color = if (selectedTab == tab) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                }
-            }
+               // Rating and visitors section
+               Row(
+                   verticalAlignment = Alignment.CenterVertically,
+                   modifier = Modifier.padding(bottom = 16.dp)
+               ) {
+                   Row(verticalAlignment = Alignment.CenterVertically) {
+                       Icon(
+                           Icons.Filled.Star,
+                           contentDescription = "Rating",
+                           tint = Color(0xFFFFC107),
+                           modifier = Modifier.size(24.dp)
+                       )
+                       Spacer(modifier = Modifier.width(4.dp))
+                       data.detail?.rating?.toString()?.let {
+                           Text(
+                               text = it,
+                               fontWeight = FontWeight.Bold,
+                               fontSize = 18.sp
+                           )
+                       }
+                       Text(
+                           text = "/5",
+                           color = MaterialTheme.colorScheme.onSurfaceVariant,
+                           fontSize = 14.sp,
+                           modifier = Modifier.padding(start = 2.dp)
+                       )
+                   }
+               }
 
-            Spacer(modifier = Modifier.height(16.dp))
+               // Tab navigation
+               var selectedTab by remember { mutableStateOf("Overview") }
+               val tabs = listOf("Overview", "Details", "Reviews", "Location", "Weather")
 
-            // Content based on selected tab
-            when (selectedTab) {
-                "Overview" -> data.detail?.let { OverviewContent(data = it, description = data.description, imgs = data.lstImgs) }
-                "Details" -> data.detail?.let { DetailsContent(data = it) }
-                "Reviews" -> data.detail?.let { ReviewsContent(data = it) }
-                "Location" -> data.detail?.let { LocationContent(data = it, location = data) }
-                "Weather" ->data.detail?.let { WeatherContent(data = it) }
-            }
-        }
-    }
+               ScrollableTabRow(
+                   selectedTabIndex = tabs.indexOf(selectedTab),
+                   edgePadding = 0.dp,
+                   backgroundColor = Color.Transparent,
+                   contentColor = MaterialTheme.colorScheme.primary,
+                   divider = {},
+                   indicator = { tabPositions ->
+                       Box(
+                           modifier = Modifier
+                               .tabIndicatorOffset(tabPositions[tabs.indexOf(selectedTab)])
+                               .height(3.dp)
+                               .padding(horizontal = 16.dp)
+                               .background(
+                                   color = MaterialTheme.colorScheme.primary,
+                                   shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
+                               )
+                       )
+                   }
+               ) {
+                   tabs.forEach { tab ->
+                       Tab(
+                           selected = selectedTab == tab,
+                           onClick = { selectedTab = tab },
+                           text = {
+                               Text(
+                                   text = tab,
+                                   fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
+                                   color = if (selectedTab == tab) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                               )
+                           }
+                       )
+                   }
+               }
+
+               Spacer(modifier = Modifier.height(16.dp))
+
+               // Content based on selected tab
+               when (selectedTab) {
+                   "Overview" -> data.detail?.let { OverviewContent(data = it, description = data.description, imgs = data.lstImgs) }
+                   "Details" -> data.detail?.let { DetailsContent(data = it) }
+                   "Reviews" -> data.detail?.let { ReviewsContent(data = it) }
+                   "Location" -> data.detail?.let { LocationContent(data = it, location = data) }
+                   "Weather" ->data.detail?.let { WeatherContent(data = it) }
+               }
+           }
+       }
+
+       Row(
+           modifier = Modifier
+               .padding(20.dp)
+               .align(Alignment.BottomEnd)
+           ,
+           horizontalArrangement = Arrangement.spacedBy(20.dp), // Cách đều 20dp
+           verticalAlignment = Alignment.CenterVertically,
+       ) {
+           BtnPrimary(
+               onClick = {
+                   navController.currentBackStackEntry?.savedStateHandle?.set("images", data.lstImgs)
+                   navController.navigateWithAnimation(Screen.Gallery.route)
+               },
+               title = "Gallery",
+               textColor = MaterialTheme.colorScheme.tertiary,
+               backgroundColor = Color.White
+           )
+
+           IconBtn(
+               icon = R.drawable.ar,
+               onClick = {
+                   navController.navigateWithAnimation(Screen.TourScreen.route)
+               }
+           )
+       }
+   }
 }
 
 @OptIn(ExperimentalLayoutApi::class)

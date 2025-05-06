@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -49,10 +48,8 @@ fun PasswordInput(
         if(label !== "") {
             Text(
                 text = label,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 14.sp,
             )
-            Spacer(modifier = Modifier.height(8.dp))
         }
 
         OutlinedTextField(
@@ -64,11 +61,12 @@ fun PasswordInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(1000.dp)) // Apply rounding to the whole component
-                .background(MaterialTheme.colorScheme.secondary), // Set the background color
+                .background(MaterialTheme.colorScheme.secondary)
+           ,
             shape = RoundedCornerShape(1000.dp), // Ensure the border is rounded
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.LightGray,
+                unfocusedBorderColor = Color.Transparent,
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
             ),
             trailingIcon = {
@@ -97,11 +95,8 @@ fun TextInput(
         if(label  !== "") {
             Text(
                 text = label,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 14.sp,
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
         }
 
         OutlinedTextField(
@@ -112,12 +107,12 @@ fun TextInput(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(1000.dp))
                 .background(MaterialTheme.colorScheme.secondary)
-            , // Rounded corners
-            shape = RoundedCornerShape(1000.dp), // Specify shape for the border
+               ,
+            shape = RoundedCornerShape(1000.dp),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.LightGray,
-                focusedBorderColor = Color.Gray
+                unfocusedBorderColor = Color.Transparent, // Changed from Transparent
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
             )
         )
 

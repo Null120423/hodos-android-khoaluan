@@ -3,11 +3,13 @@ package com.example.hodos_final_android.screen.predict
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.hodos_final_android.Screen
@@ -34,10 +36,10 @@ fun PredictResultScreen(
 
     MainLayout(
         isLoading = locationState.isLoading,
-        title = "Predict result",
+        title = "",
         content = {
             Column(
-                modifier = Modifier.fillMaxHeight().fillMaxWidth()
+                modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(top = 100.dp)
             ) {
                 if(locationState.isLoading) {
                     Txt(value = "Loading...")

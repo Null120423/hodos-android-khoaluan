@@ -7,15 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.hodos_final_android.model.DashboardModel
 import com.example.hodos_final_android.repository.CommonRepository
 import com.example.hodos_final_android.service.api.parseJsonError
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@HiltViewModel
+@Singleton
 class HomeViewModel @Inject constructor(
     private val repository: CommonRepository
 ) : ViewModel() {

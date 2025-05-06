@@ -72,6 +72,7 @@ import com.example.hodos_final_android.component.SkeletonList
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.TravelCard
 import com.example.hodos_final_android.component.Txt
+import com.example.hodos_final_android.di.HọmeViewModelEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.helper.getScreenHeight
@@ -84,7 +85,6 @@ import com.example.hodos_final_android.model.categories
 import com.example.hodos_final_android.model.posts
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
-import com.example.hodos_final_android.view_model.HomeViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
@@ -99,13 +99,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val userViewModel = remember {
         EntryPointAccessors
             .fromApplication(context, UserViewModelEntryPoint::class.java)
             .userViewModel()
+    }
+
+    val homeViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, HọmeViewModelEntryPoint::class.java)
+            .homeViewModel()
     }
 
     val authState by userViewModel.authState.collectAsState()
@@ -415,7 +420,11 @@ fun CategoryHomeItem(
     category: Category,
     modifier: Modifier = Modifier
 ) {
+    val navController = LocalNavController.current
     Card(
+        onClick = {
+            navController.navigateWithAnimation(Screen.ComingSoonScreen.route)
+        },
         modifier = modifier
             .height(60.dp)
             .widthIn(min = (getScreenWidth()/2 -30 ).dp)
@@ -469,8 +478,8 @@ fun FeatureIconsRow() {
         FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
             navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
         })
-        FeatureItem(R.drawable.chat_ai_fea, "Assistant", {
-            navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
+        FeatureItem(R.drawable.ar, "Assistant", {
+            navController.navigateWithAnimation(Screen.TourScreen.route)
         })
         FeatureItem(R.drawable.more_feature, "More", {
             navController.navigateWithAnimation(Screen.ComingSoonScreen.route)

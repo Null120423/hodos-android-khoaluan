@@ -101,9 +101,12 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.hodos),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(50.dp),
-                contentScale = ContentScale.Fit
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
             )
+
         }
 
         Seprate(height = 24)
@@ -126,7 +129,7 @@ fun LoginScreen(
         Seprate(height = 32)
 
         TextInput(
-            label = "User",
+            label = "Username or Email",
             value = username,
             onChange = { username = it },
             placeholder = "Enter your username",
@@ -221,6 +224,9 @@ fun LoginScreen(
             )
 
             TextBtn(
+                onClick = {
+                    navController.navigateWithAnimation(Screen.Register.route)
+                },
                 title = "Sign Up",
                 color = Color(0xFFFF5252),
                 size = 14,

@@ -62,8 +62,15 @@ class AIModelHelper(private val context: Context) {
 
     }
 
+    fun classifyImg(image: Bitmap?) : String?{
+        val label = this.classifyLocation(image)
+        if(label === null) {
+            return this.classifyFood(image)
+        }
+        return label
+    }
 
-    fun classifyImage(image: Bitmap?): String? {
+    private fun classifyLocation(image: Bitmap?): String? {
         if (image == null) {
             Toast.makeText(context, "Image is null", Toast.LENGTH_SHORT).show()
             return null
@@ -133,6 +140,55 @@ class AIModelHelper(private val context: Context) {
             return label
         }
     }
+
+
+    private fun classifyFood(image: Bitmap?): String? {
+        if (image == null) {
+            Toast.makeText(context, "Image is null", Toast.LENGTH_SHORT).show()
+            return null
+        }
+
+        val byteBuffer = preprocessImage(image)
+
+        // Adjusted outputData to match model's output shape (26 classes)
+        val outputData = Array(1) { FloatArray(26) }
+        interpreterFood.run(byteBuffer, outputData)
+
+        val confidences = outputData[0]
+        var maxPos = 0
+        var maxConfidence = 0f
+
+        for (i in confidences.indices) {
+            if (confidences[i] > maxConfidence) {
+                maxConfidence = confidences[i]
+                maxPos = i
+            }
+        }
+        System.out.println(confidences[maxPos])
+        System.out.println(maxPos)
+
+        val classes = arrayOf(
+            "Banh_Beo", "Banh_Can", "Banh_Gio", "Banh_Mi", "Banh_Trang_Nuong", "Banh_Xeo",
+            "Bap_Xao", "Bun_Bo", "Bun_Cha", "Bun_Dau", "Bun_Mam", "Bun_Thit_Nuong",
+            "Cao_Lau", "Chao_Long", "Com_Tam", "Goi_Cuon", "Hu_Tieu", "Mi_Quang",
+            "Pha_Lau", "Pho", "Unknown"
+        )
+
+
+        if (maxConfidence < 0.35) {
+            Toast.makeText(context, "Can't recognize", Toast.LENGTH_SHORT).show()
+            return null
+        } else {
+            val label = classes[maxPos]
+
+            if(label == "Unknown") {
+                return null
+            }
+
+            return label
+        }
+    }
+
 
     private fun preprocessImage(bitmap: Bitmap): ByteBuffer {
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)

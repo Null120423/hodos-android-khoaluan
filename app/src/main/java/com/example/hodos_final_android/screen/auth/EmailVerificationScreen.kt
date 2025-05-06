@@ -2,11 +2,13 @@ package com.example.hodos_final_android.screen.auth
 
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
@@ -25,8 +27,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,16 +42,15 @@ import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.BtnPrimary
-import com.example.hodos_final_android.component.ImgSource
 import com.example.hodos_final_android.component.MainLayout
 import com.example.hodos_final_android.component.RowCenter
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.TextBtn
 import com.example.hodos_final_android.component.Txt
-import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.model.ResendCodeModel
 import com.example.hodos_final_android.model.VerifyModel
+import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -139,9 +142,13 @@ fun EmailVerificationScreen( registerModelJson: String, viewModel: AuthViewModel
             Seprate(height = 60)
 
             // Verification Icon
-            ImgSource(
-                source = R.drawable.hodos,
-                modifier = Modifier.size(80.dp)
+            Image(
+                painter = painterResource(id = R.drawable.hodos),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
             )
 
             Seprate(height = 24)

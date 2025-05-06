@@ -73,7 +73,7 @@ fun PredictScreen(
         bitmapState.value?.let {
             isSearching.value = true
             isShowBottomSheet.value = false
-            val label = aiHelper.classifyImage(it)
+            val label = aiHelper.classifyImg(it)
 
             delay(1000)
             if (label != null) {
