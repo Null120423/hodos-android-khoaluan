@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.screen.main.planing
+package com.example.hodos_final_android.screen.planing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

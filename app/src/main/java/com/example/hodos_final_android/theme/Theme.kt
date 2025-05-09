@@ -16,8 +16,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFFEC5F5F),
-    secondary =   Color(0xFFF6F7FA),
+    primary = Color(0xFF057EF4),
+    secondary =   Color(0xFFF2FDFF),
     background = White,
     surface = White,
     onPrimary = White,
@@ -29,8 +29,8 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFEC5F5F),
-    secondary = Color.Black,
+    primary = Color(0xFF057EF4),
+    secondary = Color(0xFFF2FDFF),
     background = Color(0xFF1C1B1F),
     surface = Color(0xFF1C1B1F),
     onPrimary = White,
@@ -40,6 +40,8 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Color.White,
     scrim = dark_tran
 )
+
+val greenColor = Color(0xFF5BC359)
 
 @Composable
 fun HodosTheme(

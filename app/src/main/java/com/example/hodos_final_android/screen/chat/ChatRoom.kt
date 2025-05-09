@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.screen.main.chat
+package com.example.hodos_final_android.screen.chat
 
 
 import android.annotation.SuppressLint
@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -65,6 +66,8 @@ import com.example.hodos_final_android.component.AnimateImg
 import com.example.hodos_final_android.component.IconBtn
 import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.RowBetween
+import com.example.hodos_final_android.component.Seprate
+import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.ChatViewModelEntryPoint
 import com.example.hodos_final_android.model.ChatWithBotBody
@@ -209,6 +212,17 @@ fun ChatRoomScreen(
             onValueChange = { inputText = it },
             onSend = onSend
         )
+    }
+
+    if(chatState.error != null) {
+        Column {
+            Seprate(height = 10)
+            Title(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                value = chatState.error!!.message
+            )
+        }
     }
 
 }

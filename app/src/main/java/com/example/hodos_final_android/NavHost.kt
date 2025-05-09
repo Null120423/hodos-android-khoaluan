@@ -32,14 +32,12 @@ import com.example.hodos_final_android.screen.auth.EmailVerificationScreen
 import com.example.hodos_final_android.screen.auth.LoginScreen
 import com.example.hodos_final_android.screen.auth.RegisterScreen
 import com.example.hodos_final_android.screen.predict.PredictScreen
-import com.example.hodos_final_android.screen.main.chat.ChatDashboard
-import com.example.hodos_final_android.screen.main.chat.ChatRoomScreen
-import com.example.hodos_final_android.screen.main.planing.CreatePlanning
-import com.example.hodos_final_android.screen.main.planing.EditPlanning
-import com.example.hodos_final_android.screen.main.planing.PlanningDetail
-import com.example.hodos_final_android.screen.main.planing.PlanningScreen
-import com.example.hodos_final_android.screen.main.planing.ReviewSummaryCreatePlanningScreen
-import com.example.hodos_final_android.screen.main.planing.SuggestTripScreen
+import com.example.hodos_final_android.screen.chat.ChatDashboard
+import com.example.hodos_final_android.screen.chat.ChatRoomScreen
+import com.example.hodos_final_android.screen.planing.CreatePlanning
+import com.example.hodos_final_android.screen.planing.EditPlanning
+import com.example.hodos_final_android.screen.planing.PlanningDetail
+import com.example.hodos_final_android.screen.planing.PlanningScreen
 import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.screen.start.CollectInformationScreen
 import com.example.hodos_final_android.model.RegisterModel
@@ -48,6 +46,7 @@ import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
+import com.example.hodos_final_android.screen.planing.CreatePlanningResultScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
@@ -68,8 +67,7 @@ sealed class Screen(val route: String) {
     object CollectInfo : Screen("collectInfo")
     object PlanningDetail : Screen("planningDetail")
     object CreatePlanning : Screen("createPlanning")
-    object ReviewSummaryCreatePlanningScreen : Screen("reviewSummaryCreatePlanningScreen")
-    object SuggestTrip : Screen("suggestTrip")
+    object CreatePlanningResultScreen : Screen("CreatePlanningResultScreen")
     object EditPlanning : Screen("editPlanning")
     object ChatAiDashBoard : Screen("ChatAiDashBoard")
     object ChatAiRoom : Screen("ChatAiRoom")
@@ -138,8 +136,7 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.Planning.route) { PlanningScreen() },
         ScreenConfig(Screen.PlanningDetail.route) { PlanningDetail() },
         ScreenConfig(Screen.CreatePlanning.route) { CreatePlanning() },
-        ScreenConfig(Screen.ReviewSummaryCreatePlanningScreen.route) { ReviewSummaryCreatePlanningScreen() },
-        ScreenConfig(Screen.SuggestTrip.route) { SuggestTripScreen() },
+        ScreenConfig(Screen.CreatePlanningResultScreen.route) { CreatePlanningResultScreen() },
         ScreenConfig(Screen.EditPlanning.route) { EditPlanning() },
         ScreenConfig(Screen.ChatAiDashBoard.route) { ChatDashboard() },
         ScreenConfig(Screen.ChatAiRoom.route) { ChatRoomScreen() },

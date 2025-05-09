@@ -151,7 +151,7 @@ class AIModelHelper(private val context: Context) {
         val byteBuffer = preprocessImage(image)
 
         // Adjusted outputData to match model's output shape (26 classes)
-        val outputData = Array(1) { FloatArray(26) }
+        val outputData = Array(1) { FloatArray(21) }
         interpreterFood.run(byteBuffer, outputData)
 
         val confidences = outputData[0]

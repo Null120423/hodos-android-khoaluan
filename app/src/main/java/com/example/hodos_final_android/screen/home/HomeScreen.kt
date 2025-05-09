@@ -40,7 +40,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -173,22 +172,23 @@ fun HomeScreen(
                 ) {
                     stickyHeader {
                         Box(modifier = Modifier
-                            .background(MaterialTheme.colorScheme.background)
+                            .background(MaterialTheme.colorScheme.secondary)
                             .padding(horizontal = 15.dp)
                             .padding(WindowInsets.statusBars.asPaddingValues())){
                             RowBetween{
                                 Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(36.dp)
-                                        .weight(0.8f)
-                                        .clickable {
-                                            navController.navigateWithAnimation(Screen.SearchScreen.route)
-                                        },
-                                    shape = RoundedCornerShape(100.dp),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                                    colors = CardDefaults.outlinedCardColors(
-                                        containerColor = Color.Transparent,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(36.dp)
+                                    .weight(0.8f)
+                                    .clickable {
+                                        navController.navigateWithAnimation(Screen.SearchScreen.route)
+                                    },
+                                shape = RoundedCornerShape(100.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                colors = CardDefaults.outlinedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.background
+,
                                         contentColor = MaterialTheme.colorScheme.tertiary
                                     ),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -205,9 +205,10 @@ fun HomeScreen(
                                             contentDescription = "Search",
                                             modifier = Modifier.size(18.dp)
                                         )
-                                        Text(
-                                            text = "Search",
-                                            maxLines = 1
+                                        Txt(
+                                           value = "Search",
+                                            maxLines = 1,
+                                            color = MaterialTheme.colorScheme.tertiary
                                         )
                                     }
                                 }
@@ -220,7 +221,7 @@ fun HomeScreen(
                                     Icon(
                                         imageVector = Icons.Default.Notifications,
                                         contentDescription = "Notifications",
-                                        tint = MaterialTheme.colorScheme.tertiary
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
 
@@ -241,7 +242,7 @@ fun HomeScreen(
                                 .padding(top = 0.dp, bottom = 10.dp )){
 
                                 // skeleton for home page
-                                if(homeState.isLoading ) {
+                                if(homeState.isLoading  ) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -259,11 +260,13 @@ fun HomeScreen(
                                     SkeletonList(title = "Post helpful!")
                                 }
 
-                                CarouselExample(rounded = 0, height = 300, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
+                                CarouselExample(rounded = 0, height = 220, banners = if(homeState.data != null) homeState.data!!.banners else  emptyList())
                                 Seprate( height = 10)
 
-                                if(homeState.data != null) {
+                                if(!homeState.isLoading) {
                                     CategoriesView(categories)
+                                }
+                                if(homeState.data != null) {
                                     LocationCardGrid(locations = homeState.data!!.locationData.lst)
                                     FoodCardGrid(locations = homeState.data!!.foodData.lst)
                                     PostList(posts = posts)
@@ -455,9 +458,6 @@ fun CategoryHomeItem(
         }
     }
 }
-
-
-
 
 @Composable
 fun FeatureIconsRow() {

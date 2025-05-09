@@ -1,7 +1,10 @@
 package com.example.hodos_final_android.screen.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,13 +20,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +56,6 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
-import com.example.hodos_final_android.component.CustomPullRefreshIndicator
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.helper.rememberDebouncedState
 import com.example.hodos_final_android.model.Location
@@ -63,7 +66,7 @@ import com.example.hodos_final_android.view_model.LocationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     viewModel: LocationViewModel = hiltViewModel()
@@ -72,36 +75,29 @@ fun SearchScreen(
     val navController = LocalNavController.current
     var searchQuery by remember { mutableStateOf("") }
     var isLoadingMore by remember { mutableStateOf(false) }
-    val isRefreshing = paginationState.isLoading && paginationState.data != null
-    // Debounce search query
     val debouncedSearchQuery by rememberDebouncedState(searchQuery, debounceMillis = 500)
-
-
-    val isFetched = remember { mutableStateOf(true) }
-
-    // Add pull-to-refresh state
     val refreshScope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
-    fun refresh() =
-        refreshScope.launch {
-            refreshing = true
-            viewModel.pagination(
-                Pagination(
-                    skip = 0,
-                    take = 20,
-                    where = PaginationLocation(
-                        name = debouncedSearchQuery,
-                        type = ""
-                    )
+
+    fun refresh() = refreshScope.launch {
+        refreshing = true
+        viewModel.pagination(
+            Pagination(
+                skip = 0,
+                take = 20,
+                where = PaginationLocation(
+                    name = debouncedSearchQuery,
+                    type = ""
                 )
             )
-            delay(1500)
-            isFetched.value = true
-            refreshing = false
-        }
+        )
+        delay(500)
+        refreshing = false
+    }
 
     val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
-    // Call API on search query change
+
+    // Trigger search when query changes
     LaunchedEffect(debouncedSearchQuery) {
         viewModel.pagination(
             Pagination(
@@ -115,19 +111,22 @@ fun SearchScreen(
         )
     }
 
-    Box{
-        Column(modifier = Modifier.fillMaxSize().padding(WindowInsets.statusBars.asPaddingValues()).background(MaterialTheme.colorScheme.secondary)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.secondary)
+            .pullRefresh(pullRefreshState)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.statusBars.asPaddingValues())
+        ) {
             SearchBar(
                 query = searchQuery,
-                onQueryChange = { query ->
-                    searchQuery = query
-                },
-                onBack = {
-                    navController.popBackStack()
-                }
+                onQueryChange = { searchQuery = it },
+                onBack = { navController.popBackStack() }
             )
-
-            CustomPullRefreshIndicator(refreshing = refreshing)
 
             when {
                 paginationState.error != null -> {
@@ -140,12 +139,17 @@ fun SearchScreen(
                     val locations = paginationState.data?.data ?: emptyList()
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState),
-                        ) {
+                        modifier = Modifier.fillMaxSize()
+                    ) {
                         items(locations) { location ->
-                            LocationItem(data = location, onClick = {
-                                navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(location.id))
-                            })
+                            LocationItem(
+                                data = location,
+                                onClick = {
+                                    navController.navigateWithAnimation(
+                                        Screen.LocationDetailScreen.createRoute(location.id)
+                                    )
+                                }
+                            )
                         }
 
                         if (paginationState.data?.hasNext == true) {
@@ -159,7 +163,6 @@ fun SearchScreen(
                                     Text("Đang tải thêm...")
                                 }
 
-                                // Trigger load more
                                 LaunchedEffect(Unit) {
                                     if (!isLoadingMore) {
                                         isLoadingMore = true
@@ -180,22 +183,23 @@ fun SearchScreen(
                         }
                     }
                 }
-
-
             }
-
-
         }
 
-        if(paginationState.isLoading ) {
+        PullRefreshIndicator(
+            refreshing = refreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+
+        if (paginationState.isLoading && paginationState.data == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Loading()
             }
         }
     }
-
-
 }
+
 
 
 @Composable
@@ -204,6 +208,11 @@ fun SearchBar(
     onQueryChange: (String) -> Unit,
     onBack: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val borderColor = if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -213,8 +222,8 @@ fun SearchBar(
         Row {
             IconButton(onClick = onBack) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBackIosNew,
-                    contentDescription = "Filters",
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.tertiary
                 )
             }
@@ -222,38 +231,38 @@ fun SearchBar(
                 value = query,
                 onValueChange = onQueryChange,
                 placeholder = { Text("Search") },
-                leadingIcon = {
+                trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
                         tint = Color.Gray
                     )
                 },
-                trailingIcon = {
-                    IconButton(onClick = { /* Open filters */ }) {
-                        Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_sort_by_size),
-                            contentDescription = "Filters",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(100.dp))
-                    .background(Color.White),
+                    .background(Color.White)
+                    .border(
+                        width = 1.dp,
+                        color = borderColor,
+                        shape = RoundedCornerShape(100.dp)
+                    ),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    disabledContainerColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                singleLine = true
+                singleLine = true,
+                interactionSource = interactionSource
             )
+
+
         }
     }
 }
+
 
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalGlideComposeApi::class)

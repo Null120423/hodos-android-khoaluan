@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.screen.main.planing
+package com.example.hodos_final_android.screen.planing
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -59,6 +59,7 @@ import com.example.hodos_final_android.component.BtnPrimary
 import com.example.hodos_final_android.component.CalendarView
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.MainLayout
+import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.PlanTripModelEntryPoint
@@ -69,6 +70,9 @@ import com.example.hodos_final_android.navigateWithAnimation
 import dagger.hilt.android.EntryPointAccessors
 import java.time.LocalDate
 
+data class Body(
+    val answers: String
+)
 
 @SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalAnimationApi::class)
@@ -82,9 +86,11 @@ fun CreatePlanning() {
             .planTripModel()
     }
     val planTripQuestionState by planTripViewModel.planTripQuestionState.collectAsState()
+    val planTripQuestionResultState by planTripViewModel.planTripResultState.collectAsState()
 
     val navController = LocalNavController.current
     var currentStep by remember { mutableStateOf(0) }
+    var isAnswer by remember { mutableStateOf(false) }
     var totalSteps by remember { mutableStateOf(0) }
     var questionList by remember { mutableStateOf(emptyList<PlanTripQuestionResponse>()) }
     val answers = remember { mutableStateMapOf<Int, Any>() }
@@ -102,6 +108,24 @@ fun CreatePlanning() {
         }
     }
 
+
+    LaunchedEffect(planTripQuestionResultState.data) {
+        if(planTripQuestionResultState.data != null && isAnswer) {
+            Log.i("API", "DONE")
+            navController.popBackStack()
+            navController.navigateWithAnimation(Screen.CreatePlanningResultScreen.route)
+        }
+    }
+
+    val handlePlanTrip = {
+          planTripViewModel.planTrip(Body(
+              answers = answers.toString()
+          ))
+        isAnswer = true
+    }
+
+
+
     MainLayout(
         content = {
             Box {
@@ -113,7 +137,28 @@ fun CreatePlanning() {
                 ) {
                     if (planTripQuestionState.isLoading) {
                         Loading()
-                    } else {
+                    }
+                    else if(planTripQuestionResultState.isLoading){
+                        Column {
+                            Loading()
+                            Seprate(height = 10)
+                            Title(
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                value = "Plan trip base your answer. Please wait in few seconds"
+                            )
+                        }
+                    } else if(planTripQuestionResultState.error != null) {
+                        Column {
+                            Seprate(height = 10)
+                            Title(
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                value = planTripQuestionResultState.error!!.message
+                            )
+                        }
+                    }
+                    else {
                         LinearProgressIndicator(
                             progress = (currentStep + 1f) / totalSteps,
                             modifier = Modifier
@@ -201,8 +246,7 @@ fun CreatePlanning() {
                                 if (currentStep < totalSteps - 1) {
                                     currentStep++
                                 } else {
-                                    // Pass answers to next screen if needed
-                                    navController.navigateWithAnimation(Screen.ReviewSummaryCreatePlanningScreen.route)
+                                    handlePlanTrip()
                                 }
                             },
                             disabled = !answers.containsKey(currentStep)
@@ -306,12 +350,11 @@ fun MultiChoiceQuestion(
 @Composable
 fun DateSelectionQuestion(
     question: PlanTripQuestionResponse,
-    selectedDates: Pair<LocalDate, LocalDate>?,
-    onDateRangeSelected: (Pair<LocalDate, LocalDate>) -> Unit
+    selectedDates: Pair<LocalDate?, LocalDate?>?,
+    onDateRangeSelected: (Pair<LocalDate?, LocalDate?>) -> Unit
 ) {
-    // Create local state to track date selection
-    var startDate by remember { mutableStateOf(selectedDates?.first ?: LocalDate.now()) }
-    var endDate by remember { mutableStateOf(selectedDates?.second ?: LocalDate.now().plusDays(7)) }
+    val startDate = selectedDates?.first
+    val endDate = selectedDates?.second
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Title(
@@ -330,33 +373,33 @@ fun DateSelectionQuestion(
         CalendarView(
             startDate = startDate,
             endDate = endDate,
-            onDateSelected = { date ->
-                if (startDate != null && endDate != null) {
-                    // Reset selection
-                    startDate = date
-                    endDate = null
-                } else if (startDate != null) {
-                    if (date.isBefore(startDate)) {
-                        endDate = startDate
-                        startDate = date
-                    } else {
-                        endDate = date
+            onDateSelected = { selectedDate ->
+                when {
+                    startDate == null || (startDate != null && endDate != null) -> {
+                        // Chọn mới
+                        onDateRangeSelected(selectedDate to null)
                     }
-                    // Both dates are selected, notify parent
-                    onDateRangeSelected(startDate to endDate)
-                } else {
-                    startDate = date
+                    selectedDate < startDate -> {
+                        // Đảo chiều nếu chọn nhỏ hơn start
+                        onDateRangeSelected(selectedDate to startDate)
+                    }
+                    else -> {
+                        onDateRangeSelected(startDate to selectedDate)
+                    }
                 }
             }
         )
 
         if (startDate != null && endDate != null) {
+            Spacer(modifier = Modifier.height(12.dp))
             Txt(
-                value = "Selected range: ${startDate.toString()} to ${endDate.toString()}",
+                value = "Selected range: ${startDate} to ${endDate}",
+                fontWeight = FontWeight.Medium
             )
         }
     }
 }
+
 
 @Composable
 fun ReviewStep() {

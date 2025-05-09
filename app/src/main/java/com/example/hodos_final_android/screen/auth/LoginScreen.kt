@@ -75,9 +75,7 @@ fun LoginScreen(
     LaunchedEffect(loginState.data) {
         loginState.data?.let {
             FancyToast.makeText(context, "Login successfully!", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
-            navController.clearBackStack<Boolean>(true)
-
-            navController.navigateWithAnimation(Screen.Main.route)
+            navController.popBackStack()
         }
     }
 
@@ -161,14 +159,13 @@ fun LoginScreen(
                 Txt(
                     value = "Keep me signed in",
                     size = 14,
-                    color = Color.Gray
                 )
             }
 
             TextBtn(
                 onClick = {},
                 title = "Forgot password?",
-                color = Color(0xFFFF5252),
+                color = MaterialTheme.colorScheme.tertiary,
             )
         }
 
@@ -220,7 +217,6 @@ fun LoginScreen(
             Txt(
                 value = "You don't Have an account? ",
                 size = 14,
-                color = Color.Gray
             )
 
             TextBtn(
@@ -228,7 +224,7 @@ fun LoginScreen(
                     navController.navigateWithAnimation(Screen.Register.route)
                 },
                 title = "Sign Up",
-                color = Color(0xFFFF5252),
+                color = MaterialTheme.colorScheme.primary,
                 size = 14,
                 fontWeight = FontWeight.Medium
             )

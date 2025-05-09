@@ -100,7 +100,9 @@ fun LocationDetailScreen(
         }
     }
 
-    Box {
+    Box(
+        modifier = Modifier.background(MaterialTheme.colorScheme.secondary).fillMaxSize()
+    ) {
         if(locationDetailState.error !== null) {
             Column {
                 Title(value = locationDetailState.error!!.message, fontWeight = FontWeight.Bold)

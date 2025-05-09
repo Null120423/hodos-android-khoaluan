@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.screen.main.chat
+package com.example.hodos_final_android.screen.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

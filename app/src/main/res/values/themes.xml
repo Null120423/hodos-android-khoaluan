@@ -14,7 +14,7 @@
 
     <style name="Theme.MyApp.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/white</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/home_banner</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/hodos</item>
         <item name="postSplashScreenTheme">@style/Theme.HODOS_FINAL_ANDROID</item>
     </style>
 
