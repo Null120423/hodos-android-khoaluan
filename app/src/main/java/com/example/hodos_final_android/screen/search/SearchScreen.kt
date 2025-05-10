@@ -189,7 +189,9 @@ fun SearchScreen(
         PullRefreshIndicator(
             refreshing = refreshing,
             state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
+            modifier = Modifier.align(Alignment.TopCenter),
+            contentColor = MaterialTheme.colorScheme.primary,
+            backgroundColor = MaterialTheme.colorScheme.secondary
         )
 
         if (paginationState.isLoading && paginationState.data == null) {

@@ -1,9 +1,9 @@
-package com.example.hodos_final_android.screen.location
+package com.example.hodos_final_android.screen.planing
 
+import android.Manifest
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.model.Route
 import com.example.hodos_final_android.model.Step
-import com.example.hodos_final_android.model.exampleRouteData
+import com.example.hodos_final_android.model.exampleTripData
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -36,25 +36,24 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun DirectionScreen() {
-    val locationPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    )
+fun TripDirectionScreen() {
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     LaunchedEffect(Unit) {
         if (!locationPermissionState.status.isGranted) {
             locationPermissionState.launchPermissionRequest()
         }
     }
-
+    val gson = Gson()
+    val route: Route = gson.fromJson(exampleTripData, Route::class.java)
     val hasLocationPermission = locationPermissionState.status.isGranted
 
-    val gson = Gson()
-    val route: Route = gson.fromJson(exampleRouteData, Route::class.java)
+    val firstRoute = route.routes.firstOrNull() ?: return
+    val firstLeg = firstRoute.legs.firstOrNull() ?: return
 
-    val steps = route.routes.first().legs.first().steps
-    val polylinePoints = route.routes.first().overview_polyline.points
-    val startLocation = route.routes.first().legs.first().start_location
+    val steps = firstLeg.steps
+    val polylinePoints = firstRoute.overview_polyline.points
+    val startLocation = firstLeg.start_location
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -67,7 +66,7 @@ fun DirectionScreen() {
         GoogleMap(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
+                .weight(1f),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 isMyLocationEnabled = hasLocationPermission
@@ -76,49 +75,13 @@ fun DirectionScreen() {
             Polyline(
                 points = decodePolyline(polylinePoints),
                 color = MaterialTheme.colorScheme.primary,
-                width = 20f
+                width = 10f
             )
         }
 
-//        LazyColumn(modifier = Modifier.fillMaxSize()) {
-//            items(steps) { step ->
-//                DirectionItem(step = step)
-//            }
-//        }
+
     }
 }
-
-@Composable
-fun DirectionItem(step: Step) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Directions,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Column {
-            Text(
-                text = step.html_instructions,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                text = "${step.distance.text} | ${step.duration.text}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-        }
-    }
-}
-
 // Function to decode polyline into a list of LatLng points
 fun decodePolyline(encoded: String): List<LatLng> {
     val polyline = mutableListOf<LatLng>()
@@ -154,4 +117,36 @@ fun decodePolyline(encoded: String): List<LatLng> {
     }
 
     return polyline
+}
+
+
+@Composable
+fun DirectionItem(step: Step) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Directions,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Column {
+            Text(
+                text = step.html_instructions,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = "${step.distance.text} | ${step.duration.text}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        }
+    }
 }

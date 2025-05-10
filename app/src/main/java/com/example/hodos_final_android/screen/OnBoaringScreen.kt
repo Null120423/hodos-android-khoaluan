@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -72,11 +73,11 @@ fun OnboardingScreen(
                     modifier = Modifier
                         .padding(bottom = 32.dp),
                     activeColor = when (pagerState.currentPage) {
-                        0 ->Color(0xFF000000)
-                        1 -> Color(0xFF000000)
-                        else -> Color(0xFF000000)
+                        0 ->MaterialTheme.colorScheme.primary
+                        1 -> MaterialTheme.colorScheme.primary
+                        else -> MaterialTheme.colorScheme.primary
                     },
-                    inactiveColor = Color.LightGray,
+                    inactiveColor = MaterialTheme.colorScheme.secondary,
                     indicatorWidth = 20.dp,
                     indicatorHeight = 8.dp,
                     spacing = 12.dp
@@ -98,13 +99,13 @@ fun OnboardingScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0A0E21)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(10000.dp)
             ) {
                 Text(
                     text = if (pagerState.currentPage < 2) "Next" else "Get Started",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.background,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

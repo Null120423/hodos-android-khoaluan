@@ -17,6 +17,7 @@ import com.example.hodos_final_android.LoadingViewModel
 import com.example.hodos_final_android.ParentScreen
 import com.example.hodos_final_android.component.BottomBarComponent
 import com.example.hodos_final_android.screen.home.HomeScreen
+import com.example.hodos_final_android.screen.planing.TripUserScreen
 import com.example.hodos_final_android.screen.profile.ProfileScreen
 import com.example.hodos_final_android.theme.HodosTheme
 
@@ -56,7 +57,7 @@ fun NavigationGraph(navController: NavHostController) {
     ) {
         composable(BottomBarRoute.Home.route) { HomeScreen() }
         composable(BottomBarRoute.Activity.route) { ComingSoonScreen() }
-        composable(BottomBarRoute.Trip.route) { ComingSoonScreen(
+        composable(BottomBarRoute.Trip.route) { TripUserScreen(
         ) }
         composable(BottomBarRoute.Event.route) { ComingSoonScreen() }
         composable(BottomBarRoute.Profile.route) { ProfileScreen() }

@@ -39,7 +39,6 @@ import com.example.hodos_final_android.screen.planing.EditPlanning
 import com.example.hodos_final_android.screen.planing.PlanningDetail
 import com.example.hodos_final_android.screen.planing.PlanningScreen
 import com.example.hodos_final_android.screen.search.SearchScreen
-import com.example.hodos_final_android.screen.start.CollectInformationScreen
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.screen.ComingSoonScreen
 import com.example.hodos_final_android.screen.predict.PredictResultScreen
@@ -47,6 +46,7 @@ import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
 import com.example.hodos_final_android.screen.planing.CreatePlanningResultScreen
+import com.example.hodos_final_android.screen.planing.TripDirectionScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
@@ -85,6 +85,7 @@ sealed class Screen(val route: String) {
     }
     object ComingSoonScreen : Screen("ComingSoonScreen")
     object Direction : Screen("Direction")
+    object TripDirectionScreen : Screen("TripDirectionScreen")
     object PostDetailScreen : Screen("PostDetailScreen")
     object TourScreen : Screen("TourScreen")
 }
@@ -130,7 +131,6 @@ fun AppNavHost(navController: NavHostController) {
     // List of screen configurations
     val screens = listOf(
         ScreenConfig(Screen.Main.route) { MainScreen() },
-        ScreenConfig(Screen.CollectInfo.route) { CollectInformationScreen() },
         ScreenConfig(Screen.Login.route) { LoginScreen() },
         ScreenConfig(Screen.Register.route) { RegisterScreen() },
         ScreenConfig(Screen.Planning.route) { PlanningScreen() },
@@ -172,6 +172,9 @@ fun AppNavHost(navController: NavHostController) {
             ,
         ScreenConfig(Screen.Direction.route ) { backStackEntry ->
             DirectionScreen()
+        },
+        ScreenConfig(Screen.TripDirectionScreen.route ) { backStackEntry ->
+            TripDirectionScreen()
         },
 
         ScreenConfig(Screen.PostDetailScreen.route ) { backStackEntry ->

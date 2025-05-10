@@ -3,7 +3,6 @@ package com.example.hodos_final_android.screen.chat
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -125,8 +124,10 @@ fun ChatRoomScreen(
         }
     }
     LaunchedEffect(message) {
-        val chatWithBotBody = ChatWithBotBody(message = message)
-        chatViewModel.chatBox(chatWithBotBody)
+        if(chatState.data == null)  {
+            val chatWithBotBody = ChatWithBotBody(message = message)
+            chatViewModel.chatBox(chatWithBotBody)
+        }
     }
 
     LaunchedEffect(chatState.data) {
@@ -327,15 +328,13 @@ fun ChatMessageItem(message: ChatMessage) {
 }
 @Composable
 fun RecommendationCard(recommendation: Recommendation) {
-    Log.i("API", recommendation.reason)
     val navController = LocalNavController.current
     Card(
         onClick = {
             navController.navigateWithAnimation(Screen.LocationDetailScreen.createRoute(recommendation.id))
         },
         modifier = Modifier
-            .width(180.dp)
-            .height(200.dp),
+            .width(180.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(0.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
@@ -344,9 +343,10 @@ fun RecommendationCard(recommendation: Recommendation) {
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            ImgWithUrl(url = recommendation.images[0], modifier = Modifier.height(50.dp))
-            Txt(value = recommendation.name, fontWeight = FontWeight.Bold)
-            Txt(value = recommendation.reason)
+            ImgWithUrl(url = recommendation.img, modifier = Modifier.height(100.dp))
+            recommendation?.name?.let { Txt(value = it, fontWeight = FontWeight.Bold) }
+            recommendation?.address?.let { Txt(value = it) }
+            recommendation?.reason?.let { Txt(value = it) }
         }
     }
 }

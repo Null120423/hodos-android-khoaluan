@@ -6,7 +6,7 @@ import Resource
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
-import com.example.hodos_final_android.model.PaginationLocationRes
+import com.example.hodos_final_android.model.PaginationResponse
 import com.example.hodos_final_android.service.LocationService
 import com.example.hodos_final_android.service.api.safeApiCall
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +23,7 @@ class LocationRepository @Inject constructor(
             service.findByLabel(label)
         }
 
-    fun pagination(body: Pagination<PaginationLocation>) : Flow<Resource<PaginationLocationRes>> =
+    fun pagination(body: Pagination<PaginationLocation>) : Flow<Resource<PaginationResponse<Location>>> =
         safeApiCall {
             service.pagination(body)
         }

@@ -67,6 +67,7 @@ fun ChatDashboard(
             .fromApplication(context, ChatViewModelEntryPoint::class.java)
             .chatViewModel()
     }
+
     val suggestQuestion by chatViewModel.suggestQuestionState.collectAsState()
     var inputText by remember { mutableStateOf("") }
 
@@ -111,7 +112,7 @@ fun ChatDashboard(
                     Loading()
                 }
                 // Travel options grid
-                suggestQuestion.data?.let { TravelOptionsGrid(options = it) }
+                suggestQuestion.data?.let { TravelOptionsGrid(options = it, onClear = {    chatViewModel.clearState()}) }
             }
         }
 
@@ -122,6 +123,7 @@ fun ChatDashboard(
             onSend = {
                 inputText = ""
                 onSendMessage(inputText)
+                chatViewModel.clearState()
             }
         )
     }
@@ -224,20 +226,20 @@ fun BotMessage(message: String) {
 }
 
 @Composable
-fun TravelOptionsGrid(options: List<SuggestQuestion>) {
+fun TravelOptionsGrid(options: List<SuggestQuestion>, onClear :  () -> Unit,) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(options) { option ->
-            TravelOptionCard(option)
+            TravelOptionCard(option,onClear)
         }
     }
 }
 
 @Composable
-fun TravelOptionCard(options: SuggestQuestion) {
+fun TravelOptionCard(options: SuggestQuestion,onClear : ()-> Unit) {
     val navController = LocalNavController.current
     fun onSendMessage(message: String) {
         navController.currentBackStackEntry?.savedStateHandle?.set("message", message)
@@ -245,6 +247,7 @@ fun TravelOptionCard(options: SuggestQuestion) {
     }
     Card(
         onClick = {
+            onClear()
             onSendMessage(options.message)
         },
         modifier = Modifier

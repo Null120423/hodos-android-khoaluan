@@ -50,7 +50,7 @@ class ChatViewModel @Inject constructor(
             .launchIn(viewModelScope)
         }
 
-        fun chatBox(body: ChatWithBotBody) {
+   fun chatBox(body: ChatWithBotBody) {
             repository.chatBox(body)
                 .onEach { result ->
                     _chatState.value = when (result) {
@@ -70,5 +70,9 @@ class ChatViewModel @Inject constructor(
                     }
                 }
                 .launchIn(viewModelScope)
+    }
+
+    fun clearState() {
+        _chatState.value = ResponseDataState(isLoading = false)
     }
 }

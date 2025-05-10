@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
-import com.example.hodos_final_android.model.PaginationLocationRes
+import com.example.hodos_final_android.model.PaginationResponse
 import com.example.hodos_final_android.repository.LocationRepository
 import com.example.hodos_final_android.service.api.parseJsonError
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,8 +23,8 @@ class LocationViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _paginationState = MutableStateFlow(ResponseDataState<PaginationLocationRes>(isLoading = true))
-    val paginationState: StateFlow<ResponseDataState<PaginationLocationRes>> = _paginationState
+    private val _paginationState = MutableStateFlow(ResponseDataState<PaginationResponse<Location>>(isLoading = true))
+    val paginationState: StateFlow<ResponseDataState<PaginationResponse<Location>>> = _paginationState
 
     private val _locationFindByLabelState = MutableStateFlow(ResponseDataState<Location>(isLoading = true))
     val locationFindByLabelState : StateFlow<ResponseDataState<Location>> = _locationFindByLabelState

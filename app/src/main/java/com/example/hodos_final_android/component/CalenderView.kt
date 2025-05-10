@@ -42,7 +42,7 @@ fun CalendarView(
     onDateSelected: (LocalDate) -> Unit
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-
+    val today = LocalDate.now()
     Column(modifier = Modifier.fillMaxWidth()) {
         // Month navigation
         Row(
@@ -99,6 +99,7 @@ fun CalendarView(
                 val date = currentMonth.atDay(day)
                 val isSelected = date == startDate || date == endDate
                 val isInRange = startDate != null && endDate != null && date > startDate && date < endDate
+                val isPast = date.isBefore(today)
 
                 Box(
                     modifier = Modifier
@@ -112,13 +113,16 @@ fun CalendarView(
                             },
                             shape = MaterialTheme.shapes.small
                         )
-                        .clickable { onDateSelected(date) },
+                        .let { baseModifier ->
+                            if (!isPast) baseModifier.clickable { onDateSelected(date) } else baseModifier
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Txt(
                         value = day.toString(),
                         color = when {
                             isSelected -> MaterialTheme.colorScheme.background
+                            isPast -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                             else -> MaterialTheme.colorScheme.tertiary
                         },
                         textAlign = TextAlign.Center

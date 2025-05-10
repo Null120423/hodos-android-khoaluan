@@ -12,8 +12,10 @@ data class Trip(
     val startDate: String,
     val endDate: String,
     val budget: String,
-    val favorites: List<String>,
-    val days: List<TripDay>
+    val favorites: List<String>? = emptyList(),
+    val days: List<TripDay>? = emptyList(),
+    val id: String? = null,
+    val thumbnail: String? = null,
 )
 
 data class TripDay(

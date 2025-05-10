@@ -246,7 +246,7 @@ fun HomeScreen(
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(300.dp)
+                                            .height(220.dp)
                                             .placeholder(
                                                 visible = true,
                                                 highlight = PlaceholderHighlight.shimmer(),
@@ -479,7 +479,7 @@ fun FeatureIconsRow() {
             navController.navigateWithAnimation(Screen.ChatAiDashBoard.route)
         })
         FeatureItem(R.drawable.ar, "Assistant", {
-            navController.navigateWithAnimation(Screen.TourScreen.route)
+            navController.navigateWithAnimation(Screen.TripDirectionScreen.route)
         })
         FeatureItem(R.drawable.more_feature, "More", {
             navController.navigateWithAnimation(Screen.ComingSoonScreen.route)

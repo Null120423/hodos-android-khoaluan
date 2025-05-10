@@ -1,12 +1,16 @@
 package com.example.hodos_final_android.service
 
 
+import com.example.hodos_final_android.model.Pagination
+import com.example.hodos_final_android.model.PaginationResponse
 import com.example.hodos_final_android.model.PlanTripQuestionResponse
 import com.example.hodos_final_android.model.PlanTripRes
 import com.example.hodos_final_android.model.SaveTripResponse
+import com.example.hodos_final_android.model.Trip
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 
 interface PlanTripService {
@@ -19,6 +23,12 @@ interface PlanTripService {
 
     @POST("plan-trip/save-trip")
     suspend fun saveTrip(@Body()body: Any): SaveTripResponse
+
+    @POST("plan-trip/pagination-trip-user")
+    suspend fun paginationTripUser(@Body()pagination: Pagination<Any>): PaginationResponse<Trip>
+
+    @GET("plan-trip/{id}")
+    suspend fun detail(@Path("id") id: String): Trip
 
 }
 

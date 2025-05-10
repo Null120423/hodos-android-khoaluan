@@ -9,22 +9,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
-import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.BtnPrimary
 import com.example.hodos_final_android.component.ColumnCenter
 import com.example.hodos_final_android.component.ImgSource
 import com.example.hodos_final_android.component.Seprate
+import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.helper.getScreenWidth
-import com.example.hodos_final_android.navigateWithAnimation
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun RequireLoginScreen(
+fun ErrorScreen(
+    title: String? = ""
 ) {
-
     val navController = LocalNavController.current
-
 
     Box(
         modifier = Modifier.padding()
@@ -34,17 +32,23 @@ fun RequireLoginScreen(
         ) {
 
             ImgSource(
-                source = R.drawable.login_req,
+                source = R.drawable.error,
                 modifier = Modifier.width((getScreenWidth()).dp),
             )
 
+            if (title != null) {
+                Seprate(height = 10)
+                Title(
+                    value = title
+                )
+            }
             Seprate(height = 10)
 
             BtnPrimary(
                 minWidth = getScreenWidth() / 2,
-                title = "LOGIN",
+                title = "BACK",
                 onClick = {
-                    navController.navigateWithAnimation(Screen.Login.route)
+                    navController.popBackStack()
                 }
             )
 

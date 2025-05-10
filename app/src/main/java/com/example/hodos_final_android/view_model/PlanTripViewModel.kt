@@ -4,9 +4,12 @@ import Resource
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hodos_final_android.model.Pagination
+import com.example.hodos_final_android.model.PaginationResponse
 import com.example.hodos_final_android.model.PlanTripQuestionResponse
 import com.example.hodos_final_android.model.PlanTripRes
 import com.example.hodos_final_android.model.SaveTripResponse
+import com.example.hodos_final_android.model.Trip
 import com.example.hodos_final_android.repository.PlanTripRepository
 import com.example.hodos_final_android.service.api.parseJsonError
 import kotlinx.coroutines.delay
@@ -32,6 +35,12 @@ class PlanTripViewModel @Inject constructor(
     private val _saveTripState = MutableStateFlow(ResponseDataState<SaveTripResponse>(isLoading = false))
     val saveTripState: StateFlow<ResponseDataState<SaveTripResponse>> = _saveTripState
 
+    private val _paginationTripUserState = MutableStateFlow(ResponseDataState<PaginationResponse<Trip>>(isLoading = true))
+    val paginationTripUserState: StateFlow<ResponseDataState<PaginationResponse<Trip>>> = _paginationTripUserState
+
+
+    private val _detailState = MutableStateFlow(ResponseDataState<Trip>(isLoading = true))
+    val detailState: StateFlow<ResponseDataState<Trip>> = _detailState
 
     fun loadQuestionToCollect() {
         repository.loadQuestionToCollect()
@@ -81,6 +90,29 @@ class PlanTripViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    fun detail(id: String){
+        repository.detail(id)
+            .onEach { result ->
+                _detailState.value = when (result) {
+                    is Resource.Success -> {
+                        delay(1000)
+                        ResponseDataState(data = result.data)
+                    }
+                    is Resource.Error -> {
+                        result.message?.let { Log.i("API", it) }
+                        val error = result.message?.let { parseJsonError(it) }
+                        ResponseDataState(error = error)
+                    }
+                    is Resource.Loading -> ResponseDataState(isLoading = true)
+                    else -> {
+                        ResponseDataState()
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+
     fun saveTrip(body: Any){
         repository.saveTrip(body)
             .onEach { result ->
@@ -98,6 +130,32 @@ class PlanTripViewModel @Inject constructor(
                     else -> {
                         ResponseDataState()
                     }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun paginationTripUser(body: Pagination<Any>) {
+        repository.paginationTripUser(body)
+            .onEach { result ->
+                _paginationTripUserState.value = when (result) {
+                    is Resource.Success -> {
+                        val currentData = _paginationTripUserState.value.data?.data ?: emptyList()
+                        val newData = if (body.skip > 0) currentData + (result.data?.data ?: emptyList())
+                        else result.data?.data ?: emptyList()
+                        ResponseDataState(data = result.data?.copy(data = newData))
+                    }
+
+                    is Resource.Error -> {
+                        val error = result.message?.let { parseJsonError(it) }
+                        ResponseDataState(error = error)
+                    }
+
+                    is Resource.Loading -> {
+                        ResponseDataState(isLoading = true, data = _paginationTripUserState.value.data)
+                    }
+
+                    else -> ResponseDataState()
                 }
             }
             .launchIn(viewModelScope)
