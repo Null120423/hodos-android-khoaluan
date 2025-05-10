@@ -84,7 +84,6 @@ fun CreatePlanningResultScreen() {
         }else {
             if (trip != null) {
                 planTripViewModel.saveTrip(trip)
-                saved = 1
             }else {
                 FancyToast.makeText(context, "Can not find trip data!", FancyToast.LENGTH_LONG, FancyToast.ERROR, true).show()
             }
@@ -96,6 +95,7 @@ fun CreatePlanningResultScreen() {
         if(saveTripState.data != null && saved == 0) {
             FancyToast.makeText(context,
                 saveTripState.data?.message ?: "", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
+            saved = 1
         }
         if(saveTripState.error != null && saved == 0) {
             FancyToast.makeText(context, saveTripState.error!!.message, FancyToast.LENGTH_LONG, FancyToast.ERROR, true).show()
@@ -122,11 +122,13 @@ fun CreatePlanningResultScreen() {
 
             item {
                 if (trip != null) {
-                    DaySelector(
-                        days = trip.days,
-                        selectedDayIndex = selectedDayIndex,
-                        onDaySelected = { selectedDayIndex = it }
-                    )
+                    trip.days?.let {
+                        DaySelector(
+                            days = it,
+                            selectedDayIndex = selectedDayIndex,
+                            onDaySelected = { selectedDayIndex = it }
+                        )
+                    }
                 }
             }
 
@@ -190,6 +192,7 @@ fun CreatePlanningResultScreen() {
                     .padding(bottom = 20.dp)
             ) {
                 IconButton(
+                    enabled = !saveTripState.isLoading,
                     onClick = { handleSaveTrip() },
                     modifier = Modifier
                         .size(60.dp)
