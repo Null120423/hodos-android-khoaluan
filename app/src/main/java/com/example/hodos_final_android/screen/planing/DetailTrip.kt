@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -47,7 +48,7 @@ import dagger.hilt.android.EntryPointAccessors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailTripScreen() {
+fun DetailTripScreen(id: String) {
     val context = LocalContext.current
     val planTripViewModel = remember {
         EntryPointAccessors
@@ -60,6 +61,11 @@ fun DetailTripScreen() {
     var selectedDayIndex by remember { mutableIntStateOf(0) }
     val selectedDay = trip?.days?.get(selectedDayIndex)
     val navController = LocalNavController.current
+
+
+    LaunchedEffect(id) {
+        planTripViewModel.detail(id)
+    }
 
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -145,8 +151,7 @@ fun DetailTripScreen() {
 
         if (detailState.isLoading) {
             Loading(title = "")
-        }else {
-
+        }else if(detailState.error != null) {
             ErrorScreen(
                 title = detailState.error?.message
             )

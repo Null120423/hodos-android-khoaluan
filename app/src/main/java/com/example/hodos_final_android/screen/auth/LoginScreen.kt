@@ -119,7 +119,6 @@ fun LoginScreen(
 
         Txt(
             value = "Stay signed in with your account to make\nsearching easier",
-            color = Color.Gray,
             textAlign = TextAlign.Center
         )
 

@@ -46,6 +46,7 @@ import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
 import com.example.hodos_final_android.screen.planing.CreatePlanningResultScreen
+import com.example.hodos_final_android.screen.planing.DetailTripScreen
 import com.example.hodos_final_android.screen.planing.TripDirectionScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.google.gson.Gson
@@ -88,6 +89,11 @@ sealed class Screen(val route: String) {
     object TripDirectionScreen : Screen("TripDirectionScreen")
     object PostDetailScreen : Screen("PostDetailScreen")
     object TourScreen : Screen("TourScreen")
+    object TripDetailScreen : Screen("TripDetailScreen/{id}") {
+        fun createRoute(id: String): String {
+            return "TripDetailScreen/${URLEncoder.encode(id, "UTF-8")}"
+        }
+    }
 }
 
 data class ScreenConfig(
@@ -183,7 +189,13 @@ fun AppNavHost(navController: NavHostController) {
 
         ScreenConfig(Screen.TourScreen.route ) { backStackEntry ->
             TourScreen()
-        }
+        },
+        ScreenConfig(Screen.TripDetailScreen.route) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            DetailTripScreen(
+                id = id,
+            )
+        },
 
     )
 
@@ -229,19 +241,4 @@ fun NavController.navigateWithAnimation(route: String) {
         launchSingleTop = true
     }
 }
-
-@Composable
-fun ParentScreen(
-    viewModel: LoadingViewModel = viewModel(),
-    content: @Composable () -> Unit
-) {
-    val isLoading by viewModel.isLoading.collectAsState()
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        content()
-        // Hiển thị LoadingDialog nếu đang loading
-        LoadingDialog(isLoading)
-    }
-}
-
 

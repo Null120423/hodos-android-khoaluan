@@ -48,9 +48,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
@@ -62,6 +61,7 @@ import com.example.hodos_final_android.helper.rememberDebouncedState
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
 import com.example.hodos_final_android.model.Trip
+import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.screen.RequireLoginScreen
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun TripUserScreen(navController: NavController = rememberNavController()) {
+fun TripUserScreen() {
     val context = LocalContext.current
     val userViewModel = remember {
         EntryPointAccessors
@@ -111,6 +111,12 @@ fun TripUserScreen(navController: NavController = rememberNavController()) {
 
     val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
 
+    fun handleNavTripDetail(id: String)  {
+        navController.navigateWithAnimation(
+            Screen.TripDetailScreen.createRoute(id)
+        )
+    }
+
 
     // Trigger search when query changes
     LaunchedEffect(debouncedSearchQuery) {
@@ -145,7 +151,9 @@ fun TripUserScreen(navController: NavController = rememberNavController()) {
                 val trips = paginationTripUserState.data?.data ?: emptyList()
 
                 items(trips) { trip ->
-                    RegularTripCard(trip = trip)
+                    RegularTripCard(trip = trip, onDetail = {
+                        trip.id?.let { handleNavTripDetail(it) }
+                    })
                 }
                 if (paginationTripUserState.data?.hasNext == true) {
                     item {
@@ -209,11 +217,13 @@ fun TripUserScreen(navController: NavController = rememberNavController()) {
 
 
 @Composable
-fun RegularTripCard(trip: Trip) {
+fun RegularTripCard(trip: Trip, onDetail: () -> Unit?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Handle click */ },
+            .clickable {
+                trip.id?.let { onDetail() }
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(

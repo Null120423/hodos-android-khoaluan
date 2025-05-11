@@ -113,7 +113,7 @@ fun ActivityItem(
                         }
 
                         Txt(
-                            value = "Time " + activity.totalTime + " : " + activity?.timeStart + " - " + activity?.timeEnd,
+                            value = "Time " + " : " + activity?.timeStart + " - " + activity?.timeEnd,
                             color = MaterialTheme.colorScheme.tertiary,
                             maxLines = 2,
                         )

@@ -28,10 +28,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
@@ -47,6 +48,7 @@ import com.example.hodos_final_android.R
 import com.example.hodos_final_android.component.BottomBar.BellColorButton
 import com.example.hodos_final_android.component.BottomBar.ButtonBackground
 import com.example.hodos_final_android.component.BottomBar.ColorButtonAnimation
+import com.example.hodos_final_android.di.AppStateViewEntryPoint
 import com.example.hodos_final_android.screen.BottomBarRoute
 import com.example.hodos_final_android.theme.HodosTheme
 import com.exyte.animatednavbar.AnimatedNavigationBar
@@ -54,6 +56,7 @@ import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
 import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.animation.indendshape.shapeCornerRadius
 import com.exyte.animatednavbar.items.dropletbutton.DropletButton
+import dagger.hilt.android.EntryPointAccessors
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -112,12 +115,20 @@ val dropletButtons = listOf(
 
 @Composable
 fun BottomBarComponent(navController: NavController) {
-    var selectedItem by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+    val appStateViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, AppStateViewEntryPoint::class.java)
+            .appStateViewModel()
+    }
+
+    val appState by appStateViewModel.appState.collectAsState()
+
     AnimatedNavigationBar(
         modifier = Modifier
             .padding(horizontal = 0.dp, vertical = 0.dp)
             .height(85.dp),
-        selectedIndex = selectedItem,
+        selectedIndex = appState.selectTabIndex,
         ballColor = Color.White,
         cornerRadius = shapeCornerRadius(25.dp),
         ballAnimation = Parabolic(tween(Duration, easing = LinearOutSlowInEasing)),
@@ -132,9 +143,9 @@ fun BottomBarComponent(navController: NavController) {
             dropletButtons.forEachIndexed { index, it ->
                 DropletButton(
                     modifier = Modifier.fillMaxSize(),
-                    isSelected = selectedItem == index,
+                    isSelected = appState.selectTabIndex == index,
                     onClick = {
-                        selectedItem = index
+                        appStateViewModel.onSelectTab(index)
                         navController.navigate(it.route)
                     },
                     icon = it.icon,

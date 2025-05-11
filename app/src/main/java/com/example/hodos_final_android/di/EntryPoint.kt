@@ -1,4 +1,5 @@
 package com.example.hodos_final_android.di
+import com.example.hodos_final_android.view_model.AppViewViewModel
 import com.example.hodos_final_android.view_model.ChatViewModel
 import com.example.hodos_final_android.view_model.HomeViewModel
 import com.example.hodos_final_android.view_model.PlanTripViewModel
@@ -29,4 +30,10 @@ interface PlanTripModelEntryPoint {
 @InstallIn(SingletonComponent::class)
 interface HọmeViewModelEntryPoint {
     fun homeViewModel(): HomeViewModel
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface AppStateViewEntryPoint {
+    fun appStateViewModel(): AppViewViewModel
 }

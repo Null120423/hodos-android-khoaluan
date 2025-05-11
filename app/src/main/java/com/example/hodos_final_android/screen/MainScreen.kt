@@ -6,36 +6,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.hodos_final_android.LoadingViewModel
-import com.example.hodos_final_android.ParentScreen
 import com.example.hodos_final_android.component.BottomBarComponent
+import com.example.hodos_final_android.di.AppStateViewEntryPoint
 import com.example.hodos_final_android.screen.home.HomeScreen
 import com.example.hodos_final_android.screen.planing.TripUserScreen
 import com.example.hodos_final_android.screen.profile.ProfileScreen
 import com.example.hodos_final_android.theme.HodosTheme
+import dagger.hilt.android.EntryPointAccessors
 
 @Composable
-fun MainScreen(viewModel: LoadingViewModel = viewModel()) {
+fun MainScreen() {
     val navController = rememberNavController()
-
 
     HodosTheme {
         Scaffold(
             bottomBar = { BottomBarComponent(navController) },
             modifier = Modifier.background(Color.Transparent).fillMaxSize()
-        ) { innerPadding ->
-            ParentScreen {
+        ) { _ ->
+
                 Box(modifier = Modifier.padding()) {
                     NavigationGraph(navController)
                 }
-            }
+
         }
     }
 }

@@ -36,17 +36,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.hodos_final_android.component.Txt
+import com.example.hodos_final_android.di.AppStateViewEntryPoint
 import com.example.hodos_final_android.helper.NetworkStateMonitor
 import com.example.hodos_final_android.helper.OnboardingUtils
 import com.example.hodos_final_android.screen.OnboardingScreen
 import com.example.hodos_final_android.theme.HodosTheme
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
 val LocalNavController = staticCompositionLocalOf<NavHostController> {

@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
-import com.example.hodos_final_android.ParentScreen
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.CustomBottomSheet
 import com.example.hodos_final_android.component.ImageCarousel
@@ -62,7 +61,6 @@ fun PlanningDetail() {
         "https://hotelwoodlandnainital.com/wp-content/uploads/2024/09/Plan-Your-Trip.png"
     )
     val bottomSheetController = rememberBottomSheetController()
-    ParentScreen {
         Box{
 
             Column(
@@ -280,7 +278,6 @@ fun PlanningDetail() {
                 )
             }
         }
-    }
 }
 
 

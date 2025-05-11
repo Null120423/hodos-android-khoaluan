@@ -141,8 +141,8 @@ object NetworkModule {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             //.baseUrl("https://hodos-api.genny.id.vn/")
-            //.baseUrl("http://192.168.1.2:3000/")
-            .baseUrl("http://192.168.2.88:3000/")
+            .baseUrl("http://192.168.1.6:3000/")
+            //.baseUrl("http://192.168.2.88:3000/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
