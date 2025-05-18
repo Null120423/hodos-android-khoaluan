@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.di.PlanTripModelEntryPoint
 import com.example.hodos_final_android.screen.ErrorScreen
@@ -45,6 +46,7 @@ import com.example.hodos_final_android.screen.planing.components.ActivityItem
 import com.example.hodos_final_android.screen.planing.components.DaySelector
 import com.example.hodos_final_android.screen.planing.components.TripHeader
 import dagger.hilt.android.EntryPointAccessors
+import java.io.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,9 +64,21 @@ fun DetailTripScreen(id: String) {
     val selectedDay = trip?.days?.get(selectedDayIndex)
     val navController = LocalNavController.current
 
+    fun onTripDirection() {
+        if (trip != null) {
+            navController.currentBackStackEntry?.savedStateHandle?.set("TripDirection", trip.tripDirection as Serializable)
+        }
+        navController.currentBackStackEntry?.savedStateHandle?.set("trip", trip as Serializable)
+
+        navController.navigate(Screen.TripDirectionScreen.route)
+    }
+
 
     LaunchedEffect(id) {
-        planTripViewModel.detail(id)
+        if(detailState.data?.id != id) {
+            planTripViewModel.detail(id)
+        }
+
     }
 
 
@@ -78,7 +92,7 @@ fun DetailTripScreen(id: String) {
             item {
                 if (trip != null) {
                     TripHeader(
-                        trip = trip
+                        trip = trip,
                     )
                 }
             }
@@ -135,7 +149,7 @@ fun DetailTripScreen(id: String) {
             }
 
             IconButton(
-                    onClick = { /* Open map view */ },
+                    onClick = { onTripDirection() },
                 modifier = Modifier
                     .size(40.dp)
                     .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f), CircleShape)

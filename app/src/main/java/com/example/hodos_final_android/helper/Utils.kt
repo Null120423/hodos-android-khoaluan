@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.min
 
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 fun Easing.transform(from: Float, to: Float, value: Float): Float {
     return transform(((value - from) * (1f / (to - from))).coerceIn(0f, 1f))
@@ -107,3 +109,24 @@ class OnboardingUtils(private val context: Context) {
 fun isValidEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
+
+
+
+fun Date.getTimeAgo(): String {
+    val now = Date()
+    val diffInMillis = now.time - this.time
+
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis)
+    val hours = TimeUnit.MILLISECONDS.toHours(diffInMillis)
+    val days = TimeUnit.MILLISECONDS.toDays(diffInMillis)
+
+    return when {
+        minutes < 1 -> "Vừa xong"
+        minutes < 60 -> "$minutes phút trước"
+        hours < 24 -> "$hours giờ trước"
+        days == 1L -> "Hôm qua"
+        days < 7 -> "$days ngày trước"
+        else -> java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(this)
+    }
+}
+

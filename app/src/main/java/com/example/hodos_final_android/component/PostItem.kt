@@ -19,14 +19,14 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
-import com.example.hodos_final_android.model.Post
+import com.example.hodos_final_android.model.New
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.theme.HodosTheme
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PostItem(
-    data : Post
+fun NewItem(
+    data : New
 ) {
     val navController = LocalNavController.current
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp

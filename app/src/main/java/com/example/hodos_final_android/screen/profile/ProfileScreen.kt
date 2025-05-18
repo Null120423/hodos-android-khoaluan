@@ -18,19 +18,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AirplanemodeActive
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -38,185 +36,153 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hodos_final_android.LocalNavController
-import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.BtnPrimary
+import com.example.hodos_final_android.component.ColumnCenter
 import com.example.hodos_final_android.component.MainLayout
+import com.example.hodos_final_android.component.ProfileAvatar
 import com.example.hodos_final_android.component.Seprate
-import com.example.hodos_final_android.component.TextBtn
 import com.example.hodos_final_android.component.Txt
+import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.getScreenWidth
-import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.screen.RequireLoginScreen
+import dagger.hilt.android.EntryPointAccessors
 
 @Composable
 fun ProfileScreen(
     isLoggedIn: Boolean = true
 ) {
     val scrollState = rememberScrollState()
-    MainLayout(
-        header = false,
-        modifier = Modifier.background(MaterialTheme.colorScheme.secondary),
-        content = {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .fillMaxWidth()
-                    .padding(WindowInsets.statusBars.asPaddingValues())
-                    .weight(1f)
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                if (!isLoggedIn) {
-                    LoggedInHeader()
-                } else {
-                    LoggedOutHeader()
-                }
-                // Stats card
-                StatsCard(isLoggedIn)
 
-                // Menu items
-                MenuCard()
+    val context = LocalContext.current
+    val userViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, UserViewModelEntryPoint::class.java)
+            .userViewModel()
+    }
+    val authState by userViewModel.authState.collectAsState()
 
-                // Secondary menu items
-                SecondaryMenuCard()
+    val isConfirmLogout = remember { mutableStateOf(false) }
 
-                // Promo banner
-                if (isLoggedIn) {
-                    LocationPromoBanner()
-                } else {
-                    ReferralBanner()
-                }
-
-                Seprate(height = 100)
-
-            }
-        }
-    )
-}
-
-@Composable
-fun LoggedOutHeader() {
-    val navController = LocalNavController.current
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
+    if(
+        userViewModel.getAccessToken() == null
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                // Profile image
-                Box(
+        RequireLoginScreen()
+    }else {
+        MainLayout(
+            header = false,
+            modifier = Modifier.background(MaterialTheme.colorScheme.secondary),
+            content = {
+                Column(
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(Color.LightGray),
-                    contentAlignment = Alignment.Center
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth()
+                        .padding(WindowInsets.statusBars.asPaddingValues())
+                        .weight(1f)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(30.dp)
-                    )
+
+                    authState?.user?.username?.let { LoggedInHeader(username = it) }
+                    StatsCard(isLoggedIn)
+                    // Stats card
+
+
+                    // Menu items
+                    MenuCard()
+
+                    // Secondary menu items
+                    SecondaryMenuCard()
+
+                    // Promo banner
+                    if (isLoggedIn) {
+                        LocationPromoBanner()
+                    } else {
+                        ReferralBanner()
+                    }
+
+                    if(userViewModel.getAccessToken() != null) {
+                        BtnPrimary(
+                            backgroundColor = Color.Red,
+                            title = "Log Out",
+                            onClick = {
+                                isConfirmLogout.value = true
+                            },
+                            minWidth = getScreenWidth() - 20,
+                            size = 18
+                        )
+                    }
+                    Seprate(height = 100)
+
+                }
+            }
+        )
+
+        if(isConfirmLogout.value) {
+            ConfirmLogoutDialog(
+                onDismiss = {
+                    isConfirmLogout.value = false
+                },
+                onConfirm = {
+                    isConfirmLogout.value = false
+                    userViewModel.logout()
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                TextBtn(
-                    title = "Sign In / Sign Up",
-                    size = 20,
-                    onClick = {
-                        navController.navigateWithAnimation(Screen.Login.route)
-                    }
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Default.Notifications,
-                contentDescription = "Notifications",
-                modifier = Modifier.size(24.dp)
             )
         }
     }
+
 }
 
 @Composable
-fun LoggedInHeader() {
+fun LoggedInHeader(
+    username: String,
+    onEditClick: () -> Unit = {}
+) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        ColumnCenter(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Profile image
-                    Box(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.secondary),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Txt(
-                        value = "Huu Tai",
-                        size = 18,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(start = 76.dp)
-                ) {
-                    Txt(
-                        value = "Update profile",
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            Icon(
-                imageVector = Icons.Default.Notifications,
-                contentDescription = "Notifications",
-                modifier = Modifier.size(24.dp)
+            ProfileAvatar(
+                letter = username.substring(0, 1).uppercase(),
+                backgroundColor = Color(0xFF4CAF50),
+                size = 80
             )
+            Seprate(height = 8)
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Txt(
+                    value = username.replaceFirstChar { it.uppercase() },
+                    fontWeight = FontWeight.Bold,
+                    size = 20
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Profile",
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clickable { onEditClick() }
+                )
+            }
         }
     }
 }
@@ -231,6 +197,7 @@ fun StatsCard(isLoggedIn: Boolean) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+
             StatItem(
                 value = "12",
                 label = "Trips"
@@ -299,18 +266,18 @@ fun MenuCard() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             MenuItem(
-                icon = Icons.Default.Receipt,
+                icon = Icons.Default.Edit,
+                title = "Update profile"
+            )
+
+            MenuItem(
+                icon = Icons.Default.AirplanemodeActive,
                 title = "Trips"
             )
 
             MenuItem(
-                icon = Icons.Default.Person,
-                title = "Profile",
-            )
-
-            MenuItem(
-                icon = Icons.Default.Star,
-                title = "Rating"
+                icon = Icons.Default.Newspaper,
+                title = "Post"
             )
         }
     }

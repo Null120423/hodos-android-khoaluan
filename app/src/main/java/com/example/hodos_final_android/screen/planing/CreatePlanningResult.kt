@@ -2,7 +2,6 @@ package com.example.hodos_final_android.screen.planing
 
 
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.Loading
+import com.example.hodos_final_android.component.NotifyPopup
+import com.example.hodos_final_android.component.NotifyType
 import com.example.hodos_final_android.di.PlanTripModelEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.navigateWithAnimation
@@ -52,6 +52,7 @@ import com.example.hodos_final_android.screen.planing.components.TripHeader
 import com.example.hodos_final_android.theme.greenColor
 import com.shashank.sony.fancytoastlib.FancyToast
 import dagger.hilt.android.EntryPointAccessors
+import java.io.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +77,7 @@ fun CreatePlanningResultScreen() {
     val selectedDay = trip?.days?.get(selectedDayIndex)
     val navController = LocalNavController.current
 
-    var saved  by remember { mutableIntStateOf(0) }
+    val saved  by remember { mutableIntStateOf(0) }
 
     val handleSaveTrip = {
         if(userViewModel.getAccessToken() == null) {
@@ -90,20 +91,11 @@ fun CreatePlanningResultScreen() {
         }
     }
 
-    LaunchedEffect(saveTripState) {
-        Log.i("API", saveTripState.data.toString())
-        if(saveTripState.data != null && saved == 0) {
-            FancyToast.makeText(context,
-                saveTripState.data?.message ?: "", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
-            saved = 1
-        }
-        if(saveTripState.error != null && saved == 0) {
-            FancyToast.makeText(context, saveTripState.error!!.message, FancyToast.LENGTH_LONG, FancyToast.ERROR, true).show()
-        }
-        if(saveTripState.data != null  || saveTripState.error != null ){
-            planTripViewModel.clearSaveTrip()
-        }
+    fun onTripDirection() {
+        navController.currentBackStackEntry?.savedStateHandle?.set("trip", trip as Serializable)
+        navController.navigate(Screen.TripDirectionScreen.route)
     }
+
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // Main content
@@ -115,7 +107,7 @@ fun CreatePlanningResultScreen() {
             item {
                 if (trip != null) {
                     TripHeader(
-                        trip = trip
+                        trip = trip,
                     )
                 }
             }
@@ -172,7 +164,7 @@ fun CreatePlanningResultScreen() {
             }
 
             IconButton(
-                    onClick = { /* Open map view */ },
+                    onClick = { onTripDirection() },
                 modifier = Modifier
                     .size(40.dp)
                     .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f), CircleShape)
@@ -196,7 +188,7 @@ fun CreatePlanningResultScreen() {
                     onClick = { handleSaveTrip() },
                     modifier = Modifier
                         .size(60.dp)
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                        .background(if(saveTripState.isLoading) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Save,
@@ -227,9 +219,29 @@ fun CreatePlanningResultScreen() {
 
         }
 
-        if (saveTripState.isLoading) {
-            Loading(title = "")
-        }
 
     }
+    if (saveTripState.isLoading) {
+        Loading(title = "")
+    }
+
+    if(saveTripState.data != null) {
+        NotifyPopup(
+            message = saveTripState.data?.message!!,
+            type = NotifyType.SUCCESS,
+            onDismiss = {
+                planTripViewModel.clearSaveTrip()
+            }
+        )
+    }else if(saveTripState.error != null) {
+        NotifyPopup(
+            message = saveTripState.error?.message!!,
+            type = NotifyType.ERROR,
+            onDismiss = {
+                planTripViewModel.clearSaveTrip()
+            }
+        )
+    }
+
+
 }

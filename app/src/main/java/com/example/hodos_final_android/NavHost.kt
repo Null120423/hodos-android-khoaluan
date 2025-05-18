@@ -13,20 +13,13 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.hodos_final_android.component.LoadingDialog
 import com.example.hodos_final_android.screen.MainScreen
 import com.example.hodos_final_android.screen.auth.EmailVerificationScreen
 import com.example.hodos_final_android.screen.auth.LoginScreen
@@ -45,10 +38,12 @@ import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
+import com.example.hodos_final_android.screen.notification.NotificationScreen
 import com.example.hodos_final_android.screen.planing.CreatePlanningResultScreen
 import com.example.hodos_final_android.screen.planing.DetailTripScreen
 import com.example.hodos_final_android.screen.planing.TripDirectionScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
+import com.example.hodos_final_android.screen.post.CreatePostScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
 
@@ -94,6 +89,9 @@ sealed class Screen(val route: String) {
             return "TripDetailScreen/${URLEncoder.encode(id, "UTF-8")}"
         }
     }
+    object NotificationScreen : Screen("NotificationScreen")
+    object CreatePostScreen : Screen("CreatePostScreen")
+
 }
 
 data class ScreenConfig(
@@ -195,6 +193,14 @@ fun AppNavHost(navController: NavHostController) {
             DetailTripScreen(
                 id = id,
             )
+        },
+
+        ScreenConfig(Screen.NotificationScreen.route ) { backStackEntry ->
+            NotificationScreen()
+        },
+
+        ScreenConfig(Screen.CreatePostScreen.route ) { backStackEntry ->
+            CreatePostScreen()
         },
 
     )

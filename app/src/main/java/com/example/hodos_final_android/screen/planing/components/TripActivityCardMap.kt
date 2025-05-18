@@ -2,19 +2,19 @@ package com.example.hodos_final_android.screen.planing.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,104 +25,138 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hodos_final_android.component.ColumnStart
 import com.example.hodos_final_android.component.ImgWithUrl
+import com.example.hodos_final_android.component.RowBetween
+import com.example.hodos_final_android.component.RowStart
+import com.example.hodos_final_android.component.Seprate
+import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.model.TripActivity
 
 @Composable
 fun TripActivityCardMap(
     activity: TripActivity,
-    dayNumber: Int,
     modifier: Modifier = Modifier,
-    onDirectionsClick: () -> Unit = {}
+    onDirectionsClick: () -> Unit = {},
+    index: Int
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .fillMaxWidth().padding(10.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-
-        ImgWithUrl(
-            url = activity.img,
-            modifier = Modifier.height(100.dp).width(100.dp)
-        )
-        Row(
+        ColumnStart(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Day number indicator with blue circle
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color(0xFF4285F4), CircleShape),
-                contentAlignment = Alignment.Center
+            Button(
+                onClick = {},
+                modifier = Modifier.height(32.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                border = null
             ) {
-                Text(
-                    text = "$dayNumber",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                // Location name
-                Text(
-                    text = activity.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-
-                // Time information
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccessTime,
-                        contentDescription = null,
-                        tint = Color(0xFF4285F4),
-                        modifier = Modifier.size(20.dp)
-                    )
-
+                activity.date?.let {
                     Text(
-                        text = "${activity.timeStart} - ${activity.timeEnd}",
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-
-                // Directions button
-                Button(
-                    onClick = onDirectionsClick,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .width(150.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFEEF3FF),
-                        contentColor = Color(0xFF4285F4)
-                    )
-                ) {
-                    Text(
-                        text = "Directions",
-                        fontSize = 14.sp,
+                        text = activity.dayName + " " + activity.date,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
+            Seprate(height = 10)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Day number circle
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Txt(
+                        value = "$index",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontWeight = FontWeight.Bold,
+                        size = 12
+                    )
+                }
+
+                // Activity image
+                ImgWithUrl(
+                    url = activity.img,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+
+                // Textual info
+                Column(
+                ) {
+                    Txt(
+                        value = activity.name,
+                        fontWeight = FontWeight.SemiBold,
+                        size = 16,
+                        maxLines = 1
+                    )
+
+                    Txt(
+                        value = activity.address,
+                        size = 14,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        maxLines = 1,
+                    )
+                }
+            }
+
+            Seprate(height = 10)
+
+            RowBetween {
+                RowStart {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = "Time Icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Seprate(width = 4)
+                    Txt(
+                        value = "${activity.timeStart} - ${activity.timeEnd}",
+                        size = 14,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                Button(
+                    onClick = onDirectionsClick,
+                    modifier = Modifier.height(32.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    border = null
+                ) {
+                    Text(
+                        text = "Directions",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
         }
     }
 }
+

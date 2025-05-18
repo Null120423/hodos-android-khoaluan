@@ -1,22 +1,24 @@
 package com.example.hodos_final_android.screen.planing.components
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
@@ -27,7 +29,7 @@ import kotlin.math.absoluteValue
 fun TripActivityCarousel(
     modifier: Modifier = Modifier,
     tripActivities: List<TripActivity>,
-    backgroundColor: Color = Color(0xFF6C63FF) // Purple background color like in the image
+    onActivitySelected: (activity: TripActivity) -> Unit
 ) {
     val pagerState = rememberPagerState { tripActivities.size }
     val configuration = LocalConfiguration.current
@@ -37,20 +39,27 @@ fun TripActivityCarousel(
     val cardWidth = screenWidth * 0.75f // Center card takes 75% of screen width
     val sideItemVisibleWidth = (screenWidth - cardWidth) / 2 // Each side item shows equally
 
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .collect { page ->
+                Log.i("API", "Selected page: $page")
+                onActivitySelected(tripActivities[page])
+            }
+    }
+
     Box(
         modifier = modifier
-            .background(backgroundColor)
-            .defaultMinSize(minHeight = 300.dp)
             .fillMaxWidth()
             .padding(vertical = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)),
             pageSpacing = 0.dp, // No spacing between pages for a cleaner look
-            contentPadding = PaddingValues(horizontal = sideItemVisibleWidth) // Dynamic padding based on screen size
+            contentPadding = PaddingValues(horizontal = sideItemVisibleWidth) // Dynamic padding based on screen size,
         ) { page ->
+
             val activity = tripActivities[page]
 
             // Calculate current offset
@@ -72,7 +81,7 @@ fun TripActivityCarousel(
 
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 4.dp, vertical = 8.dp)
+                    .padding(10.dp)
                     .width(cardWidth) // Fixed width based on screen size
                     .clip(RoundedCornerShape(24.dp)) // Rounded corners like in the image
                     .graphicsLayer {
@@ -83,11 +92,11 @@ fun TripActivityCarousel(
             ) {
                 // Use the existing TripActivityCardMap but with a white background
                 TripActivityCardMap(
+                    index = page + 1,
                     activity = activity,
-                    dayNumber = 1,
                     onDirectionsClick = {},
                     modifier = Modifier
-                        .background(Color.White) // White background like in the image
+                        .background(MaterialTheme.colorScheme.background) // White background like in the image
                         .fillMaxWidth()
                 )
             }

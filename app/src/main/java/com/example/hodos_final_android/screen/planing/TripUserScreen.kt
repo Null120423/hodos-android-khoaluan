@@ -3,7 +3,6 @@ package com.example.hodos_final_android.screen.planing
 import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.component.EmptyView
 import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
@@ -141,9 +141,7 @@ fun TripUserScreen() {
         ){
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxSize(),
             ) {
                 item {
                     Seprate(height = 40)
@@ -163,7 +161,7 @@ fun TripUserScreen() {
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Đang tải thêm...")
+                            Text("Loading more...")
                         }
 
                         LaunchedEffect(Unit) {
@@ -187,6 +185,15 @@ fun TripUserScreen() {
                 item {
                     Spacer(modifier = Modifier.height(80.dp))
                 }
+
+                if(trips.isEmpty()) {
+                    item {
+                        EmptyView(
+                            title = "No trip!"
+                        )
+                    }
+                }
+
             }
 
             PullRefreshIndicator(
@@ -224,7 +231,6 @@ fun RegularTripCard(trip: Trip, onDetail: () -> Unit?) {
             .clickable {
                 trip.id?.let { onDetail() }
             },
-        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
@@ -327,5 +333,7 @@ fun RegularTripCard(trip: Trip, onDetail: () -> Unit?) {
             }
         }
     }
+
+    Seprate(height = 1, background = MaterialTheme.colorScheme.tertiary.copy(0.1f))
 }
 

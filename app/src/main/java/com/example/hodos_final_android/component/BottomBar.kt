@@ -94,7 +94,7 @@ val dropletButtons = listOf(
         icon = R.drawable.activity,
         isSelected = false,
         description = R.string.Message,
-        route = BottomBarRoute.Activity.route
+        route = BottomBarRoute.Post.route
 
     ),
     Item(

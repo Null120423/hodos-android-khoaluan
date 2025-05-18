@@ -29,6 +29,11 @@ core = "1.48.0"
 tensorflow-lite = "2.7.0"
 litert = "1.2.0"
 hilt = "2.48"
+cameraCore = "1.4.2"
+cameraLifecycle = "1.4.2"
+cameraVideo = "1.4.2"
+cameraView = "1.4.2"
+cameraCamera2 = "1.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +66,11 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 core = { group = "com.google.ar", name = "core", version.ref = "core" }
 tensorflow-lite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tensorflow-lite" }
 litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
+androidx-camera-video = { group = "androidx.camera", name = "camera-video", version.ref = "cameraVideo" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraCamera2" }
 
 
 

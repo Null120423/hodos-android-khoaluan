@@ -71,9 +71,9 @@ import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.LocationDetailModel
 import com.example.hodos_final_android.model.Route
+import com.example.hodos_final_android.model.decodePolyline
 import com.example.hodos_final_android.model.exampleRouteData
 import com.example.hodos_final_android.navigateWithAnimation
-import com.example.hodos_final_android.screen.planing.decodePolyline
 import com.example.hodos_final_android.view_model.LocationViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

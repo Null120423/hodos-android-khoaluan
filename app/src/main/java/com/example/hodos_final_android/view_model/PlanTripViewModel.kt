@@ -10,6 +10,7 @@ import com.example.hodos_final_android.model.PlanTripQuestionResponse
 import com.example.hodos_final_android.model.PlanTripRes
 import com.example.hodos_final_android.model.SaveTripResponse
 import com.example.hodos_final_android.model.Trip
+import com.example.hodos_final_android.model.TripDirection
 import com.example.hodos_final_android.repository.PlanTripRepository
 import com.example.hodos_final_android.service.api.parseJsonError
 import kotlinx.coroutines.delay
@@ -25,8 +26,10 @@ class PlanTripViewModel @Inject constructor(
     private val repository: PlanTripRepository
 ) : ViewModel() {
 
-    private val _planTripQuestionState = MutableStateFlow(ResponseDataState<List<PlanTripQuestionResponse>>(isLoading = true))
-    val planTripQuestionState: StateFlow<ResponseDataState<List<PlanTripQuestionResponse>>> = _planTripQuestionState
+    private val _planTripQuestionState =
+        MutableStateFlow(ResponseDataState<List<PlanTripQuestionResponse>>(isLoading = true))
+    val planTripQuestionState: StateFlow<ResponseDataState<List<PlanTripQuestionResponse>>> =
+        _planTripQuestionState
 
 
     private val _planTripResultState = MutableStateFlow(ResponseDataState<PlanTripRes>(isLoading = false))
@@ -41,6 +44,9 @@ class PlanTripViewModel @Inject constructor(
 
     private val _detailState = MutableStateFlow(ResponseDataState<Trip>(isLoading = true))
     val detailState: StateFlow<ResponseDataState<Trip>> = _detailState
+
+    private val _tripDirectionState = MutableStateFlow(ResponseDataState<TripDirection>(isLoading = false))
+    val tripDirectionState: StateFlow<ResponseDataState<TripDirection>> = _tripDirectionState
 
     fun loadQuestionToCollect() {
         repository.loadQuestionToCollect()
@@ -112,11 +118,32 @@ class PlanTripViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-
     fun saveTrip(body: Any){
         repository.saveTrip(body)
             .onEach { result ->
                 _saveTripState.value = when (result) {
+                    is Resource.Success -> {
+                        delay(1000)
+                        ResponseDataState(data = result.data)
+                    }
+                    is Resource.Error -> {
+                        result.message?.let { Log.i("API", it) }
+                        val error = result.message?.let { parseJsonError(it) }
+                        ResponseDataState(error = error)
+                    }
+                    is Resource.Loading -> ResponseDataState(isLoading = true)
+                    else -> {
+                        ResponseDataState()
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun tripDirection(body: Any){
+        repository.tripDirection(body)
+            .onEach { result ->
+                _tripDirectionState.value = when (result) {
                     is Resource.Success -> {
                         delay(1000)
                         ResponseDataState(data = result.data)

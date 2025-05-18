@@ -7,6 +7,7 @@ import com.example.hodos_final_android.model.PlanTripQuestionResponse
 import com.example.hodos_final_android.model.PlanTripRes
 import com.example.hodos_final_android.model.SaveTripResponse
 import com.example.hodos_final_android.model.Trip
+import com.example.hodos_final_android.model.TripDirection
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -29,6 +30,9 @@ interface PlanTripService {
 
     @GET("plan-trip/{id}")
     suspend fun detail(@Path("id") id: String): Trip
+
+    @POST("plan-trip/trip-direction")
+    suspend fun tripDirection(@Body()body: Any): TripDirection
 
 }
 

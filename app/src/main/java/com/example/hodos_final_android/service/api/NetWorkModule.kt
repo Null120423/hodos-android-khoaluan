@@ -15,6 +15,7 @@ import com.example.hodos_final_android.service.ChatBotService
 import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
 import com.example.hodos_final_android.service.PlanTripService
+import com.example.hodos_final_android.service.PostService
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import dagger.Module
@@ -73,8 +74,8 @@ class ApiLoggerInterceptor : Interceptor {
         } ?: "No Body"
 
         Log.i("API", "➡️ API Request: ${request.method} ${request.url}")
-        Log.i("API", "Headers: ${request.headers}")
-        Log.i("API", "Body: $bodyString")
+//        Log.i("API", "Headers: ${request.headers}")
+//        Log.i("API", "Body: $bodyString")
 
         val response = chain.proceed(request)
 
@@ -140,8 +141,8 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            //.baseUrl("https://hodos-api.genny.id.vn/")
-            .baseUrl("http://192.168.1.6:3000/")
+            .baseUrl("https://hodos-api.genny.id.vn/")
+            //.baseUrl("http://192.168.1.4:3000/")
             //.baseUrl("http://192.168.2.88:3000/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
@@ -174,6 +175,12 @@ object NetworkModule {
     @Singleton
     fun providePlanTripService(retrofit: Retrofit): PlanTripService {
         return retrofit.create(PlanTripService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostService(retrofit: Retrofit): PostService {
+        return retrofit.create(PostService::class.java)
     }
 }
 

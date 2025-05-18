@@ -38,4 +38,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     fun getRefreshToken(): String? {
         return _authState.value?.refreshToken
     }
+
+    fun logout() {
+        _authState.value = null
+        TokenManager.getInstance().clearTokens()
+    }
+
 }

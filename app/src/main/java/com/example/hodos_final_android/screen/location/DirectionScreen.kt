@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.model.Route
 import com.example.hodos_final_android.model.Step
+import com.example.hodos_final_android.model.decodePolyline
 import com.example.hodos_final_android.model.exampleRouteData
-import com.example.hodos_final_android.screen.planing.decodePolyline
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -81,11 +81,6 @@ fun DirectionScreen() {
             )
         }
 
-//        LazyColumn(modifier = Modifier.fillMaxSize()) {
-//            items(steps) { step ->
-//                DirectionItem(step = step)
-//            }
-//        }
     }
 }
 

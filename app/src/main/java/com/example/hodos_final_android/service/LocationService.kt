@@ -28,5 +28,10 @@ interface LocationService {
         @Path("id") id: String,
     ): Location
 
+    @POST("location/find")
+    suspend fun find(
+    ): List<Location>
+
+
 }
 

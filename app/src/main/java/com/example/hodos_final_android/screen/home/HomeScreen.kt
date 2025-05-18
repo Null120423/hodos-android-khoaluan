@@ -64,7 +64,7 @@ import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.CarouselExample
 import com.example.hodos_final_android.component.ColumnCenter
 import com.example.hodos_final_android.component.ImgWithUrl
-import com.example.hodos_final_android.component.PostItem
+import com.example.hodos_final_android.component.NewItem
 import com.example.hodos_final_android.component.RowBetween
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.SkeletonList
@@ -79,9 +79,9 @@ import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.model.Category
 import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.Location
-import com.example.hodos_final_android.model.Post
+import com.example.hodos_final_android.model.New
 import com.example.hodos_final_android.model.categories
-import com.example.hodos_final_android.model.posts
+import com.example.hodos_final_android.model.news
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -217,7 +217,7 @@ fun HomeScreen(
 
                                 IconButton(
                                     modifier = Modifier.weight(0.1f),
-                                    onClick = { /* handle click */ }) {
+                                    onClick = {navController.navigateWithAnimation(Screen.NotificationScreen.route) }) {
                                     Icon(
                                         imageVector = Icons.Default.Notifications,
                                         contentDescription = "Notifications",
@@ -269,7 +269,7 @@ fun HomeScreen(
                                 if(homeState.data != null) {
                                     LocationCardGrid(locations = homeState.data!!.locationData.lst)
                                     FoodCardGrid(locations = homeState.data!!.foodData.lst)
-                                    PostList(posts = posts)
+                                    NewList(news = news)
                                 }
 
                                 Seprate(height = 100)
@@ -305,7 +305,7 @@ fun LocationCardGrid(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Title(value = "Locations for you", size = 16, fontWeight = FontWeight.Bold)
-            Txt(value = "Watch more", size = 12)
+            Txt(value = "", size = 12)
         }
 
         Seprate(height = 10)
@@ -323,8 +323,8 @@ fun LocationCardGrid(
 
 
 @Composable
-fun PostList(
-    posts: List<Post>
+fun NewList(
+    news: List<New>
 ) {
     Column(
         modifier = Modifier
@@ -345,8 +345,8 @@ fun PostList(
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
         ) {
-            items(posts) { post ->
-                PostItem(data = post)
+            items(news) { new ->
+                NewItem(data = new)
             }
         }
     }
@@ -369,7 +369,7 @@ fun FoodCardGrid(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Title(value = "Foods for you", size = 16, fontWeight = FontWeight.Bold)
-            Txt(value = "Watch more", size = 12)
+            Txt(value = "", size = 12)
         }
 
         Seprate(height = 10)
@@ -402,7 +402,7 @@ fun CategoriesView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Title(value = "Categories", size = 16, fontWeight = FontWeight.Bold)
-            Txt(value = "Watch more", size = 12)
+            Txt(value = "", size = 12)
         }
 
         Seprate(height = 10)

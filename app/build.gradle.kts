@@ -73,6 +73,11 @@ dependencies {
     implementation(libs.litert)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.video)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.camera2)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
@@ -158,6 +163,9 @@ dependencies {
     implementation("com.exyte:animated-navigation-bar:1.0.0")
 
     implementation("com.google.accompanist:accompanist-placeholder-material:0.35.0-alpha")
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
 
 
     implementation(libs.androidx.core.splashscreen)

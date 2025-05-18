@@ -75,7 +75,7 @@ fun LoginScreen(
     LaunchedEffect(loginState.data) {
         loginState.data?.let {
             FancyToast.makeText(context, "Login successfully!", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
-            navController.popBackStack()
+            navController.navigateWithAnimation(Screen.Main.route)
         }
     }
 

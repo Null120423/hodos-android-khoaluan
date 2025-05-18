@@ -3,6 +3,7 @@ package com.example.hodos_final_android.repository
 
 
 import Resource
+import android.util.Log
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
@@ -31,5 +32,13 @@ class LocationRepository @Inject constructor(
     fun detail(id: String) : Flow<Resource<Location>> =
         safeApiCall {
             service.detail(id)
+        }
+
+
+    fun find(): Flow<Resource<List<Location>>> =
+        safeApiCall {
+            val result = service.find()
+            Log.d("API_RESPONSE", result.toString())
+            result
         }
 }

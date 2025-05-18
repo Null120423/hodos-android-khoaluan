@@ -11,12 +11,17 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 
+
 @Composable
-fun AnimateImg(modifier: Modifier = Modifier, @RawRes source: Int) {
+fun AnimateImg(
+    modifier: Modifier = Modifier,
+    @RawRes source: Int,
+    playOnce: Boolean = false
+) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(source))
     val progress by animateLottieCompositionAsState(
         composition = composition,
-        iterations = LottieConstants.IterateForever // Chạy vô hạn
+        iterations = if (playOnce) 1 else LottieConstants.IterateForever
     )
 
     LottieAnimation(
