@@ -5,7 +5,13 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Headset
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -15,10 +21,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.min
-
-import java.util.*
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 fun Easing.transform(from: Float, to: Float, value: Float): Float {
     return transform(((value - from) * (1f / (to - from))).coerceIn(0f, 1f))
@@ -127,6 +135,34 @@ fun Date.getTimeAgo(): String {
         days == 1L -> "Hôm qua"
         days < 7 -> "$days ngày trước"
         else -> java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(this)
+    }
+}
+
+fun formatPrice(price: String, currency: String): String {
+    val numPrice = price.toDoubleOrNull() ?: 0.0
+    return if (currency == "VND") {
+        NumberFormat.getCurrencyInstance(Locale("vi", "VN")).format(numPrice)
+    } else {
+        NumberFormat.getCurrencyInstance(Locale.US).format(numPrice)
+    }
+}
+
+
+fun getFeatureIcon(feature: String): ImageVector {
+    return when (feature) {
+        "Unlimited Trips" -> Icons.Default.Map
+        "Advanced Analytics" -> Icons.Default.Analytics
+        "Priority Support" -> Icons.Default.Headset
+        else -> Icons.Default.Star
+    }
+}
+
+
+fun formatDate(date: Date?): String {
+    return if (date != null) {
+        SimpleDateFormat("dd/MM/yyyy", Locale("vi", "VN")).format(date)
+    } else {
+        "N/A"
     }
 }
 

@@ -44,6 +44,13 @@ import com.example.hodos_final_android.screen.planing.DetailTripScreen
 import com.example.hodos_final_android.screen.planing.TripDirectionScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.example.hodos_final_android.screen.post.CreatePostScreen
+import com.example.hodos_final_android.screen.profile.PaymentMethodScreen
+import com.example.hodos_final_android.screen.profile.PaymentProcessingScreen
+import com.example.hodos_final_android.screen.profile.PlanSelectionScreen
+import com.example.hodos_final_android.screen.profile.PremiumOnboardingScreen
+import com.example.hodos_final_android.screen.profile.SuccessScreen
+import com.example.hodos_final_android.screen.profile.TrialActivationScreen
+import com.example.hodos_final_android.screen.profile.UpgradeOverviewScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
 
@@ -91,7 +98,14 @@ sealed class Screen(val route: String) {
     }
     object NotificationScreen : Screen("NotificationScreen")
     object CreatePostScreen : Screen("CreatePostScreen")
-
+    // flow update account
+    object UpgradeOverviewScreen : Screen("UpgradeOverviewScreen")
+    object PlanSelectionScreen : Screen("PlanSelectionScreen")
+    object PaymentMethodScreen : Screen("PaymentMethodScreen")
+    object PaymentProcessingScreen : Screen("PaymentProcessingScreen")
+    object SuccessScreen : Screen("SuccessScreen")
+    object TrialActivationScreen : Screen("TrialActivationScreen")
+    object PremiumOnboardingScreen : Screen("PremiumOnboardingScreen")
 }
 
 data class ScreenConfig(
@@ -170,21 +184,16 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.ComingSoonScreen.route) {
             ComingSoonScreen() },
         ScreenConfig(Screen.Gallery.route ) { backStackEntry ->
-            GalleryFullScreen()
-        }
-
-            ,
+            GalleryFullScreen()  },
         ScreenConfig(Screen.Direction.route ) { backStackEntry ->
             DirectionScreen()
         },
         ScreenConfig(Screen.TripDirectionScreen.route ) { backStackEntry ->
             TripDirectionScreen()
         },
-
         ScreenConfig(Screen.PostDetailScreen.route ) { backStackEntry ->
             PostDetailScreen()
         },
-
         ScreenConfig(Screen.TourScreen.route ) { backStackEntry ->
             TourScreen()
         },
@@ -194,14 +203,36 @@ fun AppNavHost(navController: NavHostController) {
                 id = id,
             )
         },
-
         ScreenConfig(Screen.NotificationScreen.route ) { backStackEntry ->
             NotificationScreen()
         },
-
         ScreenConfig(Screen.CreatePostScreen.route ) { backStackEntry ->
             CreatePostScreen()
         },
+
+        // flow upgrade account
+        ScreenConfig(Screen.UpgradeOverviewScreen.route ) {
+            backStackEntry -> UpgradeOverviewScreen()
+        },
+        ScreenConfig(Screen.PlanSelectionScreen.route) {
+            backStackEntry -> PlanSelectionScreen()
+        },
+        ScreenConfig(Screen.PaymentMethodScreen.route) {
+            backStackEntry -> PaymentMethodScreen()
+        },
+        ScreenConfig(Screen.PaymentProcessingScreen.route) {
+            backStackEntry -> PaymentProcessingScreen()
+        },
+        ScreenConfig(Screen.SuccessScreen.route) {
+                backStackEntry -> SuccessScreen()
+        },
+        ScreenConfig(Screen.TrialActivationScreen.route) {
+                backStackEntry -> TrialActivationScreen()
+        },
+        ScreenConfig(Screen.PremiumOnboardingScreen.route) {
+                backStackEntry -> PremiumOnboardingScreen()
+        },
+
 
     )
 

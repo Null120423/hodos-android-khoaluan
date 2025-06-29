@@ -4,6 +4,8 @@ package com.example.hodos_final_android.view_model
 import androidx.lifecycle.ViewModel
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.model.AuthData
+import com.example.hodos_final_android.model.PricingPlanModel
+import com.example.hodos_final_android.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,6 +33,13 @@ class UserViewModel @Inject constructor() : ViewModel() {
 
     }
 
+    fun getUser() : User? {
+        return _authState.value?.user
+    }
+
+    fun getSuggestPricingPlan() : PricingPlanModel? {
+        return this.getUser()?.pricingPlanSuggest
+    }
     fun getAccessToken(): String? {
         return _authState.value?.accessToken
     }

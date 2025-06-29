@@ -11,22 +11,20 @@ import com.example.hodos_final_android.model.VerifyModel
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-/**
- * Retrofit API service interface for network requests
- */
+
 interface AuthService {
     @POST("auth/sign-up")
-    suspend fun signUp(@Body() body: RegisterModel): Response
+    suspend fun signUp(@Body() body: RegisterModel): Response<Any>
 
 
     @POST("auth/sign-in")
     suspend fun login(@Body() body: LoginModel): AuthData
 
     @POST("auth/resend-verification-code")
-    suspend fun resendVerCode(@Body() body: ResendCodeModel): Response
+    suspend fun resendVerCode(@Body() body: ResendCodeModel): Response<Any>
 
     @POST("auth/verify")
-    suspend fun verify(@Body() body: VerifyModel): Response
+    suspend fun verify(@Body() body: VerifyModel): Response<Any>
 
     @POST("user/detail")
     suspend fun userDetail(@Body() body: GetUserInfoModel): AuthData

@@ -16,6 +16,7 @@ import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
 import com.example.hodos_final_android.service.PlanTripService
 import com.example.hodos_final_android.service.PostService
+import com.example.hodos_final_android.service.UserSubscriptionService
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import dagger.Module
@@ -141,8 +142,8 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://hodos-api.genny.id.vn/")
-            //.baseUrl("http://192.168.1.4:3000/")
+            //.baseUrl("https://hodos-api.gitlabserver.id.vn/")
+            .baseUrl("http://192.168.1.3:3000/")
             //.baseUrl("http://192.168.2.88:3000/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
@@ -181,6 +182,12 @@ object NetworkModule {
     @Singleton
     fun providePostService(retrofit: Retrofit): PostService {
         return retrofit.create(PostService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserSubscriptionService(retrofit: Retrofit): UserSubscriptionService {
+        return retrofit.create(UserSubscriptionService::class.java)
     }
 }
 

@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.hodos_final_android.component.Toast.ToastManager
+import com.example.hodos_final_android.component.Toast.ToastType
 import com.example.hodos_final_android.helper.NetworkStateMonitor
 import com.example.hodos_final_android.helper.OnboardingUtils
 import com.example.hodos_final_android.screen.OnboardingScreen
@@ -61,6 +63,14 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val isNetworkAvailable by networkMonitor.isConnected.collectAsState()
 
+            val toastManager = remember { ToastManager() }
+
+
+            toastManager.showToast(
+                type = ToastType.SUCCESS,
+                title = "Success!",
+                message = "Operation completed successfully"
+            )
 
             HodosTheme {
                 CompositionLocalProvider(LocalNavController provides navController) {

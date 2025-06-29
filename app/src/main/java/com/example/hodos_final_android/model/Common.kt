@@ -1,7 +1,9 @@
 package com.example.hodos_final_android.model
 
-data class Response(
+
+data class Response<T>(
     val message: String,
+    val data : T
 )
 
 
