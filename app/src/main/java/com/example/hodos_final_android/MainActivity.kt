@@ -61,7 +61,6 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val isNetworkAvailable by networkMonitor.isConnected.collectAsState()
 
-
             HodosTheme {
                 CompositionLocalProvider(LocalNavController provides navController) {
                     Box(modifier = Modifier.fillMaxSize()){
@@ -114,6 +113,7 @@ class MainActivity : ComponentActivity() {
 
                     }
                 }
+
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.hodos_final_android.component
+package com.example.hodos_final_android
 
 
 import androidx.compose.foundation.background

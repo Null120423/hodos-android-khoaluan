@@ -1,9 +1,13 @@
 package com.example.hodos_final_android.component.Toast
 
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,17 +61,21 @@ data class ToastData(
 
 @Composable
 fun ToastContainer(toastManager: ToastManager) {
-    Column {
-        toastManager.toasts.forEach { toast ->
-            CustomToast(
-                type = toast.type,
-                title = toast.title,
-                message = toast.message,
-                showButton = toast.showButton,
-                buttonText = toast.buttonText,
-                onButtonClick = toast.onButtonClick,
-                onDismiss = { toastManager.dismissToast(toast.id) }
-            )
+    Box(
+        modifier = Modifier.padding(top = 30.dp)
+    ) {
+        Column {
+            toastManager.toasts.forEach { toast ->
+                CustomToast(
+                    type = toast.type,
+                    title = toast.title,
+                    message = toast.message,
+                    showButton = toast.showButton,
+                    buttonText = toast.buttonText,
+                    onButtonClick = toast.onButtonClick,
+                    onDismiss = { toastManager.dismissToast(toast.id) }
+                )
+            }
         }
     }
 }

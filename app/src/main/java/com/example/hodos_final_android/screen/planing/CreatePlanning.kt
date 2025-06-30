@@ -122,6 +122,9 @@ fun CreatePlanning() {
               answers = answers.toString()
           ))
         isAnswer = true
+        navController.navigateWithAnimation(
+            Screen.CreatingPlan.route
+        )
     }
 
 
@@ -137,18 +140,7 @@ fun CreatePlanning() {
                 ) {
                     if (planTripQuestionState.isLoading) {
                         Loading()
-                    }
-                    else if(planTripQuestionResultState.isLoading){
-                        Column {
-                            Loading()
-                            Seprate(height = 10)
-                            Title(
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold,
-                                value = "Plan trip base your answer. Please wait in few seconds"
-                            )
-                        }
-                    } else if(planTripQuestionResultState.error != null) {
+                    }else if(planTripQuestionResultState.error != null) {
                         Column {
                             Seprate(height = 10)
                             Title(

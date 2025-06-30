@@ -4,6 +4,7 @@ import com.example.hodos_final_android.view_model.ChatViewModel
 import com.example.hodos_final_android.view_model.HomeViewModel
 import com.example.hodos_final_android.view_model.PlanTripViewModel
 import com.example.hodos_final_android.view_model.PostViewModel
+import com.example.hodos_final_android.view_model.UserSubscriptionModel
 import com.example.hodos_final_android.view_model.UserViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -29,7 +30,7 @@ interface PlanTripModelEntryPoint {
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface HọmeViewModelEntryPoint {
+interface HomeViewModelEntryPoint {
     fun homeViewModel(): HomeViewModel
 }
 
@@ -43,4 +44,10 @@ interface AppStateViewEntryPoint {
 @InstallIn(SingletonComponent::class)
 interface PostViewModelEntryPoint {
     fun postViewModel(): PostViewModel
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface UserSubscriptionEntryPoint {
+    fun userSubscriptionModel(): UserSubscriptionModel
 }

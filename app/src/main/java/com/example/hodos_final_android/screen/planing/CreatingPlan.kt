@@ -40,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,10 +58,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
-import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.di.PlanTripModelEntryPoint
-import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.replaceCurrentWithAnimation
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 
@@ -80,10 +80,8 @@ fun CreatingPlan() {
 
     // State management
     var isLoading by remember { mutableStateOf(true) }
-    var loadingProgress by remember { mutableStateOf(0f) }
+    var loadingProgress by remember { mutableFloatStateOf(0f) }
     var currentStep by remember { mutableStateOf("Analyzing your preferences...") }
-    var hasError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
 
     // Loading steps
     val loadingSteps = listOf(
@@ -100,11 +98,8 @@ fun CreatingPlan() {
             loadingProgress = (index + 1) / loadingSteps.size.toFloat()
             delay(1500)
         }
-
-        // Navigate to result screen after completion
-        delay(500)
         if(!planTripQuestionResultState.isLoading && planTripQuestionResultState.data != null) {
-            navController.navigateWithAnimation(Screen.CreatePlanningResultScreen.route)
+            navController.replaceCurrentWithAnimation(Screen.CreatePlanningResultScreen.route)
         }
     }
 
@@ -117,15 +112,12 @@ fun CreatingPlan() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (hasError) {
+        if (planTripQuestionResultState.error != null) {
             // Error State
             ErrorContent(
-                errorMessage = errorMessage,
+                errorMessage = planTripQuestionResultState.error!!.message,
                 onRetry = {
-                    hasError = false
-                    isLoading = true
-                    loadingProgress = 0f
-                    currentStep = loadingSteps.first()
+                    navController.popBackStack()
                 },
                 onCancel = {
                     navController.popBackStack()
@@ -152,9 +144,6 @@ fun LoadingContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Main loading animation
-        Loading()
-
         Spacer(modifier = Modifier.height(10.dp))
 
         // Progress indicator
@@ -173,14 +162,14 @@ fun LoadingContent(
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    color = Color(0xFF10B981),
-                    trackColor = Color(0xFF10B981).copy(alpha = 0.2f)
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                 )
 
                 Text(
                     text = "${(progress * 100).toInt()}% Complete",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF10B981),
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -334,7 +323,7 @@ fun ErrorContent(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Try Again")
+                Text("Go Back")
             }
         }
     }

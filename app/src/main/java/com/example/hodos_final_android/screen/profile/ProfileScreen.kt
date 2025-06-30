@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -25,9 +24,7 @@ import androidx.compose.material.icons.filled.AirplanemodeActive
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Newspaper
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -64,6 +61,7 @@ import dagger.hilt.android.EntryPointAccessors
 fun ProfileScreen(
     isLoggedIn: Boolean = true
 ) {
+
     val scrollState = rememberScrollState()
 
     val context = LocalContext.current
@@ -76,6 +74,7 @@ fun ProfileScreen(
 
     val isConfirmLogout = remember { mutableStateOf(false) }
 
+    val planData = userViewModel.getSuggestPricingPlan()
     if(
         userViewModel.getAccessToken() == null
     ) {
@@ -108,7 +107,15 @@ fun ProfileScreen(
 
                     // Promo banner
                     if (isLoggedIn) {
-                        LocationPromoBanner()
+                        if(authState?.user != null && authState?.user!!.isPremium) {
+                            if (planData != null) {
+                                SubscriptionManagementCard(currentUser = authState?.user!!, planData = planData)
+                            }
+                        }else {
+                            if (planData != null) {
+                                PremiumUpgradeCard(planData = planData)
+                            }
+                        }
                     } else {
                         ReferralBanner()
                     }
@@ -392,64 +399,6 @@ fun ReferralBanner() {
                 minWidth = getScreenWidth() - 20,
                 title = "Watch detail"
             )
-        }
-    }
-}
-
-@Composable
-fun LocationPromoBanner() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Txt(
-                    value = "Get local tips",
-                    size = 18,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.background
-
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Txt(
-                    value = "Add your country/region to get better recommendations",
-                    size = 14,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // World map icon with location pins
-            Box(
-                modifier = Modifier.size(80.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Public,
-                    contentDescription = null,
-                    modifier = Modifier.size(60.dp),
-                    tint = MaterialTheme.colorScheme.scrim
-                )
-
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .offset(x = 20.dp, y = (-10).dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
         }
     }
 }

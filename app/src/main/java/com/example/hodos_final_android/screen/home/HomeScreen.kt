@@ -71,7 +71,7 @@ import com.example.hodos_final_android.component.SkeletonList
 import com.example.hodos_final_android.component.Title
 import com.example.hodos_final_android.component.TravelCard
 import com.example.hodos_final_android.component.Txt
-import com.example.hodos_final_android.di.HọmeViewModelEntryPoint
+import com.example.hodos_final_android.di.HomeViewModelEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.helper.getScreenHeight
@@ -108,7 +108,7 @@ fun HomeScreen(
 
     val homeViewModel = remember {
         EntryPointAccessors
-            .fromApplication(context, HọmeViewModelEntryPoint::class.java)
+            .fromApplication(context, HomeViewModelEntryPoint::class.java)
             .homeViewModel()
     }
 

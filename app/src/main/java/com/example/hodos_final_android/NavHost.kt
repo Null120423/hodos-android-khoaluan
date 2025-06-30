@@ -40,10 +40,17 @@ import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
 import com.example.hodos_final_android.screen.notification.NotificationScreen
 import com.example.hodos_final_android.screen.planing.CreatePlanningResultScreen
+import com.example.hodos_final_android.screen.planing.CreatingPlan
 import com.example.hodos_final_android.screen.planing.DetailTripScreen
 import com.example.hodos_final_android.screen.planing.TripDirectionScreen
 import com.example.hodos_final_android.screen.post.PostDetailScreen
 import com.example.hodos_final_android.screen.post.CreatePostScreen
+import com.example.hodos_final_android.screen.profile.PaymentMethodScreen
+import com.example.hodos_final_android.screen.profile.PaymentProcessingScreen
+import com.example.hodos_final_android.screen.profile.PremiumOnboardingScreen
+import com.example.hodos_final_android.screen.profile.SuccessScreen
+import com.example.hodos_final_android.screen.profile.TrialActivationScreen
+import com.example.hodos_final_android.screen.profile.UpgradeOverviewScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
 
@@ -59,11 +66,14 @@ sealed class Screen(val route: String) {
         }
     }
     object Gallery : Screen("Gallery")
-    object Planning : Screen("planning")
     object CollectInfo : Screen("collectInfo")
+    // planning
+    object Planning : Screen("planning")
     object PlanningDetail : Screen("planningDetail")
+    object CreatingPlan : Screen("CreatingPlan")
     object CreatePlanning : Screen("createPlanning")
     object CreatePlanningResultScreen : Screen("CreatePlanningResultScreen")
+    // plannning
     object EditPlanning : Screen("editPlanning")
     object ChatAiDashBoard : Screen("ChatAiDashBoard")
     object ChatAiRoom : Screen("ChatAiRoom")
@@ -91,7 +101,13 @@ sealed class Screen(val route: String) {
     }
     object NotificationScreen : Screen("NotificationScreen")
     object CreatePostScreen : Screen("CreatePostScreen")
-
+    // flow update account
+    object UpgradeOverviewScreen : Screen("UpgradeOverviewScreen")
+    object PaymentMethodScreen : Screen("PaymentMethodScreen")
+    object PaymentProcessingScreen : Screen("PaymentProcessingScreen")
+    object SuccessScreen : Screen("SuccessScreen")
+    object TrialActivationScreen : Screen("TrialActivationScreen")
+    object PremiumOnboardingScreen : Screen("PremiumOnboardingScreen")
 }
 
 data class ScreenConfig(
@@ -137,11 +153,19 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.Main.route) { MainScreen() },
         ScreenConfig(Screen.Login.route) { LoginScreen() },
         ScreenConfig(Screen.Register.route) { RegisterScreen() },
+        // plan
         ScreenConfig(Screen.Planning.route) { PlanningScreen() },
         ScreenConfig(Screen.PlanningDetail.route) { PlanningDetail() },
         ScreenConfig(Screen.CreatePlanning.route) { CreatePlanning() },
         ScreenConfig(Screen.CreatePlanningResultScreen.route) { CreatePlanningResultScreen() },
         ScreenConfig(Screen.EditPlanning.route) { EditPlanning() },
+        ScreenConfig(Screen.Direction.route ) { backStackEntry ->
+            DirectionScreen()
+        },
+        ScreenConfig(Screen.CreatingPlan.route ) { backStackEntry ->
+            CreatingPlan()
+        },
+        // plan
         ScreenConfig(Screen.ChatAiDashBoard.route) { ChatDashboard() },
         ScreenConfig(Screen.ChatAiRoom.route) { ChatRoomScreen() },
         ScreenConfig(Screen.SearchScreen.route) { SearchScreen() },
@@ -149,8 +173,8 @@ fun AppNavHost(navController: NavHostController) {
             val registerModelJson = backStackEntry.arguments?.getString("registerModel") ?: ""
 
             EmailVerificationScreen(
-            registerModelJson = registerModelJson,
-        ) },
+                registerModelJson = registerModelJson,
+            ) },
         ScreenConfig(Screen.LocationDetailScreen.route) { backStackEntry ->
             val locationId = backStackEntry.arguments?.getString("locationId") ?: ""
             LocationDetailScreen(
@@ -170,21 +194,13 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.ComingSoonScreen.route) {
             ComingSoonScreen() },
         ScreenConfig(Screen.Gallery.route ) { backStackEntry ->
-            GalleryFullScreen()
-        }
-
-            ,
-        ScreenConfig(Screen.Direction.route ) { backStackEntry ->
-            DirectionScreen()
-        },
+            GalleryFullScreen()  },
         ScreenConfig(Screen.TripDirectionScreen.route ) { backStackEntry ->
             TripDirectionScreen()
         },
-
         ScreenConfig(Screen.PostDetailScreen.route ) { backStackEntry ->
             PostDetailScreen()
         },
-
         ScreenConfig(Screen.TourScreen.route ) { backStackEntry ->
             TourScreen()
         },
@@ -194,16 +210,35 @@ fun AppNavHost(navController: NavHostController) {
                 id = id,
             )
         },
-
         ScreenConfig(Screen.NotificationScreen.route ) { backStackEntry ->
             NotificationScreen()
         },
-
         ScreenConfig(Screen.CreatePostScreen.route ) { backStackEntry ->
             CreatePostScreen()
         },
 
-    )
+        // flow upgrade account
+        ScreenConfig(Screen.UpgradeOverviewScreen.route ) {
+                backStackEntry -> UpgradeOverviewScreen()
+        },
+        ScreenConfig(Screen.PaymentMethodScreen.route) {
+                backStackEntry -> PaymentMethodScreen()
+        },
+        ScreenConfig(Screen.PaymentProcessingScreen.route) {
+                backStackEntry -> PaymentProcessingScreen()
+        },
+        ScreenConfig(Screen.SuccessScreen.route) {
+                backStackEntry -> SuccessScreen()
+        },
+        ScreenConfig(Screen.TrialActivationScreen.route) {
+                backStackEntry -> TrialActivationScreen()
+        },
+        ScreenConfig(Screen.PremiumOnboardingScreen.route) {
+                backStackEntry -> PremiumOnboardingScreen()
+        },
+
+
+        )
 
     NavHost(navController = navController, startDestination = Screen.Main.route) {
         screens.forEach { screen ->
@@ -245,6 +280,23 @@ fun NavGraphBuilder.animatedComposable(
 fun NavController.navigateWithAnimation(route: String) {
     this.navigate(route) {
         launchSingleTop = true
+    }
+}
+
+fun NavController.navigateBackWithAnimation() {
+    this.popBackStack()
+}
+
+fun NavController.replaceCurrentWithAnimation(route: String) {
+    val currentRoute = this.currentBackStackEntry?.destination?.route
+
+    this.navigate(route) {
+        launchSingleTop = true
+        currentRoute?.let {
+            popUpTo(it) {
+                inclusive = true // remove current route from back stack
+            }
+        }
     }
 }
 

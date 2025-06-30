@@ -96,7 +96,6 @@ fun CreatePlanningResultScreen() {
         navController.navigate(Screen.TripDirectionScreen.route)
     }
 
-
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // Main content
         LazyColumn(
