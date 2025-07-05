@@ -1,7 +1,6 @@
 package com.example.hodos_final_android
 
 
-import GalleryFullScreen
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -36,6 +35,7 @@ import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.screen.ComingSoonScreen
 import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
+import com.example.hodos_final_android.screen.location.GalleryFullScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
 import com.example.hodos_final_android.screen.notification.NotificationScreen

@@ -21,6 +21,19 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
+data class LoginWithGoogleDto(
+    val email: String,
+    val fullname : String,
+    val avatar: String
+)
+
+
+data class LoginWithFacebookDto(
+    val email: String,
+    val fullname : String,
+    val avatar: String
+)
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -54,6 +67,51 @@ class AuthViewModel @Inject constructor(
         _verifyState.value = ResponseState()
         _signUpState.value = ResponseState()
     }
+
+    fun loginWithGoogle(body: LoginWithGoogleDto) {
+        authRepository.loginWithGoogle(body).onEach { result ->
+            when (result) {
+                is Resource.Success -> {
+                    result.data?.let { userViewModel.updateAuthData(it) }
+                    _loginState.value = ResponseDataState(data = result.data)
+                }
+                is Resource.Error -> {
+                    val error = result.message?.let { parseJsonError(it) }
+                    _loginState.value = ResponseDataState(error = error)
+                }
+                is Resource.Loading -> {
+                    _loginState.value = ResponseDataState(isLoading = true)
+                }
+
+                else -> {
+                    _loginState.value = ResponseDataState()
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun loginWithFacebook(body: LoginWithFacebookDto) {
+        authRepository.loginWithFacebook(body).onEach { result ->
+            when (result) {
+                is Resource.Success -> {
+                    result.data?.let { userViewModel.updateAuthData(it) }
+                    _loginState.value = ResponseDataState(data = result.data)
+                }
+                is Resource.Error -> {
+                    val error = result.message?.let { parseJsonError(it) }
+                    _loginState.value = ResponseDataState(error = error)
+                }
+                is Resource.Loading -> {
+                    _loginState.value = ResponseDataState(isLoading = true)
+                }
+
+                else -> {
+                    _loginState.value = ResponseDataState()
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
 
 
     fun signUp(email: String, password: String, username: String, confirmPassword: String) {

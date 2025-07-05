@@ -21,7 +21,7 @@ fun ProfileAvatar(
     backgroundColor: Color,
     modifier: Modifier = Modifier,
     url: String? = "",
-    size : Int = 64
+    size : Int = 64,
 ) {
     Box(
         modifier = modifier

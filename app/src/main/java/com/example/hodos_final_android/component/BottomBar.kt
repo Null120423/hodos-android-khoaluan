@@ -91,17 +91,17 @@ val dropletButtons = listOf(
 
     ),
     Item(
+        icon = R.drawable.search_icon,
+        isSelected = false,
+        description = R.string.Heart,
+        route = BottomBarRoute.Event.route
+
+    ),
+    Item(
         icon = R.drawable.activity,
         isSelected = false,
         description = R.string.Message,
         route = BottomBarRoute.Post.route
-
-    ),
-    Item(
-        icon = R.drawable.event,
-        isSelected = false,
-        description = R.string.Heart,
-        route = BottomBarRoute.Event.route
 
     ),
     Item(

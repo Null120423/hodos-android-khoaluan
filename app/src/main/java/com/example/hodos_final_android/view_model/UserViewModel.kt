@@ -33,6 +33,7 @@ class UserViewModel @Inject constructor() : ViewModel() {
 
     }
 
+
     fun getUser() : User? {
         return _authState.value?.user
     }

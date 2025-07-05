@@ -12,6 +12,8 @@ import com.example.hodos_final_android.model.Response
 import com.example.hodos_final_android.model.VerifyModel
 import com.example.hodos_final_android.service.AuthService
 import com.example.hodos_final_android.service.api.safeApiCall
+import com.example.hodos_final_android.view_model.LoginWithFacebookDto
+import com.example.hodos_final_android.view_model.LoginWithGoogleDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -33,6 +35,11 @@ class AuthRepository @Inject constructor(
             Flow<Resource<AuthData>> =  safeApiCall {
                 service.login(body)
     }
+    fun loginWithGoogle(body: LoginWithGoogleDto):
+            Flow<Resource<AuthData>> =  safeApiCall { service.loginWithGoogle(body) }
+
+    fun loginWithFacebook(body: LoginWithFacebookDto):
+            Flow<Resource<AuthData>> =  safeApiCall { service.loginWithFacebook(body) }
 
     fun userInfo(body: GetUserInfoModel) :
             Flow<Resource<AuthData>> =  safeApiCall {

@@ -1,36 +1,63 @@
 package com.example.hodos_final_android.screen.auth
 
-
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,14 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
-import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
-import com.example.hodos_final_android.component.BtnPrimary
-import com.example.hodos_final_android.component.MainLayout
-import com.example.hodos_final_android.component.RowCenter
-import com.example.hodos_final_android.component.Seprate
-import com.example.hodos_final_android.component.TextBtn
-import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.model.ResendCodeModel
 import com.example.hodos_final_android.model.VerifyModel
@@ -57,9 +77,13 @@ import com.google.gson.reflect.TypeToken
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("DefaultLocale")
 @Composable
-fun EmailVerificationScreen( registerModelJson: String, viewModel: AuthViewModel = hiltViewModel()) {
+fun EmailVerificationScreen(
+    registerModelJson: String,
+    viewModel: AuthViewModel = hiltViewModel()
+) {
     val registerModel: RegisterModel = Gson().fromJson(
         registerModelJson, object : TypeToken<RegisterModel>() {}.type
     )
@@ -68,11 +92,18 @@ fun EmailVerificationScreen( registerModelJson: String, viewModel: AuthViewModel
     val resendCodeState by viewModel.resendCodeState.collectAsState()
 
     val verificationCode = remember { mutableStateListOf("", "", "", "") }
-    val focusRequesters = List(4) { FocusRequester() }
+    val focusRequesters = remember { List(4) { FocusRequester() } }
     val keyboardController = LocalSoftwareKeyboardController.current
     var timeRemaining by remember { mutableIntStateOf(32) }
 
     val context = LocalContext.current
+
+    // Animation states
+    var contentVisible by remember { mutableStateOf(false) }
+    var codeInputVisible by remember { mutableStateOf(false) }
+    var buttonVisible by remember { mutableStateOf(false) }
+    var shouldRequestFocus by remember { mutableStateOf(false) }
+
     // Timer countdown effect
     LaunchedEffect(key1 = timeRemaining) {
         if (timeRemaining > 0) {
@@ -82,14 +113,38 @@ fun EmailVerificationScreen( registerModelJson: String, viewModel: AuthViewModel
     }
 
     LaunchedEffect(Unit) {
-        focusRequesters[0].requestFocus()
+        contentVisible = true
+        delay(300)
+        codeInputVisible = true
+        delay(200)
+        buttonVisible = true
+        delay(500)
+        shouldRequestFocus = true
     }
 
+    // Separate LaunchedEffect for focus request
+    LaunchedEffect(shouldRequestFocus, codeInputVisible) {
+        if (shouldRequestFocus && codeInputVisible) {
+            try {
+                delay(100) // Small delay to ensure UI is ready
+                focusRequesters[0].requestFocus()
+            } catch (e: Exception) {
+                // Handle focus request failure gracefully
+                println("Focus request failed: ${e.message}")
+            }
+        }
+    }
+
+    // Rest of your LaunchedEffects remain the same...
     LaunchedEffect(verifyState.response) {
         verifyState.response?.let {
             FancyToast.makeText(context, verifyState.response!!.message, FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show()
 
-            navController.navigateWithAnimation(Screen.Login.route)
+            if(registerModel.password.isEmpty()) {
+                navController.popBackStack()
+            }else {
+                navController.navigateWithAnimation(Screen.Login.route)
+            }
         }
     }
 
@@ -112,11 +167,6 @@ fun EmailVerificationScreen( registerModelJson: String, viewModel: AuthViewModel
         }
     }
 
-    // Format time as MM:SS
-    val formattedTime = remember(timeRemaining) {
-        String.format("%02d:%02d", timeRemaining / 60, timeRemaining % 60)
-    }
-
     val handleResendCode = {
         val resendCodeModel = ResendCodeModel(
             username = registerModel.username,
@@ -125,157 +175,402 @@ fun EmailVerificationScreen( registerModelJson: String, viewModel: AuthViewModel
         viewModel.resendVerificationCode(resendCodeModel)
     }
 
+    LaunchedEffect(registerModel.password) {
+        if(registerModel.password.isEmpty()) {
+            handleResendCode()
+        }
+    }
+
+    // Format time as MM:SS
+    val formattedTime = remember(timeRemaining) {
+        String.format("%02d:%02d", timeRemaining / 60, timeRemaining % 60)
+    }
+
+
+
     val handleVerifyCode = {
         val verifyModel = VerifyModel(
             username = registerModel.username,
             email = registerModel.email,
-            verifyCode =verificationCode.joinToString("")
+            verifyCode = verificationCode.joinToString("")
         )
-
         viewModel.verify(verifyModel)
     }
 
-
-    MainLayout(
-        isLoading = verifyState.isLoading or resendCodeState.isLoading,
-        content = {
-            Seprate(height = 60)
-
-            // Verification Icon
-            Image(
-                painter = painterResource(id = R.drawable.hodos),
-                contentDescription = "App Logo",
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.95f)
+                    )
+                )
             )
+    ) {
+        // Background overlay for better contrast
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.3f),
+                            Color.Black.copy(alpha = 0.1f),
+                            Color.Transparent
+                        ),
+                        radius = 1000f
+                    )
+                )
+        )
 
-            Seprate(height = 24)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
 
-            Txt(
-                value = "Check Your Email",
-                size = 24,
-                fontWeight = FontWeight.Bold
-            )
-
-            Seprate(height = 8)
-
-            Txt(
-                value = "We've sent the code to the email on\nyour device",
-                color = Color.Gray,
-                textAlign = TextAlign.Center
-            )
-
-            Seprate(height = 32)
-
-            // Verification Code Input
-
+            // Back button (top left)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.Start
             ) {
-                repeat(4) { index ->
-                    VerificationDigitInput(
-                        value = verificationCode[index],
-                        onValueChange = { input ->
-                            if (input.length == 1) {
-                                verificationCode[index] = input
-                                if (index < 3) {
-                                    focusRequesters[index + 1].requestFocus()
-                                } else {
-                                    keyboardController?.hide() // Ẩn bàn phím khi nhập xong
-                                }
-                            } else if (input.isEmpty()) {
-                                verificationCode[index] = ""
-                                if (index > 0) {
-                                    focusRequesters[index - 1].requestFocus()
-                                }
-                            }
-                        },
-                        modifier = Modifier.focusRequester(focusRequesters[index])
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            Color.White.copy(alpha = 0.2f),
+                            CircleShape
+                        )
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.height(60.dp))
 
-            Seprate(height = 24)
-
-            // Timer
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+            // Main content with animations
+            AnimatedVisibility(
+                visible = contentVisible,
+                enter = slideInVertically(
+                    animationSpec = tween(600, easing = FastOutSlowInEasing),
+                    initialOffsetY = { it / 3 }
+                ) + fadeIn(
+                    animationSpec = tween(600, easing = FastOutSlowInEasing)
+                )
             ) {
-                Txt(
-                    value = "Code expires in: ",
-                    size = 14,
-                    color = Color.Gray
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Email verification icon with animation
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(
+                                Color.White.copy(alpha = 0.9f),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Email,
+                            contentDescription = "Email Verification",
+                            modifier = Modifier.size(50.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-                Txt(
-                    value = formattedTime,
-                    size = 14,
-                    color = Color(0xFFFF5252),
-                    fontWeight = FontWeight.Medium
-                )
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Title with animation
+                    AnimatedContent(
+                        targetState = "Check Your Email",
+                        transitionSpec = {
+                            slideInVertically { -it } + fadeIn() togetherWith
+                                    slideOutVertically { it } + fadeOut()
+                        },
+                        label = "title_animation"
+                    ) { title ->
+                        Text(
+                            text = title,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "We've sent a 4-digit verification code to\n${registerModel.email}",
+                        fontSize = 16.sp,
+                        color = Color.White.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center,
+                        lineHeight = 22.sp
+                    )
+                }
             }
 
-            Seprate(height = 16)
+            Spacer(modifier = Modifier.height(48.dp))
 
-            // Resend Code
-            RowCenter {
-                Txt(
-                    value = "Didn't receive code? ",
-                    size = 14,
-                    color = Color.Gray
+            // Verification code input with animation
+            AnimatedVisibility(
+                visible = codeInputVisible,
+                enter = slideInVertically(
+                    animationSpec = tween(500, delayMillis = 300, easing = FastOutSlowInEasing),
+                    initialOffsetY = { it / 2 }
+                ) + fadeIn(
+                    animationSpec = tween(500, delayMillis = 300, easing = FastOutSlowInEasing)
                 )
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Enter Verification Code",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White.copy(alpha = 0.9f),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                TextBtn(
-                    onClick = handleResendCode,
-                    title = "Resend Code",
-                    color = Color(0xFFFF5252),
-                    size = 14,
-                    fontWeight = FontWeight.Medium
-                )
+                    // In the verification code input section, update the Row:
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        repeat(4) { index ->
+                            AnimatedVerificationDigitInput(
+                                value = verificationCode[index],
+                                onValueChange = { input ->
+                                    if (input.length == 1) {
+                                        verificationCode[index] = input
+                                        if (index < 3) {
+                                            try {
+                                                focusRequesters[index + 1].requestFocus()
+                                            } catch (e: Exception) {
+                                                // Handle focus request failure gracefully
+                                                println("Focus request failed for index ${index + 1}: ${e.message}")
+                                            }
+                                        } else {
+                                            keyboardController?.hide()
+                                        }
+                                    } else if (input.isEmpty()) {
+                                        verificationCode[index] = ""
+                                        if (index > 0) {
+                                            try {
+                                                focusRequesters[index - 1].requestFocus()
+                                            } catch (e: Exception) {
+                                                // Handle focus request failure gracefully
+                                                println("Focus request failed for index ${index - 1}: ${e.message}")
+                                            }
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.focusRequester(focusRequesters[index]),
+                                delay = index * 100,
+                                isVisible = codeInputVisible
+                            )
+                        }
+                    }
+                }
             }
 
-            Seprate(height = 48)
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Verify Button
-            BtnPrimary(
-                title = "Verify",
-                onClick = handleVerifyCode,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
+            // Timer and resend section
+            AnimatedVisibility(
+                visible = codeInputVisible,
+                enter = fadeIn(
+                    animationSpec = tween(500, delayMillis = 500, easing = FastOutSlowInEasing)
+                )
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Timer
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Code expires in: ",
+                            fontSize = 14.sp,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                        AnimatedContent(
+                            targetState = formattedTime,
+                            transitionSpec = {
+                                slideInVertically { it } + fadeIn() togetherWith
+                                        slideOutVertically { -it } + fadeOut()
+                            },
+                            label = "timer_animation"
+                        ) { time ->
+                            Text(
+                                text = time,
+                                fontSize = 14.sp,
+                                color = if (timeRemaining <= 10) Color.Red else MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Resend code
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Didn't receive code? ",
+                            fontSize = 14.sp,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                        TextButton(
+                            onClick = handleResendCode,
+                            enabled = timeRemaining == 0 && !resendCodeState.isLoading
+                        ) {
+                            if (resendCodeState.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    text = "Resend Code",
+                                    color = if (timeRemaining == 0) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.5f),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Verify button with animation
+            AnimatedVisibility(
+                visible = buttonVisible,
+                enter = slideInVertically(
+                    animationSpec = tween(500, delayMillis = 600, easing = FastOutSlowInEasing),
+                    initialOffsetY = { it / 2 }
+                ) + fadeIn(
+                    animationSpec = tween(500, delayMillis = 600, easing = FastOutSlowInEasing)
+                )
+            ) {
+                Button(
+                    onClick = handleVerifyCode,
+                    enabled = verificationCode.all { it.isNotEmpty() } && !verifyState.isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                    ),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    if (verifyState.isLoading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "Verify Email",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Help text
+            AnimatedVisibility(
+                visible = buttonVisible,
+                enter = fadeIn(
+                    animationSpec = tween(500, delayMillis = 800, easing = FastOutSlowInEasing)
+                )
+            ) {
+                Text(
+                    text = "Check your spam folder if you don't see the email",
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = 0.6f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
+            }
         }
-    )
+    }
 }
+
 @Composable
-fun VerificationDigitInput(
+private fun AnimatedVerificationDigitInput(
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    delay: Int = 0,
+    isVisible: Boolean = true
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier
-            .size(50.dp),
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            textAlign = TextAlign.Center
-        ),
-        singleLine = true,
-        shape = RoundedCornerShape(4.dp),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = Color.Gray
-        ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-    )
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            kotlinx.coroutines.delay(delay.toLong())
+            visible = true
+        } else {
+            visible = false
+        }
+    }
+
+    androidx.compose.animation.AnimatedVisibility(
+        visible = visible,
+        enter = scaleIn(
+            animationSpec = tween(400, easing = FastOutSlowInEasing),
+            initialScale = 0.3f
+        ) + fadeIn(
+            animationSpec = tween(400, easing = FastOutSlowInEasing)
+        )
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier.size(60.dp),
+            textStyle = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            ),
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color.White.copy(alpha = 0.6f),
+                cursorColor = Color.White,
+                focusedContainerColor =  MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                unfocusedContainerColor = Color.Black.copy(alpha = 0.1f)
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+    }
 }

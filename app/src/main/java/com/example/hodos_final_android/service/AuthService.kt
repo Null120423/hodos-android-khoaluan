@@ -8,6 +8,8 @@ import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.model.ResendCodeModel
 import com.example.hodos_final_android.model.Response
 import com.example.hodos_final_android.model.VerifyModel
+import com.example.hodos_final_android.view_model.LoginWithFacebookDto
+import com.example.hodos_final_android.view_model.LoginWithGoogleDto
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -21,6 +23,14 @@ interface AuthService {
 
     @POST("auth/sign-in")
     suspend fun login(@Body() body: LoginModel): AuthData
+
+    @POST("auth/sign-in-with-google")
+    suspend fun loginWithGoogle(@Body() body: LoginWithGoogleDto): AuthData
+
+
+    @POST("auth/sign-in-with-facebook")
+    suspend fun loginWithFacebook(@Body() body: LoginWithFacebookDto): AuthData
+
 
     @POST("auth/resend-verification-code")
     suspend fun resendVerCode(@Body() body: ResendCodeModel): Response

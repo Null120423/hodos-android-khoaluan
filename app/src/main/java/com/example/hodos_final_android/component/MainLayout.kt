@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.hodos_final_android.screen.predict.BottomSheetContent
 
 
 @Composable
@@ -57,12 +56,12 @@ fun MainLayout(
         }
 
         // Optional Bottom Sheet
-        if (isVisibleBottomSheet?.value == true) {
-            BottomSheetContent(
-                onDismiss = onCloseBottomSheet,
-                bottomSheetContent = bottomSheetContent
-            )
-        }
+//        if (isVisibleBottomSheet?.value == true) {
+//            BottomSheetContent(
+//                onDismiss = onCloseBottomSheet,
+//                bottomSheetContent = bottomSheetContent
+//            )
+//        }
 
         // Optional Loading Dialog
         LoadingDialog(isLoading = isLoading)

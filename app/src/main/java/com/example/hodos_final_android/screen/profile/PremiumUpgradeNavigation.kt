@@ -1,5 +1,6 @@
 package com.example.hodos_final_android.screen.profile
 
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -78,6 +79,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LinearCardBg
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
@@ -86,12 +88,16 @@ import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.UserSubscriptionEntryPoint
+import com.example.hodos_final_android.di.UserViewModelEntryPoint
+import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.helper.downloadQrImage
 import com.example.hodos_final_android.helper.formatPrice
 import com.example.hodos_final_android.helper.getScreenWidth
+import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.PricingPlanModel
 import com.example.hodos_final_android.navigateBackWithAnimation
 import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.view_model.AuthViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 
@@ -1302,8 +1308,11 @@ fun PaymentProcessingScreen() {
 
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun SuccessScreen() {
+fun SuccessScreen(
+    authViewModel: AuthViewModel = hiltViewModel(),
+) {
     val navController = LocalNavController.current
     val context = LocalContext.current
 
@@ -1313,8 +1322,38 @@ fun SuccessScreen() {
             .userSubscriptionModel()
     }
 
+    val userViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, UserViewModelEntryPoint::class.java)
+            .userViewModel()
+    }
+
     val state by userSubscriptionModel.state.collectAsState()
     val plan = state.selectPlan
+
+    // auth se
+    val authState by userViewModel.authState.collectAsState()
+
+    fun handleResetLogin() {
+        val accessToken = authState?.accessToken
+
+        if (accessToken == null ) {
+            val tokenManager = TokenManager.getInstance()
+            val getUserInfoModel = tokenManager.getAccessToken()?.let {
+                GetUserInfoModel(
+                    accessToken = it,
+                    refreshToken = tokenManager.getRefreshToken()!!
+                )
+            }
+            if (getUserInfoModel != null) {
+                authViewModel.userInfo(getUserInfoModel)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        handleResetLogin()
+    }
 
     Column(
         modifier = Modifier
@@ -1423,10 +1462,12 @@ fun SuccessScreen() {
 
             OutlinedButton(
                 onClick = {
-                    navController.clearBackStack<Any>()
-                    navController.navigateWithAnimation(Screen.Main.route)
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Back to Home")
             }
@@ -1438,7 +1479,6 @@ fun SuccessScreen() {
 // 6. Trial Activation Screen
 @Composable
 fun TrialActivationScreen() {
-    val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .fillMaxSize()

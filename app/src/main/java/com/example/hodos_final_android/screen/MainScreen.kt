@@ -3,6 +3,7 @@ package com.example.hodos_final_android.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -26,7 +27,7 @@ fun MainScreen() {
     HodosTheme {
         Scaffold(
             bottomBar = { BottomBarComponent(navController) },
-            modifier = Modifier.background(Color.Transparent).fillMaxSize()
+            modifier = Modifier.background(Color.Transparent).fillMaxSize().navigationBarsPadding()
         ) { _ ->
 
                 Box(modifier = Modifier.padding()) {
@@ -40,8 +41,8 @@ fun MainScreen() {
 sealed class BottomBarRoute(val route: String) {
     object Home : BottomBarRoute("home")
     object Post : BottomBarRoute("Post")
-    object Trip : BottomBarRoute("trip")
     object Event : BottomBarRoute("Event")
+    object Trip : BottomBarRoute("trip")
     object Profile : BottomBarRoute("Profile")
 }
 
@@ -54,9 +55,9 @@ fun NavigationGraph(navController: NavHostController) {
     ) {
         composable(BottomBarRoute.Home.route) { HomeScreen() }
         composable(BottomBarRoute.Post.route) { PostScreen() }
+        composable(BottomBarRoute.Event.route) { FeatureDiscoveryScreen() }
         composable(BottomBarRoute.Trip.route) { TripUserScreen(
         ) }
-        composable(BottomBarRoute.Event.route) { ComingSoonScreen() }
         composable(BottomBarRoute.Profile.route) { ProfileScreen() }
     }
 }

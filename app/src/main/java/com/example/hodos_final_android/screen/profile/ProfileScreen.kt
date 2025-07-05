@@ -1,6 +1,7 @@
 package com.example.hodos_final_android.screen.profile
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,14 +47,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hodos_final_android.LocalNavController
+import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.BtnPrimary
 import com.example.hodos_final_android.component.ColumnCenter
+import com.example.hodos_final_android.component.EmailVerificationCard
 import com.example.hodos_final_android.component.MainLayout
 import com.example.hodos_final_android.component.ProfileAvatar
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.getScreenWidth
+import com.example.hodos_final_android.model.RegisterModel
+import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.screen.RequireLoginScreen
 import dagger.hilt.android.EntryPointAccessors
 
@@ -61,10 +67,9 @@ import dagger.hilt.android.EntryPointAccessors
 fun ProfileScreen(
     isLoggedIn: Boolean = true
 ) {
-
     val scrollState = rememberScrollState()
-
     val context = LocalContext.current
+    val navController = LocalNavController.current
     val userViewModel = remember {
         EntryPointAccessors
             .fromApplication(context, UserViewModelEntryPoint::class.java)
@@ -94,10 +99,26 @@ fun ProfileScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
 
-                    authState?.user?.username?.let { LoggedInHeader(username = it) }
+                    authState?.user?.username?.let { LoggedInHeader(username = it, avatar = authState?.user?.avatar) }
                     StatsCard(isLoggedIn)
-                    // Stats card
 
+                    val user = authState?.user
+                    if (user != null) {
+                        EmailVerificationCard(
+                            isVisible = isLoggedIn && user.isNeedVerify,
+                            userEmail = user.email,
+                            onVerifyClick = {
+                                val registerModel = RegisterModel(
+                                    username = user.username,
+                                    email = user.email,
+                                    password = "",
+                                    confirmPassword = ""
+                                )
+                                navController.navigateWithAnimation(Screen.EmailVerification.createRoute(registerModel))
+                            },
+                            onDismiss = {},
+                        )
+                    }
 
                     // Menu items
                     MenuCard()
@@ -108,8 +129,9 @@ fun ProfileScreen(
                     // Promo banner
                     if (isLoggedIn) {
                         if(authState?.user != null && authState?.user!!.isPremium) {
-                            if (planData != null) {
-                                SubscriptionManagementCard(currentUser = authState?.user!!, planData = planData)
+                            val pricingPlan = authState?.user?.userSubscription?.pricingPlan
+                            if (pricingPlan != null) {
+                                SubscriptionManagementCard(currentUser = authState?.user!!, planData = pricingPlan)
                             }
                         }else {
                             if (planData != null) {
@@ -156,6 +178,7 @@ fun ProfileScreen(
 @Composable
 fun LoggedInHeader(
     username: String,
+    avatar: String? = null,
     onEditClick: () -> Unit = {}
 ) {
     Box(
@@ -167,7 +190,8 @@ fun LoggedInHeader(
             ProfileAvatar(
                 letter = username.substring(0, 1).uppercase(),
                 backgroundColor = Color(0xFF4CAF50),
-                size = 80
+                size = 80,
+                url =avatar
             )
             Seprate(height = 8)
 

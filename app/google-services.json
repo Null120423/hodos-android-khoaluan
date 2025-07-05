@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "646639558632",
+    "project_id": "hodos-f29d9",
+    "storage_bucket": "hodos-f29d9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:646639558632:android:ce3e27a73f1a52324c8e5d",
+        "android_client_info": {
+          "package_name": "com.example.hodos_final_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnmLqsCMdYuSmu2vT0Vdz_B3uGZkqjrjA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
