@@ -14,6 +14,7 @@ import com.example.hodos_final_android.service.AuthService
 import com.example.hodos_final_android.service.ChatBotService
 import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
+import com.example.hodos_final_android.service.NotificationService
 import com.example.hodos_final_android.service.PlanTripService
 import com.example.hodos_final_android.service.PostService
 import com.example.hodos_final_android.service.UserSubscriptionService
@@ -142,14 +143,18 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            //.baseUrl("https://hodos-api.gitlabserver.id.vn/")
-            .baseUrl("http://192.168.1.3:3000/")
+            .baseUrl("https://hodos-api.gitlabserver.id.vn/")
+            //.baseUrl("http://192.168.1.2:3000/")
             //.baseUrl("http://192.168.2.88:3000/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-
+    @Provides
+    @Singleton
+    fun provideNotificationService(retrofit: Retrofit): NotificationService {
+        return retrofit.create(NotificationService::class.java)
+    }
     @Provides
     @Singleton
     fun provideAuthService(retrofit: Retrofit): AuthService {

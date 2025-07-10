@@ -38,16 +38,18 @@ import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.GalleryFullScreen
 import com.example.hodos_final_android.screen.location.LocationDetailScreen
 import com.example.hodos_final_android.screen.location.TourScreen
+import com.example.hodos_final_android.screen.notification.NotificationDetailScreen
 import com.example.hodos_final_android.screen.notification.NotificationScreen
 import com.example.hodos_final_android.screen.planing.CreatePlanningResultScreen
 import com.example.hodos_final_android.screen.planing.CreatingPlan
 import com.example.hodos_final_android.screen.planing.DetailTripScreen
 import com.example.hodos_final_android.screen.planing.TripDirectionScreen
-import com.example.hodos_final_android.screen.post.PostDetailScreen
+import com.example.hodos_final_android.screen.blog.BlogDetailScreen
 import com.example.hodos_final_android.screen.post.CreatePostScreen
 import com.example.hodos_final_android.screen.profile.PaymentMethodScreen
 import com.example.hodos_final_android.screen.profile.PaymentProcessingScreen
 import com.example.hodos_final_android.screen.profile.PremiumOnboardingScreen
+import com.example.hodos_final_android.screen.profile.ProfileUpdateScreen
 import com.example.hodos_final_android.screen.profile.SuccessScreen
 import com.example.hodos_final_android.screen.profile.TrialActivationScreen
 import com.example.hodos_final_android.screen.profile.UpgradeOverviewScreen
@@ -92,7 +94,6 @@ sealed class Screen(val route: String) {
     object ComingSoonScreen : Screen("ComingSoonScreen")
     object Direction : Screen("Direction")
     object TripDirectionScreen : Screen("TripDirectionScreen")
-    object PostDetailScreen : Screen("PostDetailScreen")
     object TourScreen : Screen("TourScreen")
     object TripDetailScreen : Screen("TripDetailScreen/{id}") {
         fun createRoute(id: String): String {
@@ -100,6 +101,7 @@ sealed class Screen(val route: String) {
         }
     }
     object NotificationScreen : Screen("NotificationScreen")
+    object NotificationDetailScreen : Screen("NotificationDetailScreen")
     object CreatePostScreen : Screen("CreatePostScreen")
     // flow update account
     object UpgradeOverviewScreen : Screen("UpgradeOverviewScreen")
@@ -108,6 +110,13 @@ sealed class Screen(val route: String) {
     object SuccessScreen : Screen("SuccessScreen")
     object TrialActivationScreen : Screen("TrialActivationScreen")
     object PremiumOnboardingScreen : Screen("PremiumOnboardingScreen")
+
+    // profile
+    object UpdateProfileScreen : Screen("UpdateProfileScreen")
+
+    // blog
+    object BlogDetailScreen: Screen("BlogDetailScreen")
+
 }
 
 data class ScreenConfig(
@@ -198,9 +207,6 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.TripDirectionScreen.route ) { backStackEntry ->
             TripDirectionScreen()
         },
-        ScreenConfig(Screen.PostDetailScreen.route ) { backStackEntry ->
-            PostDetailScreen()
-        },
         ScreenConfig(Screen.TourScreen.route ) { backStackEntry ->
             TourScreen()
         },
@@ -212,6 +218,9 @@ fun AppNavHost(navController: NavHostController) {
         },
         ScreenConfig(Screen.NotificationScreen.route ) { backStackEntry ->
             NotificationScreen()
+        },
+        ScreenConfig(Screen.NotificationDetailScreen.route ) { backStackEntry ->
+            NotificationDetailScreen()
         },
         ScreenConfig(Screen.CreatePostScreen.route ) { backStackEntry ->
             CreatePostScreen()
@@ -237,7 +246,17 @@ fun AppNavHost(navController: NavHostController) {
                 backStackEntry -> PremiumOnboardingScreen()
         },
 
+        // profile
 
+        ScreenConfig(Screen.UpdateProfileScreen.route) {
+                backStackEntry -> ProfileUpdateScreen()
+        },
+
+        // blog
+
+        ScreenConfig(Screen.BlogDetailScreen.route) {
+                backStackEntry -> BlogDetailScreen()
+        },
         )
 
     NavHost(navController = navController, startDestination = Screen.Main.route) {

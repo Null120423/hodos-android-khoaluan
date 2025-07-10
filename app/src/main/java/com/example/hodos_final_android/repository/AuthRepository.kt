@@ -15,6 +15,8 @@ import com.example.hodos_final_android.service.api.safeApiCall
 import com.example.hodos_final_android.view_model.LoginWithFacebookDto
 import com.example.hodos_final_android.view_model.LoginWithGoogleDto
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
@@ -45,6 +47,19 @@ class AuthRepository @Inject constructor(
             Flow<Resource<AuthData>> =  safeApiCall {
              service.userDetail(body)
     }
+
+
+
+    fun updateUserProfile(
+        fullName: RequestBody,
+        phone: RequestBody,
+        birthDate: RequestBody,
+        gender: RequestBody,
+        avatar: MultipartBody.Part?
+    ): Flow<Resource<AuthData>> = safeApiCall {
+        service.updateUserProfile(fullName, phone, birthDate, gender, avatar)
+    }
+
 }
 
 

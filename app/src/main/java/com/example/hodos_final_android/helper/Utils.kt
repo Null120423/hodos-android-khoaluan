@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -186,3 +189,11 @@ fun downloadQrImage(context: Context, imageUrl: String, filename: String = "qr_c
     Toast.makeText(context, "Downloading QR to Downloads...", Toast.LENGTH_SHORT).show()
 }
 
+fun Uri.toMultipartBodyPart(context: Context, fieldName: String = "avatar"): MultipartBody.Part? {
+    val contentResolver = context.contentResolver ?: return null
+    val inputStream = contentResolver.openInputStream(this) ?: return null
+
+    val fileName = "avatar_${System.currentTimeMillis()}.jpg"
+    val requestBody = inputStream.readBytes().toRequestBody("image/*".toMediaTypeOrNull())
+    return MultipartBody.Part.createFormData(fieldName, fileName, requestBody)
+}

@@ -48,29 +48,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.Loading
+import com.example.hodos_final_android.di.LocationViewEntryPoint
 import com.example.hodos_final_android.helper.rememberDebouncedState
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
 import com.example.hodos_final_android.navigateWithAnimation
-import com.example.hodos_final_android.view_model.LocationViewModel
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    viewModel: LocationViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val viewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, LocationViewEntryPoint::class.java)
+            .locationViewModel()
+    }
+
     val paginationState by viewModel.paginationState.collectAsState()
     val navController = LocalNavController.current
     var searchQuery by remember { mutableStateOf("") }
@@ -279,7 +286,7 @@ fun LocationItem(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = Color.Transparent
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 0.dp

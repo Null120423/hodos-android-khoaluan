@@ -87,6 +87,7 @@ import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.HomeViewModelEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.TokenManager
+import com.example.hodos_final_android.model.BlogModel
 import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.Location
 import com.example.hodos_final_android.model.New
@@ -137,6 +138,7 @@ fun HomeScreen(
     val authState by userViewModel.authState.collectAsState()
     val homeState by homeViewModel.homeState.collectAsState()
 
+    val blogs = homeState.data?.blogs
 
     // Configure status bar for dark theme
     LaunchedEffect(Unit) {
@@ -222,7 +224,9 @@ fun HomeScreen(
                                 // Main content sections with dark theme
                                 DarkLocationSection(locations = homeState.data?.locationData?.lst ?: emptyList())
                                 DarkFoodSection(locations = homeState.data?.foodData?.lst ?: emptyList())
-                                DarkNewsSection(news = news)
+                                if (blogs != null) {
+                                    DarkNewsSection(news = blogs)
+                                }
                                 Spacer(modifier = Modifier.height(120.dp))
                             }
                         }
@@ -509,7 +513,7 @@ private fun DarkFoodSection(locations: List<Location>) {
 }
 
 @Composable
-private fun DarkNewsSection(news: List<New>) {
+private fun DarkNewsSection(news: List<BlogModel>) {
     DarkSectionWithCards(
         title = "Helpful Posts",
         emoji = "📰",
@@ -658,8 +662,14 @@ private fun EnhancedTravelCard(data: Location) {
 }
 
 @Composable
-private fun DarkNewsCard(data: New) {
+private fun DarkNewsCard(data: BlogModel) {
     var isPressed by remember { mutableStateOf(false) }
+    val navController = LocalNavController.current
+
+    val handleDetail = {
+        navController.currentBackStackEntry?.savedStateHandle?.set("url", "https://hodos-admin.gitlabserver.id.vn/blog-detail/"+data.id)
+        navController.navigateWithAnimation(Screen.BlogDetailScreen.route)
+    }
 
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
@@ -672,7 +682,6 @@ private fun DarkNewsCard(data: New) {
         color = Color.Gray.copy(0.1f),
         modifier = Modifier
             .width(280.dp)
-            .height(160.dp)
             .graphicsLayer(scaleX = scale, scaleY = scale)
     ) {
         Box(
@@ -680,6 +689,7 @@ private fun DarkNewsCard(data: New) {
                 .fillMaxSize()
                 .clickable {
                     isPressed = true
+                    handleDetail()
                 }
         ) {
             Row(
@@ -720,13 +730,6 @@ private fun DarkNewsCard(data: New) {
                         )
 
                     }
-
-                    Icon(
-                        Icons.Default.MoreHoriz,
-                        contentDescription = "More options",
-                        tint = Color.Gray.copy(alpha = 0.7f),
-                        modifier = Modifier.size(20.dp)
-                    )
                 }
             }
         }

@@ -3,6 +3,7 @@ import com.example.hodos_final_android.view_model.AppViewViewModel
 import com.example.hodos_final_android.view_model.ChatViewModel
 import com.example.hodos_final_android.view_model.HomeViewModel
 import com.example.hodos_final_android.view_model.LocationViewModel
+import com.example.hodos_final_android.view_model.NotificationViewModel
 import com.example.hodos_final_android.view_model.PlanTripViewModel
 import com.example.hodos_final_android.view_model.PostViewModel
 import com.example.hodos_final_android.view_model.UserSubscriptionModel
@@ -52,13 +53,14 @@ interface PostViewModelEntryPoint {
 interface UserSubscriptionEntryPoint {
     fun userSubscriptionModel(): UserSubscriptionModel
 }
-
-
-
-
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface LocationViewEntryPoint {
     fun locationViewModel(): LocationViewModel
+}
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface NotificationViewEntryPoint {
+    fun notificationViewModel(): NotificationViewModel
 }
 

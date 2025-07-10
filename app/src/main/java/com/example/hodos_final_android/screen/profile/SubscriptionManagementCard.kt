@@ -43,10 +43,10 @@ import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.helper.formatDate
 import com.example.hodos_final_android.helper.formatPrice
 import com.example.hodos_final_android.model.PricingPlanModel
-import com.example.hodos_final_android.model.User
+import com.example.hodos_final_android.model.UserModel
 
 @Composable
-fun SubscriptionManagementCard(currentUser: User, planData: PricingPlanModel) {
+fun SubscriptionManagementCard(currentUser: UserModel, planData: PricingPlanModel) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),

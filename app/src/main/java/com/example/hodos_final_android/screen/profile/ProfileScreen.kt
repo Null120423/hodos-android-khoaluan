@@ -1,7 +1,8 @@
 package com.example.hodos_final_android.screen.profile
 
-
 import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +12,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,6 +31,10 @@ import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.CardGiftcard
+import androidx.compose.material.icons.outlined.TravelExplore
+import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -41,6 +49,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -76,32 +86,58 @@ fun ProfileScreen(
             .userViewModel()
     }
     val authState by userViewModel.authState.collectAsState()
-
     val isConfirmLogout = remember { mutableStateOf(false) }
-
     val planData = userViewModel.getSuggestPricingPlan()
-    if(
-        userViewModel.getAccessToken() == null
-    ) {
+
+    if (userViewModel.getAccessToken() == null) {
         RequireLoginScreen()
-    }else {
-        MainLayout(
-            header = false,
-            modifier = Modifier.background(MaterialTheme.colorScheme.secondary),
-            content = {
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primary.copy(0.7f),
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+            ) {
+                Row(
+                    modifier = Modifier.statusBarsPadding()
+                ){
+                    Seprate(height = 5)
+                }
+
+                // Header Section with Profile
+                authState?.user?.username?.let {
+                    ModernProfileHeader(
+                        username = it,
+                        avatar = authState?.user?.avatar,
+                        isPremium = authState?.user?.isPremium == true,
+                        onEditClick = {
+                            navController.navigateWithAnimation(Screen.UpdateProfileScreen.route)
+                        }
+                    )
+                }
+                // Stats Card
+                ModernStatsCard(isLoggedIn = isLoggedIn)
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Content Cards
                 Column(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .fillMaxWidth()
-                        .padding(WindowInsets.statusBars.asPaddingValues())
-                        .weight(1f)
-                        .verticalScroll(scrollState),
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
-                    authState?.user?.username?.let { LoggedInHeader(username = it, avatar = authState?.user?.avatar) }
-                    StatsCard(isLoggedIn)
-
+                    // Email Verification Card
                     val user = authState?.user
                     if (user != null) {
                         EmailVerificationCard(
@@ -120,46 +156,57 @@ fun ProfileScreen(
                         )
                     }
 
-                    // Menu items
-                    MenuCard()
+                    // Main Menu Card
+                    ModernMenuCard()
 
-                    // Secondary menu items
-                    SecondaryMenuCard()
+                    // Settings Menu Card
+                    ModernSecondaryMenuCard()
 
-                    // Promo banner
+                    // Premium/Subscription Card
                     if (isLoggedIn) {
-                        if(authState?.user != null && authState?.user!!.isPremium) {
+                        if (authState?.user != null && authState?.user!!.isPremium == true) {
                             val pricingPlan = authState?.user?.userSubscription?.pricingPlan
                             if (pricingPlan != null) {
                                 SubscriptionManagementCard(currentUser = authState?.user!!, planData = pricingPlan)
                             }
-                        }else {
+                        } else {
                             if (planData != null) {
                                 PremiumUpgradeCard(planData = planData)
                             }
                         }
                     } else {
-                        ReferralBanner()
+                        ModernReferralCard()
                     }
 
-                    if(userViewModel.getAccessToken() != null) {
-                        BtnPrimary(
-                            backgroundColor = Color.Red,
-                            title = "Log Out",
-                            onClick = {
-                                isConfirmLogout.value = true
-                            },
-                            minWidth = getScreenWidth() - 20,
-                            size = 18
-                        )
+                    // Logout Button
+                    if (userViewModel.getAccessToken() != null) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White.copy(alpha = 0.9f)
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        ) {
+                            BtnPrimary(
+                                backgroundColor = Color(0xFFFF5252),
+                                title = "Sign Out",
+                                onClick = {
+                                    isConfirmLogout.value = true
+                                },
+                                minWidth = getScreenWidth() - 64,
+                                size = 16,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
-                    Seprate(height = 100)
 
+                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
-        )
+        }
 
-        if(isConfirmLogout.value) {
+        if (isConfirmLogout.value) {
             ConfirmLogoutDialog(
                 onDismiss = {
                     isConfirmLogout.value = false
@@ -168,261 +215,423 @@ fun ProfileScreen(
                     isConfirmLogout.value = false
                     userViewModel.logout()
                 }
-
             )
         }
     }
-
 }
 
 @Composable
-fun LoggedInHeader(
+fun ModernProfileHeader(
     username: String,
     avatar: String? = null,
+    isPremium: Boolean = false,
     onEditClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier.fillMaxWidth()
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 20.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.95f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
-        ColumnCenter(
-            modifier = Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileAvatar(
-                letter = username.substring(0, 1).uppercase(),
-                backgroundColor = Color(0xFF4CAF50),
-                size = 80,
-                url =avatar
-            )
-            Seprate(height = 8)
+            Box {
+                ProfileAvatar(
+                    letter = username.substring(0, 1).uppercase(),
+                    backgroundColor = Color(0xFF667eea),
+                    size = 100,
+                    url = avatar
+                )
+
+                if (isPremium) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFFFD700), Color(0xFFFFA000))
+                                ),
+                                shape = CircleShape
+                            )
+                            .padding(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Premium",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Txt(
-                    value = username.replaceFirstChar { it.uppercase() },
+                Text(
+                    text = username.replaceFirstChar { it.uppercase() },
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    size = 20
+                    color = Color(0xFF2D3748)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Profile",
-                    tint = MaterialTheme.colorScheme.tertiary,
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Box(
                     modifier = Modifier
-                        .size(18.dp)
+                        .background(
+                            Color(0xFF667eea).copy(alpha = 0.1f),
+                            CircleShape
+                        )
                         .clickable { onEditClick() }
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Profile",
+                        tint = Color(0xFF667eea),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            if (isPremium) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Premium Member",
+                    fontSize = 14.sp,
+                    color = Color(0xFFFFD700),
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
     }
 }
-@Composable
-fun StatsCard(isLoggedIn: Boolean) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-
-            StatItem(
-                value = "12",
-                label = "Trips"
-            )
-
-            Divider(
-                modifier = Modifier
-                    .height(60.dp)
-                    .width(1.dp)
-                    .padding(vertical = 16.dp),
-                color = MaterialTheme.colorScheme.tertiary
-            )
-
-            StatItem(
-                value = if (isLoggedIn) "12" else "-",
-                label = "Hodos Xu"
-            )
-
-            Divider(
-                modifier = Modifier
-                    .height(60.dp)
-                    .width(1.dp)
-                    .padding(vertical = 16.dp),
-                color = MaterialTheme.colorScheme.tertiary
-            )
-
-            StatItem(
-                value = if (isLoggedIn) "120" else "-",
-                label = "Gift card"
-            )
-        }
-    }
-}
 
 @Composable
-fun StatItem(value: String, label: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(vertical = 16.dp)
-    ) {
-        Text(
-            text = value,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = Color.Gray
-        )
-    }
-}
-
-@Composable
-fun MenuCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            MenuItem(
-                icon = Icons.Default.Edit,
-                title = "Update profile"
-            )
-
-            MenuItem(
-                icon = Icons.Default.AirplanemodeActive,
-                title = "Trips"
-            )
-
-            MenuItem(
-                icon = Icons.Default.Newspaper,
-                title = "Post"
-            )
-        }
-    }
-}
-
-@Composable
-fun SecondaryMenuCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            MenuItem(
-                icon = Icons.Default.Help,
-                title = "Support"
-            )
-
-            MenuItem(
-                icon = Icons.Default.Settings,
-                title = "Settings"
-            )
-        }
-    }
-}
-
-@Composable
-fun MenuItem(
-    icon: ImageVector,
-    title: String,
-    subtitle: String? = null,
-    onClick: () -> Unit = {}
-) {
+fun ModernStatsCard(isLoggedIn: Boolean) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            containerColor = Color.White.copy(alpha = 0.95f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Box(modifier = Modifier.clip(RoundedCornerShape(20.dp))) {
-            Row(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ModernStatItem(
+                icon = Icons.Outlined.TravelExplore,
+                value = "12",
+                label = "Trips",
+                color = Color(0xFF4CAF50)
+            )
+
+            Divider(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                ,
-                verticalAlignment = Alignment.CenterVertically
+                    .height(60.dp)
+                    .width(1.dp),
+                color = Color(0xFFE0E0E0)
+            )
+
+            ModernStatItem(
+                icon = Icons.Outlined.Wallet,
+                value = if (isLoggedIn) "12" else "-",
+                label = "Hodos Xu",
+                color = Color(0xFF2196F3)
+            )
+
+            Divider(
+                modifier = Modifier
+                    .height(60.dp)
+                    .width(1.dp),
+                color = Color(0xFFE0E0E0)
+            )
+
+            ModernStatItem(
+                icon = Icons.Outlined.CardGiftcard,
+                value = if (isLoggedIn) "120" else "-",
+                label = "Gift Cards",
+                color = Color(0xFFFF9800)
+            )
+        }
+    }
+}
+
+@Composable
+fun ModernStatItem(
+    icon: ImageVector,
+    value: String,
+    label: String,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    color.copy(alpha = 0.1f),
+                    CircleShape
+                )
+                .padding(12.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = value,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2D3748)
+        )
+
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = Color(0xFF718096)
+        )
+    }
+}
+
+@Composable
+fun ModernMenuCard() {
+    val navController = LocalNavController.current
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.95f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "My Account",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF2D3748),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            ModernMenuItem(
+                icon = Icons.Default.Edit,
+                title = "Update Profile",
+                subtitle = "Edit your personal information",
+                color = Color(0xFF667eea),
+                onClick = {
+                    navController.navigateWithAnimation(Screen.UpdateProfileScreen.route)
+                }
+            )
+
+            ModernMenuItem(
+                icon = Icons.Default.AirplanemodeActive,
+                title = "My Trips",
+                subtitle = "View your travel history",
+                color = Color(0xFF4CAF50)
+            )
+
+            ModernMenuItem(
+                icon = Icons.Default.Newspaper,
+                title = "My Posts",
+                subtitle = "Manage your shared content",
+                color = Color(0xFFFF9800)
+            )
+        }
+    }
+}
+
+@Composable
+fun ModernSecondaryMenuCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.95f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "Support & Settings",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF2D3748),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            ModernMenuItem(
+                icon = Icons.Default.Help,
+                title = "Help & Support",
+                subtitle = "Get help and contact us",
+                color = Color(0xFF9C27B0)
+            )
+
+            ModernMenuItem(
+                icon = Icons.Default.Settings,
+                title = "Settings",
+                subtitle = "App preferences and privacy",
+                color = Color(0xFF607D8B)
+            )
+        }
+    }
+}
+
+@Composable
+fun ModernMenuItem(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    color: Color,
+    onClick: () -> Unit = {}
+) {
+    val scale by animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = spring(),
+        label = "MenuItem Scale"
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF8F9FA)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color.copy(alpha = 0.1f),
+                        CircleShape
+                    )
+                    .padding(12.dp)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Txt(
-                        value = title,
-                        size = 16
-                    )
-
-                    if (subtitle != null) {
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Txt(
-                            value = subtitle,
-                            size = 12,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
+                    tint = color
                 )
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF2D3748)
+                )
+                Text(
+                    text = subtitle,
+                    fontSize = 14.sp,
+                    color = Color(0xFF718096)
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = null,
+                tint = Color(0xFF718096),
+                modifier = Modifier.size(20.dp)
+            )
         }
-
-
     }
 }
 
+
 @Composable
-fun ReferralBanner() {
+fun ModernReferralCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFF667eea),
+                            Color(0xFF764ba2)
+                        )
+                    )
+                )
         ) {
-            Txt(
-                value = "Invite your friends",
-                size = 18,
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+            Column(
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Text(
+                    text = "Invite Friends & Earn Rewards",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
 
-            BtnPrimary(
-                minWidth = getScreenWidth() - 20,
-                title = "Watch detail"
-            )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Share Hodos with friends and get exclusive benefits",
+                    fontSize = 14.sp,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                BtnPrimary(
+                    backgroundColor = Color.White,
+                    textColor = Color(0xFF667eea),
+                    title = "Start Inviting",
+                    minWidth = getScreenWidth() - 80,
+                    size = 16
+                )
+            }
         }
     }
 }

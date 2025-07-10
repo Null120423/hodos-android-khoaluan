@@ -3,7 +3,8 @@ package com.example.hodos_final_android.model
 data class DashboardModel(
     val banners: List<String>,
     val foodData:FoodDataDashboard,
-    val locationData: LocationDataDashboard
+    val locationData: LocationDataDashboard,
+    val blogs: List<BlogModel>
 )
 
 data class FoodDataDashboard(

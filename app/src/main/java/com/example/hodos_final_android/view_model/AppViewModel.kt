@@ -1,7 +1,6 @@
 package com.example.hodos_final_android.view_model
 
 import androidx.lifecycle.ViewModel
-import com.example.hodos_final_android.repository.CommonRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -13,7 +12,6 @@ data class AppStateModel(
 )
 @Singleton
 class AppViewViewModel @Inject constructor(
-    private val repository: CommonRepository
 ) : ViewModel() {
 
     private val _appState = MutableStateFlow(AppStateModel(

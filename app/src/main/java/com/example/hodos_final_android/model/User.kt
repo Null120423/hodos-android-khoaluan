@@ -11,7 +11,7 @@ data class LocationType(
     val LOCATION: String
 )
 
-data class UserSubscription(
+data class UserSubscriptionModel(
     val id: String,
     val createdAt: String,
     val createdBy: String?,
@@ -37,37 +37,54 @@ data class UserSubscription(
 )
 
 
-data class User(
+data class UserModel(
     val id: String,
     val isNeedVerify: Boolean,
-    val createdAt: String,
+    val createdAt: String?,
     val createdBy: String?,
     val createdByName: String?,
-    val updatedAt: String,
+    val updatedAt: String?,
     val updatedBy: String?,
     val deleteBy: String?,
-    val isDeleted: Boolean,
+    val isDeleted: Boolean?,
     val username: String,
     val email: String,
     val avatar: String,
-    val verifyAt: String,
-    val verifyCode: String,
-    val isActive: Boolean,
-    val verifyExpiredTime: String,
-    val userDetail: Any?,
-    val isPremium: Boolean,
-    val tripsThisMonth: Int,
-    val collaboratorsUsed: Int,
+    val verifyAt: String?,
+    val verifyCode: String?,
+    val isActive: Boolean?,
+    val verifyExpiredTime: String?,
+    val isPremium: Boolean?,
+    val tripsThisMonth: Int?,
+    val collaboratorsUsed: Int?,
     val subscriptionEndDate: Date? = null,
     val isAutoRenew: Boolean = true,
-    val subscriptionStatus: String = "active",
+    val subscriptionStatus: String? = "active",
     val pricingPlanSuggest: PricingPlanModel? = null,
-    val userSubscription: UserSubscription? = null
+    val userSubscription: UserSubscriptionModel? = null,
+    val userDetail: UserDetail? = null,
 )
 data class AuthData(
     val accessToken: String,
     val refreshToken: String,
     val enumData: EnumData,
-    val user: User
+    val user: UserModel
 )
 
+data class UserDetail(
+    val id: String = "",
+    val userId: String = "",
+    val fullName: String? = "",
+    val phoneNumber: String? = "",
+    val birthDate: String? = "",
+    val gender: String? = "",
+    val address: String = "",
+    val nationality: String = "",
+    val travelInterests: List<String> = emptyList(),
+    val travelHistory: String = "",
+    val languages: List<String> = emptyList(),
+    val bio: String = "",
+    val facebookUrl: String = "",
+    val telegramUrl: String = "",
+    val githubUrl: String = ""
+)

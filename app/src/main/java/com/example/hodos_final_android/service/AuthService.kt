@@ -10,8 +10,13 @@ import com.example.hodos_final_android.model.Response
 import com.example.hodos_final_android.model.VerifyModel
 import com.example.hodos_final_android.view_model.LoginWithFacebookDto
 import com.example.hodos_final_android.view_model.LoginWithGoogleDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Part
 
 /**
  * Retrofit API service interface for network requests
@@ -40,5 +45,15 @@ interface AuthService {
 
     @POST("user/detail")
     suspend fun userDetail(@Body() body: GetUserInfoModel): AuthData
+
+    @Multipart
+    @PUT("user")
+    suspend fun updateUserProfile(
+        @Part("fullName") fullName: RequestBody,
+        @Part("phoneNumber") phone: RequestBody,
+        @Part("birthDate") birthDate: RequestBody,
+        @Part("gender") gender: RequestBody,
+        @Part avatar: MultipartBody.Part? = null
+    ) : AuthData
 }
 

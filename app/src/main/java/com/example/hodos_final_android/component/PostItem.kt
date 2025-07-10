@@ -33,7 +33,7 @@ fun NewItem(
 
     val handleDetail = {
         navController.currentBackStackEntry?.savedStateHandle?.set("url", data.url)
-        navController.navigateWithAnimation(Screen.PostDetailScreen.route)
+        navController.navigateWithAnimation(Screen.BlogDetailScreen.route)
     }
 
     HodosTheme {
