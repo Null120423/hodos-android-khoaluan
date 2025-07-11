@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.dp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.ImgWithUrl
+import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.di.PlanTripModelEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.rememberDebouncedState
@@ -286,10 +287,10 @@ fun TripUserScreen() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White.copy(alpha = 0.9f)),
+                        .background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
-                    EnhancedLoadingView()
+                    Loading()
                 }
             }
 
@@ -623,26 +624,7 @@ fun EnhancedEmptyView() {
     }
 }
 
-@Composable
-fun EnhancedLoadingView() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(48.dp),
-            color = MaterialTheme.colorScheme.primary,
-            strokeWidth = 4.dp
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Loading your trips...",
-            style = MaterialTheme.typography.titleMedium,
-            color = Color(0xFF64748B)
-        )
-    }
-}
 
 @Composable
 fun EnhancedErrorView(error: String, onRetry: () -> Unit) {

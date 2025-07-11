@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MarkEmailRead
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Subscriptions
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +51,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -57,6 +60,7 @@ import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.NotificationViewEntryPoint
 import com.example.hodos_final_android.model.NotificationModel
+import com.example.hodos_final_android.model.Post
 import com.example.hodos_final_android.model.PricingPlanModel
 import com.example.hodos_final_android.model.TransactionModel
 import com.example.hodos_final_android.model.UserSubscriptionModel
@@ -67,6 +71,18 @@ import java.util.Date
 import java.util.Locale
 
 
+data class PostRejectionMetadata(
+    val post: Post,
+    val reason: RejectionReason
+)
+
+data class RejectionReason(
+    val id: String,
+    val reason: String,
+    val details: String,
+    val rejectedAt: String,
+    val createdBy: String
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationDetailScreen() {
@@ -171,6 +187,20 @@ fun NotificationDetailScreen() {
                     QRCodeCard(qrCode)
                 }
             }
+            notification?.metadata?.let { metadata ->
+                val post = metadata.post
+                val reason = metadata.reason
+
+                if (post != null && reason != null) {
+                    PostRejectionCard(
+                        PostRejectionMetadata(
+                            post = post,
+                            reason = reason
+                        )
+                    )
+                }
+            }
+
 
             // Metadata Section
             if (notification != null) {
@@ -495,6 +525,8 @@ fun SubscriptionDetailsCard(subscription: UserSubscriptionModel) {
                     it
                 )
             }
+            // Post Rejection Details
+
             TransactionDetailRow("Current Period Ends", formatDate(subscription.currentPeriodEndDate))
             TransactionDetailRow("Trial", if (subscription.isTrial) "Yes" else "No")
         }
@@ -696,5 +728,142 @@ fun getStatusColor(status: String): Color {
         "expired" -> Color(0xFFFF5722)
         "cancelled" -> Color(0xFF9E9E9E)
         else -> Color(0xFF607D8B)
+    }
+}
+
+@Composable
+fun PostRejectionCard(postRejection: PostRejectionMetadata) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Cancel,
+                    contentDescription = "Post Rejected",
+                    tint = Color(0xFFE91E63),
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = "Post Rejection Details",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1A1A1A)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Post thumbnail
+            AsyncImage(
+                model = postRejection.post.thumbnail,
+                contentDescription = "Post thumbnail",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Post details
+            TransactionDetailRow("Post Title", postRejection.post.title)
+            TransactionDetailRow("Status", postRejection.post.status.uppercase())
+            TransactionDetailRow("Created At", formatTimestamp(postRejection.post.createdAt.toString()))
+            TransactionDetailRow("Comments", postRejection.post.commentCount.toString())
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Post content preview
+            Text(
+                text = "Content Preview",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF1A1A1A)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFF5F5F5)
+            ) {
+                Text(
+                    text = postRejection.post.content,
+                    fontSize = 14.sp,
+                    color = Color(0xFF333333),
+                    modifier = Modifier.padding(12.dp),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Rejection reason
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFFE91E63).copy(alpha = 0.1f)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Rejection reason",
+                            tint = Color(0xFFE91E63),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "Rejection Reason",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFE91E63)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Reason: ${postRejection.reason.reason.uppercase()}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF1A1A1A)
+                    )
+
+                    if (postRejection.reason.details.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Details: ${postRejection.reason.details}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF666666)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Rejected on ${formatTimestamp(postRejection.reason.rejectedAt)}",
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                }
+            }
+        }
     }
 }

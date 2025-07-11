@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.hodos_final_android.LocalNavController
-import com.example.hodos_final_android.screen.planing.Loading
+import com.example.hodos_final_android.component.Loading
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SetJavaScriptEnabled")
@@ -66,13 +66,13 @@ fun BlogDetailScreen() {
                 )
             )
         }
-    ) { _ ->
-        Box(modifier = Modifier.padding()) {
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
             Box(modifier = Modifier.fillMaxSize()) {
                 AndroidView(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 8.dp), // Thêm padding cho đẹp
+                       , // Thêm padding cho đẹp
                     factory = { context ->
                         WebView(context).apply {
                             layoutParams = ViewGroup.LayoutParams(

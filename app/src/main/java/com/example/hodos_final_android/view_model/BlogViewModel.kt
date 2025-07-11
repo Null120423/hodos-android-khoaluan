@@ -3,8 +3,11 @@ package com.example.hodos_final_android.view_model
 import Resource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hodos_final_android.model.BlogModel
 import com.example.hodos_final_android.model.NotificationModel
 import com.example.hodos_final_android.model.Pagination
+import com.example.hodos_final_android.model.PaginationResponse
+import com.example.hodos_final_android.repository.BlogRepository
 import com.example.hodos_final_android.repository.NotificationRepository
 import com.example.hodos_final_android.service.NotificationPaginationResponse
 import com.example.hodos_final_android.service.ReadNotificationResponse
@@ -19,24 +22,18 @@ import javax.inject.Singleton
 
 @Singleton
 class BlogViewModel @Inject constructor(
-    private val repo: NotificationRepository,
+    private val repo: BlogRepository,
 ) : ViewModel() {
 
-    private val _notificationPaginationState = MutableStateFlow(ResponseDataState<NotificationPaginationResponse>(isLoading = true))
-    val notificationPaginationState: StateFlow<ResponseDataState<NotificationPaginationResponse>> = _notificationPaginationState.asStateFlow()
-
-    private val _detailState = MutableStateFlow(ResponseDataState<NotificationModel>(isLoading = true))
-    val detailState: StateFlow<ResponseDataState<NotificationModel>> = _detailState.asStateFlow()
-
-    private val _readState = MutableStateFlow(ResponseDataState<ReadNotificationResponse>(isLoading = true))
-    val readState: StateFlow<ResponseDataState<ReadNotificationResponse>> = _readState.asStateFlow()
+    private val _blogPaginationState = MutableStateFlow(ResponseDataState<PaginationResponse<BlogModel>>(isLoading = true))
+    val blogPaginationState: StateFlow<ResponseDataState<PaginationResponse<BlogModel>>> = _blogPaginationState.asStateFlow()
 
     fun pagination(body: Pagination<Any>) {
         repo.pagination(body)
             .onEach { result ->
-                _notificationPaginationState.value = when (result) {
+                _blogPaginationState.value = when (result) {
                     is Resource.Success -> {
-                        val currentData = _notificationPaginationState.value.data?.data ?: emptyList()
+                        val currentData = _blogPaginationState.value.data?.data ?: emptyList()
                         val newData = if (body.skip > 0) currentData + (result.data?.data ?: emptyList())
                         else result.data?.data ?: emptyList()
                         ResponseDataState(data = result.data?.copy(data = newData))
@@ -46,47 +43,7 @@ class BlogViewModel @Inject constructor(
                         ResponseDataState(error = error)
                     }
                     is Resource.Loading -> {
-                        ResponseDataState(isLoading = true, data = _notificationPaginationState.value.data)
-                    }
-                    else -> ResponseDataState()
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    fun detail(id: String) {
-        repo.detail(id)
-            .onEach { result ->
-                _detailState.value = when (result) {
-                    is Resource.Success -> {
-                        ResponseDataState(data = result.data)
-                    }
-                    is Resource.Error -> {
-                        val error = result.message?.let { parseJsonError(it) }
-                        ResponseDataState(error = error)
-                    }
-                    is Resource.Loading -> {
-                        ResponseDataState(isLoading = true, data = _detailState.value.data)
-                    }
-                    else -> ResponseDataState()
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    fun read(id: String) {
-        repo.read(id)
-            .onEach { result ->
-                _readState.value = when (result) {
-                    is Resource.Success -> {
-                        ResponseDataState(data = result.data)
-                    }
-                    is Resource.Error -> {
-                        val error = result.message?.let { parseJsonError(it) }
-                        ResponseDataState(error = error)
-                    }
-                    is Resource.Loading -> {
-                        ResponseDataState(isLoading = true, data = _readState.value.data)
+                        ResponseDataState(isLoading = true, data = _blogPaginationState.value.data)
                     }
                     else -> ResponseDataState()
                 }

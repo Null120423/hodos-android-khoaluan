@@ -1,5 +1,6 @@
 package com.example.hodos_final_android.di
 import com.example.hodos_final_android.view_model.AppViewViewModel
+import com.example.hodos_final_android.view_model.BlogViewModel
 import com.example.hodos_final_android.view_model.ChatViewModel
 import com.example.hodos_final_android.view_model.HomeViewModel
 import com.example.hodos_final_android.view_model.LocationViewModel
@@ -62,5 +63,12 @@ interface LocationViewEntryPoint {
 @InstallIn(SingletonComponent::class)
 interface NotificationViewEntryPoint {
     fun notificationViewModel(): NotificationViewModel
+}
+
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface BlogViewEntryPoint {
+    fun blogViewModel(): BlogViewModel
 }
 

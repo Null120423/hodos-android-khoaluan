@@ -13,6 +13,7 @@ import com.example.hodos_final_android.model.AuthData
 import com.example.hodos_final_android.model.PricingPlanModel
 import com.example.hodos_final_android.model.UserModel
 import com.example.hodos_final_android.repository.AuthRepository
+import com.example.hodos_final_android.service.api.parseJsonError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,6 +60,12 @@ class UserViewModel @Inject constructor(
                 avatar = it.avatar
             )
         }
+        _uiState.value = _uiState.value.copy(
+            fullName =  "",
+            gender =  "",
+            birthDate =  "",
+            phoneNumber = ""
+        )
 
         userDetail?.let {
             _uiState.value = _uiState.value.copy(
@@ -138,12 +145,14 @@ class UserViewModel @Inject constructor(
                             result.data?.let {
                                 updateAuthData(it)
                             }
+                            initUiState()
                             onSuccess()
                         }
 
                         is Resource.Error -> {
                             onError(Exception("Unknown error"))
-                            Toast.makeText(context,"" , Toast.LENGTH_SHORT).show()
+                            val error = result.message?.let { parseJsonError(it) }
+                            Toast.makeText(context, error?.message, Toast.LENGTH_SHORT).show()
                         }
 
                         is Resource.Loading -> {

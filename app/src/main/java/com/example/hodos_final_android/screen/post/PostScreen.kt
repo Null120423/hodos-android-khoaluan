@@ -85,6 +85,7 @@ import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.ProfileAvatar
 import com.example.hodos_final_android.di.PostViewModelEntryPoint
+import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.getTimeAgo
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.Post
@@ -102,7 +103,9 @@ data class StoryItem(
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun PostScreen() {
+fun PostScreen(
+
+) {
     val context = LocalContext.current
     val navController = LocalNavController.current
     val postViewModel = remember {
@@ -110,6 +113,14 @@ fun PostScreen() {
             .fromApplication(context, PostViewModelEntryPoint::class.java)
             .postViewModel()
     }
+
+    val userViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, UserViewModelEntryPoint::class.java)
+            .userViewModel()
+    }
+
+    val isLogin = userViewModel.authState.collectAsState().value != null
 
     val paginationPostState by postViewModel.paginationState.collectAsState()
 
@@ -223,12 +234,14 @@ fun PostScreen() {
         }
 
         // Modern Floating Action Button
-        ModernFAB(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 100.dp, end = 16.dp)
-        ) {
-            navController.navigateWithAnimation(Screen.CreatePostScreen.route)
+        if(isLogin) {
+            ModernFAB(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 100.dp, end = 16.dp)
+            ) {
+                navController.navigateWithAnimation(Screen.CreatePostScreen.route)
+            }
         }
 
         // Enhanced Pull Refresh Indicator
@@ -476,6 +489,7 @@ fun ModernPostCard(post: Post, onPostClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ProfileAvatar(
+                    url = post.user.avatar,
                     letter = post.username?.firstOrNull()?.uppercase() ?: "?",
                     backgroundColor = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(40.dp)

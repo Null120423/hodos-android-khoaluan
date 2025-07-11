@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.component.EmptyStateWithAnimation
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.di.NotificationViewEntryPoint
 import com.example.hodos_final_android.helper.rememberDebouncedState
@@ -208,6 +209,9 @@ fun NotificationScreen() {
                     else -> {
                         val notifications = paginationState.data?.data ?: emptyList()
 
+                        if(notifications.isEmpty()) {
+                            EmptyStateWithAnimation()
+                        }
                         LazyColumn(
                             modifier = Modifier.fillMaxSize()
                         ) {

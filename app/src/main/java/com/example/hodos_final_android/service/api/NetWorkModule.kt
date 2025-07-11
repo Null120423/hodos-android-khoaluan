@@ -11,6 +11,7 @@ import android.util.Log
 import com.airbnb.lottie.BuildConfig
 import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.service.AuthService
+import com.example.hodos_final_android.service.BlogService
 import com.example.hodos_final_android.service.ChatBotService
 import com.example.hodos_final_android.service.CommonService
 import com.example.hodos_final_android.service.LocationService
@@ -143,8 +144,8 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://hodos-api.gitlabserver.id.vn/")
-            //.baseUrl("http://192.168.1.2:3000/")
+            //.baseUrl("https://hodos-api.gitlabserver.id.vn/")
+            .baseUrl("http://192.168.1.2:3000/")
             //.baseUrl("http://192.168.2.88:3000/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
@@ -193,6 +194,12 @@ object NetworkModule {
     @Singleton
     fun provideUserSubscriptionService(retrofit: Retrofit): UserSubscriptionService {
         return retrofit.create(UserSubscriptionService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBlogService(retrofit: Retrofit): BlogService {
+        return retrofit.create(BlogService::class.java)
     }
 }
 

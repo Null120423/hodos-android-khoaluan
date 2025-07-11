@@ -28,7 +28,6 @@ import com.example.hodos_final_android.screen.chat.ChatDashboard
 import com.example.hodos_final_android.screen.chat.ChatRoomScreen
 import com.example.hodos_final_android.screen.planing.CreatePlanning
 import com.example.hodos_final_android.screen.planing.EditPlanning
-import com.example.hodos_final_android.screen.planing.PlanningDetail
 import com.example.hodos_final_android.screen.planing.PlanningScreen
 import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.model.RegisterModel
@@ -53,6 +52,7 @@ import com.example.hodos_final_android.screen.profile.ProfileUpdateScreen
 import com.example.hodos_final_android.screen.profile.SuccessScreen
 import com.example.hodos_final_android.screen.profile.TrialActivationScreen
 import com.example.hodos_final_android.screen.profile.UpgradeOverviewScreen
+import com.example.hodos_final_android.screen.blog.BlogListScreen
 import com.google.gson.Gson
 import java.net.URLEncoder
 
@@ -116,6 +116,7 @@ sealed class Screen(val route: String) {
 
     // blog
     object BlogDetailScreen: Screen("BlogDetailScreen")
+    object BlogListScreen: Screen("BlogListScreen")
 
 }
 
@@ -164,7 +165,6 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.Register.route) { RegisterScreen() },
         // plan
         ScreenConfig(Screen.Planning.route) { PlanningScreen() },
-        ScreenConfig(Screen.PlanningDetail.route) { PlanningDetail() },
         ScreenConfig(Screen.CreatePlanning.route) { CreatePlanning() },
         ScreenConfig(Screen.CreatePlanningResultScreen.route) { CreatePlanningResultScreen() },
         ScreenConfig(Screen.EditPlanning.route) { EditPlanning() },
@@ -257,6 +257,12 @@ fun AppNavHost(navController: NavHostController) {
         ScreenConfig(Screen.BlogDetailScreen.route) {
                 backStackEntry -> BlogDetailScreen()
         },
+
+        ScreenConfig(Screen.BlogListScreen.route) {
+                backStackEntry -> BlogListScreen()
+        },
+
+
         )
 
     NavHost(navController = navController, startDestination = Screen.Main.route) {

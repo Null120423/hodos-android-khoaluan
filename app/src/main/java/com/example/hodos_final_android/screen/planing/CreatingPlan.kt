@@ -1,11 +1,5 @@
 package com.example.hodos_final_android.screen.planing
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -47,11 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -249,6 +238,7 @@ fun ErrorContent(
     onRetry: () -> Unit,
     onCancel: () -> Unit
 ) {
+    val primaryColor =MaterialTheme.colorScheme.primary
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -314,7 +304,7 @@ fun ErrorContent(
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF10B981)
+                    containerColor = primaryColor
                 )
             ) {
                 Icon(
@@ -329,54 +319,5 @@ fun ErrorContent(
     }
 }
 
-@Composable
-fun Loading() {
-    // Custom loading animation
-    val infiniteTransition = rememberInfiniteTransition(label = "loading")
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "rotation"
-    )
 
-    Box(
-        modifier = Modifier.size(80.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        // Outer ring
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .rotate(rotation)
-                .drawBehind {
-                    drawArc(
-                        color = Color(0xFF10B981),
-                        startAngle = 0f,
-                        sweepAngle = 270f,
-                        useCenter = false,
-                        style = Stroke(width = 6.dp.toPx(), cap = StrokeCap.Round)
-                    )
-                }
-        )
-
-        // Inner circle
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .background(Color(0xFF10B981).copy(alpha = 0.1f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.FlightTakeoff,
-                contentDescription = null,
-                tint = Color(0xFF10B981),
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
 

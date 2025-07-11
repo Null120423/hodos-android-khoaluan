@@ -19,7 +19,9 @@ data class Post(
     val timePosted: Int,
     val commentCount: Int,
     val createdAt: Date,
-    val locations: List<Location> = emptyList()
+    val locations: List<Location> = emptyList(),
+    val user : UserModel,
+    val status: String
 )
 
 

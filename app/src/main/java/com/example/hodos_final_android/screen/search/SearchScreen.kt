@@ -56,6 +56,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.component.EmptyBlogWithAnimation
 import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.di.LocationViewEntryPoint
 import com.example.hodos_final_android.helper.rememberDebouncedState
@@ -82,6 +83,7 @@ fun SearchScreen(
     val navController = LocalNavController.current
     var searchQuery by remember { mutableStateOf("") }
     var isLoadingMore by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     val debouncedSearchQuery by rememberDebouncedState(searchQuery, debounceMillis = 500)
     val refreshScope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
@@ -116,12 +118,13 @@ fun SearchScreen(
                 )
             )
         )
+        isLoading = false
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.background)
             .pullRefresh(pullRefreshState)
     ) {
         Column(
@@ -130,15 +133,19 @@ fun SearchScreen(
                 .padding(WindowInsets.statusBars.asPaddingValues())
         ) {
             SearchBar(
+                borderColor = MaterialTheme.colorScheme.primary,
                 query = searchQuery,
-                onQueryChange = { searchQuery = it },
+                onQueryChange = {
+                    searchQuery = it
+                    isLoading = true
+                                },
                 onBack = { navController.popBackStack() }
             )
 
             when {
                 paginationState.error != null -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Lỗi: ${paginationState.error?.message ?: "Không rõ lỗi"}")
+                        Text("Error: ${paginationState.error?.message ?: "Unknow error"}")
                     }
                 }
 
@@ -157,6 +164,10 @@ fun SearchScreen(
                                     )
                                 }
                             )
+                        }
+
+                        if(locations.isEmpty() && !isLoading && !paginationState.isLoading) {
+                            item { EmptyBlogWithAnimation() }
                         }
 
                         if (paginationState.data?.hasNext == true) {
@@ -201,7 +212,7 @@ fun SearchScreen(
             backgroundColor = MaterialTheme.colorScheme.secondary
         )
 
-        if (paginationState.isLoading && paginationState.data == null) {
+        if ((paginationState.isLoading && paginationState.data == null )|| isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Loading()
             }
@@ -215,26 +226,27 @@ fun SearchScreen(
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isBack: Boolean? = true,
+    borderColor: Color? = Color.Transparent
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    val borderColor = if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondary)
             .padding(16.dp)
     ) {
         Row {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
+            if(isBack!!) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                }
             }
             TextField(
                 value = query,
@@ -253,7 +265,8 @@ fun SearchBar(
                     .background(Color.White)
                     .border(
                         width = 1.dp,
-                        color = borderColor,
+                        color = (if (isFocused) MaterialTheme.colorScheme.primary else borderColor)
+                            ?: MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(100.dp)
                     ),
                 colors = TextFieldDefaults.colors(

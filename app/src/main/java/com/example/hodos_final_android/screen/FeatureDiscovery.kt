@@ -7,7 +7,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,15 +27,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.LocalDining
+import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
@@ -57,6 +55,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,15 +67,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.getScreenWidth
 import com.example.hodos_final_android.navigateWithAnimation
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.android.EntryPointAccessors
 
 data class FeatureCard(
     val title: String,
@@ -185,10 +187,10 @@ fun FeatureDiscoveryScreen() {
     // Enhanced secondary features
     val secondaryFeatures = listOf(
         FeatureCard(
-            title = "AI Analytics",
-            subtitle = "Smart Insights",
-            description = "Data-driven intelligence",
-            icon = Icons.Default.Analytics,
+            title = "Locations & Foods",
+            subtitle = "Explore Places & Local Dishes",
+            description =  "Discover popular destinations and authentic cuisine from around the world",
+            icon = Icons.Default.LocalDining,
             gradient = listOf(
                 MaterialTheme.colorScheme.primary,
                 MaterialTheme.colorScheme.primary,
@@ -197,19 +199,19 @@ fun FeatureDiscoveryScreen() {
                 MaterialTheme.colorScheme.primary.copy(0.5f),
             ),
             accentColor = Color(0xFFfa709a),
-            onClick = { /* Navigate to Analytics */ }
+            onClick = { navController.navigateWithAnimation(Screen.SearchScreen.route) }
         ),
         FeatureCard(
-            title = "Voice AI",
-            subtitle = "Speech Recognition",
-            description = "Advanced voice processing",
-            icon = Icons.Default.Mic,
+            title = "Helpful Post & Tips",
+            subtitle = "Practical Guides & Insights",
+            description = "Explore curated advice and expert tips to make the most of your experience",
+            icon = Icons.Default.PostAdd,
             gradient = listOf(
                 Color(0xFF667eea),
                 Color(0xFF764ba2)
             ),
             accentColor = Color(0xFF667eea),
-            onClick = { /* Navigate to Voice AI */ }
+            onClick = { navController.navigateWithAnimation(Screen.BlogListScreen.route) }
         )
     )
 
@@ -282,7 +284,7 @@ fun FeatureDiscoveryScreen() {
 
             item{
                 Text(
-                    text = "Additional Tools",
+                    text = "Additional",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF4A5568),
@@ -344,6 +346,15 @@ private fun EnhancedHeaderSection(
     onProfileClick: () -> Unit,
     onUpgradeClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val userViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, UserViewModelEntryPoint::class.java)
+            .userViewModel()
+    }
+    val authState by userViewModel.authState.collectAsState()
+
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -380,66 +391,34 @@ private fun EnhancedHeaderSection(
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Enhanced Upgrade Button
-                Button(
-                    onClick = onUpgradeClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier
-                        .height(48.dp)
-                        .shadow(8.dp, RoundedCornerShape(24.dp)),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+            if(authState?.user?.isPremium == true) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "Upgrade",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Pro",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                // Enhanced Profile Avatar
-                Surface(
-                    shape = CircleShape,
-                    shadowElevation = 6.dp
-                ) {
-                    Box(
+                    Button(
+                        onClick = onUpgradeClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = RoundedCornerShape(24.dp),
                         modifier = Modifier
-                            .size(48.dp)
-                            .background(
-                                brush = Brush.radialGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primary.copy(0.6f),
-                                        MaterialTheme.colorScheme.primary,
-                                        MaterialTheme.colorScheme.primary
-                                    )
-                                ),
-                                shape = CircleShape
-                            )
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) { onProfileClick() },
-                        contentAlignment = Alignment.Center
+                            .height(48.dp)
+                            .shadow(8.dp, RoundedCornerShape(24.dp)),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                     ) {
                         Icon(
-                            Icons.Default.Person,
-                            contentDescription = "Profile",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            Icons.Default.Star,
+                            contentDescription = "Upgrade",
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Pro",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }

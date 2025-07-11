@@ -1,10 +1,6 @@
 package com.example.hodos_final_android.screen.home
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -40,16 +36,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,7 +69,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
@@ -87,28 +77,16 @@ import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.HomeViewModelEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.TokenManager
+import com.example.hodos_final_android.model.BannerModel
 import com.example.hodos_final_android.model.BlogModel
 import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.Location
-import com.example.hodos_final_android.model.New
-import com.example.hodos_final_android.model.news
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.FacebookSdk
-import com.facebook.login.LoginResult
-import com.facebook.login.widget.LoginButton
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -238,8 +216,8 @@ fun HomeScreen(
                 refreshing,
                 pullRefreshState,
                 Modifier.align(Alignment.TopCenter),
-                backgroundColor = Color(0xFF2A2A2A),
-                contentColor = Color(0xFFFF6B35)
+                backgroundColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -338,7 +316,7 @@ private fun EnhancedHeader() {
 }
 
 @Composable
-private fun EnhancedFeaturedBannerSection(banners: List<String>) {
+private fun EnhancedFeaturedBannerSection(banners: List<BannerModel>) {
     if (banners.isNotEmpty()) {
         var currentIndex by remember { mutableStateOf(0) }
         val navController = LocalNavController.current
@@ -375,9 +353,9 @@ private fun EnhancedFeaturedBannerSection(banners: List<String>) {
                                 fadeOut(animationSpec = tween(400))
                     },
                     label = "banner_image"
-                ) { imageUrl ->
+                ) { banner ->
                     ImgWithUrl(
-                        url = imageUrl,
+                        url = banner.thumbnail,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -406,7 +384,7 @@ private fun EnhancedFeaturedBannerSection(banners: List<String>) {
                                 slideOutVertically { -it / 3 } + fadeOut()
                     },
                     label = "banner_content"
-                ) { _ ->
+                ) { banner ->
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -422,7 +400,7 @@ private fun EnhancedFeaturedBannerSection(banners: List<String>) {
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "banner.title",
+                                text = banner.title,
                                 fontSize = 18.sp,
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
@@ -431,16 +409,16 @@ private fun EnhancedFeaturedBannerSection(banners: List<String>) {
                                 overflow = TextOverflow.Ellipsis
                             )
 
-//                            if (banner.description.isNotEmpty()) {
-//                                Spacer(modifier = Modifier.height(4.dp))
-//                                Text(
-//                                    text = banner.description,
-//                                    fontSize = 14.sp,
-//                                    color = Color.White.copy(alpha = 0.8f),
-//                                    maxLines = 2,
-//                                    overflow = TextOverflow.Ellipsis
-//                                )
-//                            }
+                            if (banner.description.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = banner.description,
+                                    fontSize = 14.sp,
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
 
                         Row(
@@ -474,10 +452,18 @@ private fun EnhancedFeaturedBannerSection(banners: List<String>) {
                             }
 
                             Icon(
-                                Icons.Default.ArrowForward,
+                                imageVector = Icons.Default.ArrowForward,
                                 contentDescription = "View Banner",
                                 tint = Color.White,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable(onClick = {
+                                        if(currentIndex < banners.size - 1 ) {
+                                            currentIndex ++
+                                        }else {
+                                            currentIndex = 0
+                                        }
+                                    })
                             )
                         }
                     }
@@ -561,12 +547,6 @@ private fun <T> DarkSectionWithCards(
                     fontWeight = FontWeight.Bold,
                 )
             }
-
-            Icon(
-                Icons.Default.ArrowForward,
-                contentDescription = "See all",
-                modifier = Modifier.size(20.dp)
-            )
         }
 
         LazyRow(

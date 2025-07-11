@@ -1,5 +1,7 @@
 package com.example.hodos_final_android.model
 
+import com.example.hodos_final_android.screen.notification.RejectionReason
+
 data class NotificationTypeData(
     val color: String,
     val name: String,
@@ -32,5 +34,7 @@ data class NotificationModel(
 data class NotificationMetadata(
     val pricingPlan: PricingPlanModel?,
     val transaction: TransactionModel?,
-    val userSubscription: UserSubscriptionModel?
+    val userSubscription: UserSubscriptionModel?,
+    val post: Post,
+    val reason: RejectionReason
 )

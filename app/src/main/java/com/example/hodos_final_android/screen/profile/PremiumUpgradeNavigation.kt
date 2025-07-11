@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -163,6 +164,7 @@ fun UpgradeOverviewScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF9FAFB))
+            .navigationBarsPadding()
     ) {
         TopAppBar(
             title = {
@@ -281,9 +283,9 @@ fun UpgradeOverviewScreen() {
                                         handlePayment()
                                     },
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFF8B5CF6)
+                                        containerColor = MaterialTheme.colorScheme.primary
                                     ),
-                                    shape = RoundedCornerShape(8.dp),
+                                    shape = RoundedCornerShape(100.dp),
                                     modifier = Modifier.height(48.dp)
                                 ) {
                                     Text(
