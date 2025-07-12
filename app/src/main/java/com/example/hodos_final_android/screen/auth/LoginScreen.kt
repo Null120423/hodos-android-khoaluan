@@ -1,5 +1,6 @@
 package com.example.hodos_final_android.screen.auth
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -72,6 +73,7 @@ import com.example.hodos_final_android.LocalLogInWithSocial
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
+import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.model.LoginModel
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
@@ -81,33 +83,55 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.messaging.FirebaseMessaging
 import com.shashank.sony.fancytoastlib.FancyToast
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
-
     val context = LocalContext.current
     val navController = LocalNavController.current
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     var showTraditionalLogin by remember { mutableStateOf(false) }
+
+    // handle FCM token.
+    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val token = task.result
+            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("fcm_token", token).apply()
+
+            Log.e("FCM",  token)
+
+        } else {
+            Log.e("FCM", "Fetching FCM token failed", task.exception)
+        }
+    }
 
     val loginState by viewModel.loginState.collectAsState()
 
     val handleLogin = {
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val fcmToken = prefs.getString("fcm_token", null)
+
         val login = LoginModel(
             username = username,
-            password = password
+            password = password,
+            fcmToken = fcmToken
         )
         viewModel.login(login)
+        isLoading = true
     }
 
     // login gooogle
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        isLoading = true
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
@@ -116,6 +140,8 @@ fun LoginScreen(
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val user = FirebaseAuth.getInstance().currentUser
+                        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        val fcmToken = prefs.getString("fcm_token", null)
                         user?.let {
                             val name = it.displayName
                             val email = it.email
@@ -124,7 +150,8 @@ fun LoginScreen(
                                 val loginWithGoogleBody = LoginWithGoogleDto(
                                     fullname = name,
                                     email = email,
-                                    avatar = avatar
+                                    avatar = avatar,
+                                    fcmToken = fcmToken
                                 )
                                 viewModel.loginWithGoogle(loginWithGoogleBody)
 
@@ -157,13 +184,18 @@ fun LoginScreen(
     LaunchedEffect(loginState.data) {
         loginState.data?.let {
             Toast.makeText(context, "Login successfully!", Toast.LENGTH_SHORT).show()
-            navController.navigateWithAnimation(Screen.Main.route)
+            isLoading = false
+            delay(500)
+            if (navController.previousBackStackEntry != null) {
+                navController.popBackStack()
+            }
         }
     }
 
     LaunchedEffect(loginState.error) {
         loginState.error?.let {
             FancyToast.makeText(context, loginState.error!!.message, FancyToast.LENGTH_LONG, FancyToast.ERROR, true).show()
+            isLoading = false
         }
     }
 
@@ -282,7 +314,10 @@ fun LoginScreen(
                     SocialLoginContent(
                         onLoginFacebook = {
                             loginWithFacebook { facebookDto ->
-                                viewModel.loginWithFacebook(facebookDto)
+                                isLoading = true
+                                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                val fcmToken = prefs.getString("fcm_token", null)
+                                viewModel.loginWithFacebook(facebookDto, fcmToken)
                             }
                         },
                         onLoginGoogle = {
@@ -295,7 +330,13 @@ fun LoginScreen(
                     )
                 }
             }
+
+
         }
+
+    }
+    if(isLoading) {
+        Loading()
     }
 }
 

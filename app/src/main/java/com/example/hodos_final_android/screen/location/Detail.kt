@@ -306,11 +306,13 @@ fun ModernLocationInfo(data: Location) {
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = data.address,
-                                color = Color(0xFF6B7280),
-                                fontSize = 14.sp
-                            )
+                            data?.address?.let {
+                                Text(
+                                    text = it,
+                                    color = Color(0xFF6B7280),
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
                     }
                 }
@@ -818,11 +820,13 @@ fun LocationContent(data: LocationDetailModel, location: Location) {
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
-                        text = location.address,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF6B7280)
-                    )
+                    location.address?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF6B7280)
+                        )
+                    }
                 }
             }
         }

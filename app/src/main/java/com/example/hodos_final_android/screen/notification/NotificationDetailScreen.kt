@@ -60,8 +60,8 @@ import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.NotificationViewEntryPoint
 import com.example.hodos_final_android.model.NotificationModel
-import com.example.hodos_final_android.model.Post
 import com.example.hodos_final_android.model.PricingPlanModel
+import com.example.hodos_final_android.model.RejectedPost
 import com.example.hodos_final_android.model.TransactionModel
 import com.example.hodos_final_android.model.UserSubscriptionModel
 import dagger.hilt.android.EntryPointAccessors
@@ -72,17 +72,23 @@ import java.util.Locale
 
 
 data class PostRejectionMetadata(
-    val post: Post,
+    val post: RejectedPost,
     val reason: RejectionReason
 )
 
 data class RejectionReason(
     val id: String,
+    val postId: String,
     val reason: String,
+    val adminId: String,
     val details: String,
-    val rejectedAt: String,
-    val createdBy: String
+    val createdAt: String,
+    val createdBy: String,
+    val isDeleted: Boolean,
+    val updatedAt: String,
+    val rejectedAt: String
 )
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationDetailScreen() {
@@ -214,6 +220,7 @@ fun NotificationDetailScreen() {
 
 @Composable
 fun NotificationHeader(notification: NotificationModel) {
+    val typeData = notification.typeData
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -229,19 +236,21 @@ fun NotificationHeader(notification: NotificationModel) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Color(android.graphics.Color.parseColor(notification.typeData.color)).copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = getNotificationIcon(notification.type),
-                        contentDescription = notification.type,
-                        tint = Color(android.graphics.Color.parseColor(notification.typeData.color)),
-                        modifier = Modifier.size(28.dp)
-                    )
+                if (typeData != null) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(Color(android.graphics.Color.parseColor(typeData.color)).copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = getNotificationIcon(notification.type),
+                            contentDescription = notification.type,
+                            tint = Color(android.graphics.Color.parseColor(typeData.color)),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
@@ -252,17 +261,19 @@ fun NotificationHeader(notification: NotificationModel) {
                         color = Color(0xFF1A1A1A)
                     )
 
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(android.graphics.Color.parseColor(notification.typeData.color)).copy(alpha = 0.1f)
-                    ) {
-                        Text(
-                            text = notification.typeData.name,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(android.graphics.Color.parseColor(notification.typeData.color)),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
+                    if (typeData != null) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(android.graphics.Color.parseColor(typeData.color)).copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text = typeData.name,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(android.graphics.Color.parseColor(typeData.color)),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
                 }
 
@@ -590,6 +601,7 @@ fun QRCodeCard(qrCodeUrl: String) {
 
 @Composable
 fun MetadataCard(notification: NotificationModel) {
+    val typeData = notification.typeData
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -622,7 +634,9 @@ fun MetadataCard(notification: NotificationModel) {
             Spacer(modifier = Modifier.height(16.dp))
 
             TransactionDetailRow("Notification ID", notification.id)
-            TransactionDetailRow("Type", notification.typeData.description)
+            if (typeData != null) {
+                TransactionDetailRow("Type", typeData.description)
+            }
             TransactionDetailRow("Created At", formatTimestamp(notification.createdAt))
             TransactionDetailRow("Sent At", formatTimestamp(notification.sentAt))
         }
@@ -779,7 +793,7 @@ fun PostRejectionCard(postRejection: PostRejectionMetadata) {
 
             // Post details
             TransactionDetailRow("Post Title", postRejection.post.title)
-            TransactionDetailRow("Status", postRejection.post.status.uppercase())
+            postRejection.post.status?.let { TransactionDetailRow("Status", it.uppercase()) }
             TransactionDetailRow("Created At", formatTimestamp(postRejection.post.createdAt.toString()))
             TransactionDetailRow("Comments", postRejection.post.commentCount.toString())
 
@@ -814,10 +828,11 @@ fun PostRejectionCard(postRejection: PostRejectionMetadata) {
             // Rejection reason
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFE91E63).copy(alpha = 0.1f)
+                color = Color(0xFFE91E63).copy(alpha = 0.1f),
+                modifier = Modifier.fillMaxSize()
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp).fillMaxSize()
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

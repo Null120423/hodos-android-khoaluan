@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +32,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.hodos_final_android.helper.NetworkStateMonitor
 import com.example.hodos_final_android.helper.OnboardingUtils
+import com.example.hodos_final_android.helper.getOrCacheDeviceId
 import com.example.hodos_final_android.screen.OnboardingScreen
 import com.example.hodos_final_android.theme.HodosTheme
 import com.example.hodos_final_android.view_model.LoginWithFacebookDto
@@ -76,6 +80,15 @@ class MainActivity : ComponentActivity() {
         FacebookSdk.sdkInitialize(applicationContext)
         callbackManager = CallbackManager.Factory.create()
 
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                1001
+            )
+        }
+
         try {
             val info = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
             for (signature in info.signingInfo?.apkContentsSigners!!) {
@@ -91,6 +104,7 @@ class MainActivity : ComponentActivity() {
 
 
         fun onLoginFacebook(onLogin : (body: LoginWithFacebookDto) -> Unit) {
+
             LoginManager.getInstance().logInWithReadPermissions(
                 this@MainActivity,
                 listOf("email", "public_profile")
@@ -120,7 +134,7 @@ class MainActivity : ComponentActivity() {
                                     val dataLogin = LoginWithFacebookDto(
                                         fullname = name,
                                         email = email,
-                                        avatar = avatar
+                                        avatar = avatar,
                                     )
                                     onLogin(dataLogin)
                                 }
@@ -164,6 +178,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val isNetworkAvailable by networkMonitor.isConnected.collectAsState()
+
+            val context = LocalContext.current
+
+            LaunchedEffect(Unit) {
+                getOrCacheDeviceId(context)
+            }
 
             HodosTheme {
                 CompositionLocalProvider(LocalNavController provides navController, LocalLogInWithSocial provides logInWithSocial) {

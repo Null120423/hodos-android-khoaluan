@@ -26,7 +26,7 @@ data class NotificationModel(
     val sentAt: String,
     val linkTo: String?,
     val metadata: NotificationMetadata?,
-    val typeData: NotificationTypeData,
+    val typeData: NotificationTypeData?,
     val user: UserModel?,
     val username: String?,
     val avatar: String?
@@ -35,6 +35,19 @@ data class NotificationMetadata(
     val pricingPlan: PricingPlanModel?,
     val transaction: TransactionModel?,
     val userSubscription: UserSubscriptionModel?,
-    val post: Post,
-    val reason: RejectionReason
+    val post: RejectedPost?,
+    val reason: RejectionReason?
 )
+data class RejectedPost(
+    val id: String,
+    val title: String,
+    val content: String,
+    val thumbnail: String,
+    val status: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val createdByName: String,
+    val commentCount: Int,
+    val timePosted: Long
+)
+

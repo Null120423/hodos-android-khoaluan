@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,12 +59,15 @@ import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.EmptyStateWithAnimation
 import com.example.hodos_final_android.component.Loading
+import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.NotificationViewEntryPoint
+import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.rememberDebouncedState
 import com.example.hodos_final_android.model.NotificationModel
 import com.example.hodos_final_android.model.Pagination
 import com.example.hodos_final_android.model.PaginationLocation
 import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.screen.RequireLoginScreen
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -98,6 +102,12 @@ fun NotificationScreen() {
             .notificationViewModel()
     }
 
+    val userViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, UserViewModelEntryPoint::class.java)
+            .userViewModel()
+    }
+
 
     val paginationState by notificationViewModel.notificationPaginationState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -129,8 +139,12 @@ fun NotificationScreen() {
 
     val unreadTotal = paginationState.data?.unreadCount
 
+    val isLogin = userViewModel.authState.collectAsState().value?.user != null
+
+
 // Trigger search when query changes
     LaunchedEffect(debouncedSearchQuery) {
+        if (!isLogin) return@LaunchedEffect
         notificationViewModel.pagination(
             Pagination(
                 skip = 0,
@@ -192,15 +206,19 @@ fun NotificationScreen() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(if (!isLogin) PaddingValues(0.dp) else paddingValues)
                 .background(MaterialTheme.colorScheme.secondary)
                 .pullRefresh(pullRefreshState)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize().padding(horizontal = 10.dp, vertical = 10.dp)
+                    .fillMaxSize()
             ) {
                 when {
+                    !isLogin -> {
+                        Seprate(height = 20)
+                        RequireLoginScreen()
+                    }
                     paginationState.error != null -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text("Lỗi: ${paginationState.error?.message ?: "Không rõ lỗi"}")
@@ -213,7 +231,7 @@ fun NotificationScreen() {
                             EmptyStateWithAnimation()
                         }
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 10.dp)
                         ) {
                             items(notifications) { noti ->
                                 NotificationCard(
@@ -263,7 +281,7 @@ fun NotificationScreen() {
                 backgroundColor = MaterialTheme.colorScheme.secondary
             )
 
-            if (paginationState.isLoading && paginationState.data == null) {
+            if (paginationState.isLoading && paginationState.data == null && isLogin) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Loading()
                 }
@@ -298,19 +316,22 @@ fun NotificationCard(notification: NotificationModel) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Notification Icon
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color(android.graphics.Color.parseColor(notification.typeData.color)).copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = getNotificationIcon(notification.type),
-                    contentDescription = notification.type,
-                    tint = Color(android.graphics.Color.parseColor(notification.typeData.color)),
-                    modifier = Modifier.size(24.dp)
-                )
+            val typeData = notification.typeData
+            if (typeData != null) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color(android.graphics.Color.parseColor(typeData.color)).copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = getNotificationIcon(notification.type),
+                        contentDescription = notification.type,
+                        tint = Color(android.graphics.Color.parseColor(typeData.color)),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
 
             // Notification Content
@@ -359,17 +380,19 @@ fun NotificationCard(notification: NotificationModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Type Badge
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(android.graphics.Color.parseColor(notification.typeData.color)).copy(alpha = 0.1f)
-                    ) {
-                        Text(
-                            text = notification.typeData.name,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(android.graphics.Color.parseColor(notification.typeData.color)),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
+                    if (typeData != null) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(android.graphics.Color.parseColor(typeData.color)).copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text =typeData.name,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(android.graphics.Color.parseColor(typeData.color)),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
 
                     // Timestamp

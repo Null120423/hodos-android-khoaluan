@@ -487,11 +487,13 @@ fun AIResultSection(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = location.address,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
+                    location.address?.let {
+                        Text(
+                            text = it,
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 

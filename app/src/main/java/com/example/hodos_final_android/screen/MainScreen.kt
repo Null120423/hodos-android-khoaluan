@@ -39,7 +39,7 @@ fun MainScreen() {
 }
 
 sealed class BottomBarRoute(val route: String) {
-    object Home : BottomBarRoute("home")
+    object Home : BottomBarRoute("Home")
     object Post : BottomBarRoute("Post")
     object Event : BottomBarRoute("Event")
     object Trip : BottomBarRoute("trip")

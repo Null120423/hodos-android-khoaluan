@@ -24,14 +24,16 @@ import javax.inject.Inject
 data class LoginWithGoogleDto(
     val email: String,
     val fullname : String,
-    val avatar: String
+    val avatar: String,
+    val fcmToken: String?
 )
 
 
 data class LoginWithFacebookDto(
     val email: String,
     val fullname : String,
-    val avatar: String
+    val avatar: String,
+    val fcmToken: String? = null
 )
 
 @HiltViewModel
@@ -90,8 +92,14 @@ class AuthViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun loginWithFacebook(body: LoginWithFacebookDto) {
-        authRepository.loginWithFacebook(body).onEach { result ->
+    fun loginWithFacebook(body: LoginWithFacebookDto, fcmToken : String?) {
+        val bodyPre = LoginWithFacebookDto(
+            fullname = body.fullname,
+            email = body.email,
+            avatar = body.avatar,
+            fcmToken = fcmToken,
+        )
+        authRepository.loginWithFacebook(bodyPre).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     result.data?.let { userViewModel.updateAuthData(it) }

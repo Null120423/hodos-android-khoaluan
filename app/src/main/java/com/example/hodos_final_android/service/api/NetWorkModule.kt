@@ -2,14 +2,12 @@ package com.example.hodos_final_android.service.api
 
 
 import Resource
-import Resource.Error
-import Resource.Loading
-import Resource.Success
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.airbnb.lottie.BuildConfig
 import com.example.hodos_final_android.helper.TokenManager
+import com.example.hodos_final_android.helper.getOrCacheDeviceId
 import com.example.hodos_final_android.service.AuthService
 import com.example.hodos_final_android.service.BlogService
 import com.example.hodos_final_android.service.ChatBotService
@@ -20,7 +18,9 @@ import com.example.hodos_final_android.service.PlanTripService
 import com.example.hodos_final_android.service.PostService
 import com.example.hodos_final_android.service.UserSubscriptionService
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.google.gson.JsonSyntaxException
+import com.squareup.moshi.JsonDataException
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +28,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.SerializationException
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -43,7 +44,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
-
 class TokenProvider @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) {
@@ -51,6 +51,20 @@ class TokenProvider @Inject constructor(
         return TokenManager.getInstance().getAccessToken()
     }
 }
+
+class DeviceIdInterceptor(private val context: Context) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val deviceId = getOrCacheDeviceId(context)
+
+        val requestBuilder = chain.request().newBuilder()
+        if (!deviceId.isNullOrBlank()) {
+            requestBuilder.addHeader("X-Device-Id", deviceId)
+        }
+
+        return chain.proceed(requestBuilder.build())
+    }
+}
+
 
 class TokenInterceptor(private val tokenProvider: TokenProvider) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -128,10 +142,12 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        tokenProvider: TokenProvider
+        tokenProvider: TokenProvider,
+        deviceIdInterceptor: DeviceIdInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(deviceIdInterceptor)
             .addInterceptor(ApiLoggerInterceptor())
             .addInterceptor(TokenInterceptor(tokenProvider))
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -151,6 +167,13 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
+    @Provides
+    @Singleton
+    fun provideDeviceIdInterceptor(@ApplicationContext context: Context): DeviceIdInterceptor {
+        return DeviceIdInterceptor(context)
+    }
+
+
     @Provides
     @Singleton
     fun provideNotificationService(retrofit: Retrofit): NotificationService {
@@ -223,20 +246,26 @@ fun parseJsonError(errorString: String): ErrorRes? {
 inline fun <T> safeApiCall(
     crossinline apiCall: suspend () -> T
 ): Flow<Resource<T>> = flow {
-    emit(Loading())
+    emit(Resource.Loading())
 
     try {
         val response = apiCall()
-        emit(Success(response))
+        emit(Resource.Success(response))
     } catch (e: HttpException) {
         val errorBody = e.response()?.errorBody()?.string()
         val statusCode = e.code()
         val message = errorBody ?: e.message()
 
-        emit(Error(message = "Error: $message", statusCode = statusCode))
+        emit(Resource.Error(message = "HTTP Error: $message", statusCode = statusCode))
     } catch (e: IOException) {
-        emit(Error(message = "Couldn't reach server. Check your internet connection."))
+        emit(Resource.Error(message = "Couldn't reach server. Check your internet connection."))
+    } catch (e: JsonDataException) { // Moshi
+        emit(Resource.Error(message = "Data parse error: ${e.localizedMessage}"))
+    } catch (e: JsonParseException) { // Gson
+        emit(Resource.Error(message = "JSON parse error: ${e.localizedMessage}"))
+    } catch (e: SerializationException) { // kotlinx.serialization
+        emit(Resource.Error(message = "Serialization error: ${e.localizedMessage}"))
     } catch (e: Exception) {
-        emit(Error(message = "An unexpected error occurred: ${e.message}"))
+        emit(Resource.Error(message = "Unexpected error: ${e.localizedMessage ?: "Unknown error"}"))
     }
 }

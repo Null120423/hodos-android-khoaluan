@@ -21,7 +21,7 @@ data class Post(
     val createdAt: Date,
     val locations: List<Location> = emptyList(),
     val user : UserModel,
-    val status: String
+    val status: String? = ""
 )
 
 

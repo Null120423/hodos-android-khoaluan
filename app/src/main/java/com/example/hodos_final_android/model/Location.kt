@@ -12,7 +12,7 @@ data class Location(
     val deleteBy: String?,
     val isDeleted: Boolean,
     val name: String,
-    val address: String,
+    val address: String? = "",
     val description: String,
     val label: String,
     val lstImgs: List<String>,

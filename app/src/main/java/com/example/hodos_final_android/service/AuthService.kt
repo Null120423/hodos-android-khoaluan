@@ -26,7 +26,7 @@ interface AuthService {
     suspend fun signUp(@Body() body: RegisterModel): Response
 
 
-    @POST("auth/sign-in")
+    @POST("auth/sign-in-mobile")
     suspend fun login(@Body() body: LoginModel): AuthData
 
     @POST("auth/sign-in-with-google")

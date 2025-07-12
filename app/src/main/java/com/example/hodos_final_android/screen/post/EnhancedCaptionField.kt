@@ -190,11 +190,13 @@ fun LocationSuggestionItem(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            Text(
-                text = location.address,
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
+            location.address?.let {
+                Text(
+                    text = it,
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 }

@@ -1,9 +1,11 @@
 package com.example.hodos_final_android.helper
 
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.animation.core.Easing
 import androidx.compose.foundation.layout.PaddingValues
@@ -196,4 +198,19 @@ fun Uri.toMultipartBodyPart(context: Context, fieldName: String = "avatar"): Mul
     val fileName = "avatar_${System.currentTimeMillis()}.jpg"
     val requestBody = inputStream.readBytes().toRequestBody("image/*".toMediaTypeOrNull())
     return MultipartBody.Part.createFormData(fieldName, fileName, requestBody)
+}
+
+@SuppressLint("HardwareIds")
+fun getDeviceId(context: Context): String {
+    return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+}
+@SuppressLint("HardwareIds")
+fun getOrCacheDeviceId(context: Context): String? {
+    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    var id = prefs.getString("device_id", null)
+    if (id == null) {
+        id = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+        prefs.edit().putString("device_id", id).apply()
+    }
+    return id
 }

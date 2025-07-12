@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.component.BottomBar.BellColorButton
 import com.example.hodos_final_android.component.BottomBar.ButtonBackground
@@ -124,6 +125,35 @@ fun BottomBarComponent(navController: NavController) {
 
     val appState by appStateViewModel.appState.collectAsState()
 
+    fun NavController.navigateIfNotCurrent(route: String) {
+        val currentRoute = this.currentBackStackEntry?.destination?.route
+        if (currentRoute != route) {
+            this.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+                popUpTo(graph.startDestinationId) {
+                    saveState = true
+                }
+            }
+        }
+    }
+
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val tabRoutes = dropletButtons.map { it.route }
+
+//    LaunchedEffect(currentRoute) {
+//        if (currentRoute in tabRoutes) {
+//            val index = tabRoutes.indexOf(currentRoute)
+//            if (index != appState.selectTabIndex) {
+//                appStateViewModel.onSelectTab(index)
+//            }
+//        }
+//    }
+
+
     AnimatedNavigationBar(
         modifier = Modifier
             .padding(horizontal = 0.dp, vertical = 0.dp)
@@ -146,7 +176,7 @@ fun BottomBarComponent(navController: NavController) {
                     isSelected = appState.selectTabIndex == index,
                     onClick = {
                         appStateViewModel.onSelectTab(index)
-                        navController.navigate(it.route)
+                        navController.navigateIfNotCurrent(it.route)
                     },
                     icon = it.icon,
                     dropletColor = MaterialTheme.colorScheme.primary,

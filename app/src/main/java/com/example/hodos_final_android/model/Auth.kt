@@ -21,7 +21,8 @@ data class ResendCodeModel (
 
 data class LoginModel (
     val username: String,
-    val password: String
+    val password: String,
+    val fcmToken : String?
 )
 
 data class GetUserInfoModel (

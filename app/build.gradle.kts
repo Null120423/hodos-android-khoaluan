@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -79,6 +80,7 @@ dependencies {
     implementation(libs.androidx.camera.video)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.camera2)
+    implementation(libs.firebase.messaging.ktx)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
@@ -171,6 +173,13 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.facebook.android:facebook-login:16.3.0")
+
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
 
     implementation(libs.androidx.core.splashscreen)
 

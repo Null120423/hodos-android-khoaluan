@@ -49,7 +49,6 @@ fun Loading(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent) // nền mờ
             .zIndex(999f), // nổi lên trên
         contentAlignment = Alignment.Center
     ) {

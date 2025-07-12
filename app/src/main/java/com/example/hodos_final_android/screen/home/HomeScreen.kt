@@ -622,12 +622,14 @@ private fun EnhancedTravelCard(data: Location) {
                         color = Color.White,
                         maxLines = 2
                     )
-                    Text(
-                        text = data.address,
-                        fontSize = 12.sp,
-                        color = Color.White.copy(0.7f),
-                        maxLines = 2
-                    )
+                    data.address?.let {
+                        Text(
+                            text = it,
+                            fontSize = 12.sp,
+                            color = Color.White.copy(0.7f),
+                            maxLines = 2
+                        )
+                    }
                 }
             }
         }

@@ -77,10 +77,12 @@ fun TravelCard(
                            )
 
                            // Text with truncated address
-                           Txt(
-                               value = data.address.take(12), // Limit text to first 12 characters
-                               size = 12,
-                           )
+                           data.address?.let {
+                               Txt(
+                                   value = it.take(12), // Limit text to first 12 characters
+                                   size = 12,
+                               )
+                           }
                        }
 
                    }

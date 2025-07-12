@@ -303,6 +303,9 @@ fun NavGraphBuilder.animatedComposable(
 
 // Helper extension for navigation
 fun NavController.navigateWithAnimation(route: String) {
+    val currentRoute = this.currentBackStackEntry?.destination?.route
+    if (currentRoute == route) return
+
     this.navigate(route) {
         launchSingleTop = true
     }
