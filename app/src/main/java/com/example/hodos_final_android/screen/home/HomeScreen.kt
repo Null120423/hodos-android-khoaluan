@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -132,7 +133,7 @@ fun HomeScreen(
     fun refresh() =
         refreshScope.launch {
             refreshing = true
-            homeViewModel.fetchTop10Locations()
+            homeViewModel.getDashboard(authState?.user?.id)
             delay(1500)
             refreshing = false
         }
@@ -157,7 +158,7 @@ fun HomeScreen(
 
     LaunchedEffect(homeState) {
         if(homeState.data == null && homeState.isLoading) {
-            homeViewModel.fetchTop10Locations()
+            homeViewModel.getDashboard(authState?.user?.id)
             delay(1500)
         }
     }
@@ -176,7 +177,9 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 stickyHeader {
-                    EnhancedHeader()
+                    EnhancedHeader(
+                        homeState.data?.unreadCount ?: 0
+                    )
                     Seprate(height = 20)
                 }
 
@@ -223,7 +226,7 @@ fun HomeScreen(
     }
 }
 @Composable
-private fun EnhancedHeader() {
+private fun EnhancedHeader(unreadCount: Int = 0) {
     val navController = LocalNavController.current
 
     Box(
@@ -293,24 +296,48 @@ private fun EnhancedHeader() {
             Spacer(modifier = Modifier.width(12.dp))
 
             // Enhanced Notification Button
-            Surface(
-                shape = CircleShape,
-                shadowElevation = 6.dp
+            Box(
+                contentAlignment = Alignment.TopEnd
             ) {
-                IconButton(
-                    onClick = { navController.navigateWithAnimation(Screen.NotificationScreen.route) },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(Color.White, CircleShape)
+                Surface(
+                    shape = CircleShape,
+                    shadowElevation = 6.dp
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "Notifications",
-                        tint = Color(0xFF667eea),
-                        modifier = Modifier.size(24.dp)
-                    )
+                    IconButton(
+                        onClick = { navController.navigateWithAnimation(Screen.NotificationScreen.route) },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White, CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notifications",
+                            tint = Color(0xFF667eea),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
+
+               if(unreadCount > 0 && unreadCount != null) {
+                   Box(
+                       modifier = Modifier
+                           .offset(x = (-4).dp, y = 4.dp)
+                           .size(24.dp)
+                           .background(Color.Red, shape = CircleShape),
+                       contentAlignment = Alignment.Center
+                   ) {
+                       unreadCount.toString()                                                          .let {
+                           Text(
+                               text = it,
+                               color = Color.White,
+                               fontSize = 10.sp,
+                               fontWeight = FontWeight.Bold
+                           )
+                       }
+                   }
+               }
             }
+
         }
     }
 }

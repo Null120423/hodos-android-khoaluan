@@ -120,8 +120,6 @@ class AuthViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-
-
     fun signUp(email: String, password: String, username: String, confirmPassword: String) {
         val registerModel = RegisterModel(username, email, password, confirmPassword)
 

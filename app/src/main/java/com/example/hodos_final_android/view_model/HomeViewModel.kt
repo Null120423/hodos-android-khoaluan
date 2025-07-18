@@ -15,16 +15,23 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class GetDashBoard(
+    val userId: String? = null
+)
 @Singleton
 class HomeViewModel @Inject constructor(
-    private val repository: CommonRepository
+    private val repository: CommonRepository,
 ) : ViewModel() {
 
     private val _homeState = MutableStateFlow(ResponseDataState<DashboardModel>(isLoading = true))
     val homeState: StateFlow<ResponseDataState<DashboardModel>> = _homeState
 
-    fun fetchTop10Locations() {
-        repository.dashboard()
+
+    fun getDashboard(userId: String?) {
+        val body = GetDashBoard(
+            userId = userId
+        )
+        repository.dashboard(body)
             .onEach { result ->
                 _homeState.value = when (result) {
                     is Resource.Success -> {

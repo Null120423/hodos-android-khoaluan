@@ -12,7 +12,9 @@ data class Recommendation(
 data class ChatBotResponse(
     val type: String,
     val recommendations: List<Recommendation>,
-    val message: String
+    val message: String,
+    val reason: String,
+    val description: String
 )
 
 data class SuggestQuestion(

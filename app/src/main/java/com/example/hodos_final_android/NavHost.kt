@@ -32,6 +32,7 @@ import com.example.hodos_final_android.screen.planing.PlanningScreen
 import com.example.hodos_final_android.screen.search.SearchScreen
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.screen.ComingSoonScreen
+import com.example.hodos_final_android.screen.TermAndSecurity.TermAndSecurityScreen
 import com.example.hodos_final_android.screen.predict.PredictResultScreen
 import com.example.hodos_final_android.screen.location.DirectionScreen
 import com.example.hodos_final_android.screen.location.GalleryFullScreen
@@ -117,6 +118,9 @@ sealed class Screen(val route: String) {
     // blog
     object BlogDetailScreen: Screen("BlogDetailScreen")
     object BlogListScreen: Screen("BlogListScreen")
+
+    /// term and security
+    object TermAndSecurity: Screen("TermAndSecurity")
 
 }
 
@@ -262,7 +266,9 @@ fun AppNavHost(navController: NavHostController) {
                 backStackEntry -> BlogListScreen()
         },
 
-
+        ScreenConfig(Screen.TermAndSecurity.route) {
+                backStackEntry -> TermAndSecurityScreen()
+        },
         )
 
     NavHost(navController = navController, startDestination = Screen.Main.route) {

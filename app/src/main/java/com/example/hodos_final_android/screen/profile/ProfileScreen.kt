@@ -26,10 +26,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirplanemodeActive
+import androidx.compose.material.icons.filled.ContactMail
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CardGiftcard
@@ -42,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +60,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.BtnPrimary
@@ -68,14 +72,17 @@ import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.component.Txt
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
 import com.example.hodos_final_android.helper.getScreenWidth
+import com.example.hodos_final_android.model.GetUserInfoModel
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.navigateWithAnimation
 import com.example.hodos_final_android.screen.RequireLoginScreen
+import com.example.hodos_final_android.view_model.AuthViewModel
 import dagger.hilt.android.EntryPointAccessors
 
 @Composable
 fun ProfileScreen(
-    isLoggedIn: Boolean = true
+    isLoggedIn: Boolean = true,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -88,6 +95,27 @@ fun ProfileScreen(
     val authState by userViewModel.authState.collectAsState()
     val isConfirmLogout = remember { mutableStateOf(false) }
     val planData = userViewModel.getSuggestPricingPlan()
+
+
+    fun handleResetLogin() {
+        val accessToken = authState?.accessToken
+        val refreshToken = authState?.refreshToken
+
+
+        // If either token is missing, cannot proceed
+        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) return
+
+        val getUserInfoModel = GetUserInfoModel(
+            accessToken = accessToken,
+            refreshToken = refreshToken
+        )
+        authViewModel.userInfo(getUserInfoModel)
+    }
+
+
+    LaunchedEffect(Unit) {
+        handleResetLogin()
+    }
 
     if (userViewModel.getAccessToken() == null) {
         RequireLoginScreen()
@@ -469,6 +497,7 @@ fun ModernMenuCard() {
 
 @Composable
 fun ModernSecondaryMenuCard() {
+    val navController = LocalNavController.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -487,6 +516,15 @@ fun ModernSecondaryMenuCard() {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2D3748),
                 modifier = Modifier.padding(bottom = 12.dp)
+            )
+            ModernMenuItem(
+                icon = Icons.Default.PrivacyTip,
+                title = "Terms & Security",
+                subtitle = "Get help and contact us",
+                color = MaterialTheme.colorScheme.primary,
+                onClick = {
+                    navController.navigateWithAnimation(Screen.TermAndSecurity.route)
+                }
             )
 
             ModernMenuItem(

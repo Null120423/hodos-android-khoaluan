@@ -4,7 +4,8 @@ data class DashboardModel(
     val banners: List<BannerModel>,
     val foodData:FoodDataDashboard,
     val locationData: LocationDataDashboard,
-    val blogs: List<BlogModel>
+    val blogs: List<BlogModel>,
+    val unreadCount: Int = 0
 )
 
 data class BannerModel(

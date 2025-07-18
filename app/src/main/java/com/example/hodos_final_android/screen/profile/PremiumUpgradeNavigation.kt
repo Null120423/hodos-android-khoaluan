@@ -76,12 +76,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.hodos_final_android.LinearCardBg
 import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.ErrorView
@@ -90,7 +88,6 @@ import com.example.hodos_final_android.component.Loading
 import com.example.hodos_final_android.component.Seprate
 import com.example.hodos_final_android.di.UserSubscriptionEntryPoint
 import com.example.hodos_final_android.di.UserViewModelEntryPoint
-import com.example.hodos_final_android.helper.TokenManager
 import com.example.hodos_final_android.helper.downloadQrImage
 import com.example.hodos_final_android.helper.formatPrice
 import com.example.hodos_final_android.helper.getScreenWidth
@@ -484,12 +481,28 @@ fun PaymentMethodScreen() {
             .userSubscriptionModel()
     }
 
+    val userViewModel = remember {
+        EntryPointAccessors
+            .fromApplication(context, UserViewModelEntryPoint::class.java)
+            .userViewModel()
+    }
+
     fun clearDataCheckTransaction() {
         userSubscriptionModel.clearTransactionCheck()
         showQRDialog = false
         showBankTransferDialog = false
         navController.navigateWithAnimation(Screen.PaymentProcessingScreen.route)
     }
+    val transactionCheckState by userSubscriptionModel.transactionCheckState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        while (transactionCheckState.isCompleted != true) {
+            delay(1000)
+            userSubscriptionModel.transactionCheck()
+        }
+        navController.navigateWithAnimation(Screen.SuccessScreen.route)
+    }
+
 
     Column(
         modifier = Modifier
@@ -1313,7 +1326,6 @@ fun PaymentProcessingScreen() {
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SuccessScreen(
-    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
@@ -1334,28 +1346,6 @@ fun SuccessScreen(
     val plan = state.selectPlan
 
     // auth se
-    val authState by userViewModel.authState.collectAsState()
-
-    fun handleResetLogin() {
-        val accessToken = authState?.accessToken
-
-        if (accessToken == null ) {
-            val tokenManager = TokenManager.getInstance()
-            val getUserInfoModel = tokenManager.getAccessToken()?.let {
-                GetUserInfoModel(
-                    accessToken = it,
-                    refreshToken = tokenManager.getRefreshToken()!!
-                )
-            }
-            if (getUserInfoModel != null) {
-                authViewModel.userInfo(getUserInfoModel)
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        handleResetLogin()
-    }
 
     Column(
         modifier = Modifier
@@ -1452,15 +1442,15 @@ fun SuccessScreen(
 
         // ✅ Action Buttons
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(
-                onClick = {
-                    navController.navigateWithAnimation(Screen.PremiumOnboardingScreen.route)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6))
-            ) {
-                Text("Explore Premium Features")
-            }
+//            Button(
+//                onClick = {
+//                    navController.navigateWithAnimation(Screen.PremiumOnboardingScreen.route)
+//                },
+//                modifier = Modifier.fillMaxWidth(),
+//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6))
+//            ) {
+//                Text("Explore Premium Features")
+//            }
 
             OutlinedButton(
                 onClick = {
@@ -1710,166 +1700,5 @@ fun PremiumOnboardingScreen() {
                 }
             }
         }
-    }
-}
-
-// Helper Composables
-@Composable
-fun FeatureItem(icon: ImageVector, title: String, description: String) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        Color(0xFF8B5CF6).copy(alpha = 0.1f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color(0xFF8B5CF6),
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PlanCard(
-    plan: PremiumPlan,
-    isSelected: Boolean,
-    onSelect: () -> Unit
-) {
-    Card(
-        onClick = onSelect,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF8B5CF6).copy(alpha = 0.1f) else Color.White
-        ),
-        border = if (isSelected) BorderStroke(2.dp, Color(0xFF8B5CF6)) else null,
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 2.dp)
-    ) {
-       LinearCardBg {
-           Box {
-               Column(
-                   modifier = Modifier.padding(20.dp)
-               ) {
-                   Row(
-                       modifier = Modifier.fillMaxWidth(),
-                       horizontalArrangement = Arrangement.SpaceBetween,
-                       verticalAlignment = Alignment.CenterVertically
-                   ) {
-                       Column {
-                           Text(
-                               text = plan.name,
-                               style = MaterialTheme.typography.titleLarge,
-                               fontWeight = FontWeight.Bold,
-                               color = Color.White,
-                           )
-
-                           Row(
-                               verticalAlignment = Alignment.Bottom,
-                               horizontalArrangement = Arrangement.spacedBy(8.dp)
-                           ) {
-                               Text(
-                                   text = formatPrice(plan.price, plan.currency),
-                                   style = MaterialTheme.typography.headlineMedium,
-                                   fontWeight = FontWeight.Bold,
-                                   color = Color.White,
-                               )
-
-                               if (plan.originalPrice != null) {
-                                   Text(
-                                       text = formatPrice(plan.originalPrice, plan.currency),
-                                       style = MaterialTheme.typography.bodyMedium,
-                                       color = Color.White,
-                                       textDecoration = TextDecoration.LineThrough
-                                   )
-                               }
-                           }
-
-                           Text(
-                               text = "/${if (plan.billingCycle == "monthly") "month" else "year"}",
-                               style = MaterialTheme.typography.bodyMedium,
-                               color = Color.White,
-                           )
-                       }
-
-                       RadioButton(
-                           selected = isSelected,
-                           onClick = onSelect,
-                           colors = RadioButtonDefaults.colors(
-                               selectedColor = Color(0xFF8B5CF6)
-                           )
-                       )
-                   }
-
-                   if (plan.discount != null) {
-                       Spacer(modifier = Modifier.height(8.dp))
-                       Card(
-                           colors = CardDefaults.cardColors(
-                               containerColor = Color(0xFF10B981).copy(alpha = 0.1f)
-                           )
-                       ) {
-                           Text(
-                               text = plan.discount,
-                               style = MaterialTheme.typography.labelSmall,
-                               color = Color(0xFF065F46),
-                               fontWeight = FontWeight.SemiBold,
-                               modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                           )
-                       }
-                   }
-
-                   Spacer(modifier = Modifier.height(16.dp))
-
-                   Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                       plan.features.forEach { feature ->
-                           Row(
-                               verticalAlignment = Alignment.CenterVertically,
-                               horizontalArrangement = Arrangement.spacedBy(8.dp)
-                           ) {
-                               Icon(
-                                   imageVector = Icons.Default.Check,
-                                   contentDescription = null,
-                                   tint = Color(0xFF10B981),
-                                   modifier = Modifier.size(16.dp)
-                               )
-                               Text(
-                                   text = feature,
-                                   style = MaterialTheme.typography.bodyMedium,
-                                   color = Color.White,
-                               )
-                           }
-                       }
-                   }
-               }
-           }
-       }
     }
 }

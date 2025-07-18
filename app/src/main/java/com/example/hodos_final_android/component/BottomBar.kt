@@ -144,14 +144,7 @@ fun BottomBarComponent(navController: NavController) {
 
     val tabRoutes = dropletButtons.map { it.route }
 
-//    LaunchedEffect(currentRoute) {
-//        if (currentRoute in tabRoutes) {
-//            val index = tabRoutes.indexOf(currentRoute)
-//            if (index != appState.selectTabIndex) {
-//                appStateViewModel.onSelectTab(index)
-//            }
-//        }
-//    }
+
 
 
     AnimatedNavigationBar(

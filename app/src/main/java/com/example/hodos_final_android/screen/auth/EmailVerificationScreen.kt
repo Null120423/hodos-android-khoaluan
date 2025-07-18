@@ -70,7 +70,7 @@ import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.model.RegisterModel
 import com.example.hodos_final_android.model.ResendCodeModel
 import com.example.hodos_final_android.model.VerifyModel
-import com.example.hodos_final_android.navigateWithAnimation
+import com.example.hodos_final_android.replaceCurrentWithAnimation
 import com.example.hodos_final_android.view_model.AuthViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -143,7 +143,7 @@ fun EmailVerificationScreen(
             if(registerModel.password.isEmpty()) {
                 navController.popBackStack()
             }else {
-                navController.navigateWithAnimation(Screen.Login.route)
+                navController.replaceCurrentWithAnimation(Screen.Login.route)
             }
         }
     }

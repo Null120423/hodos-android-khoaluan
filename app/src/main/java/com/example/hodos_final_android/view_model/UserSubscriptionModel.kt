@@ -100,7 +100,7 @@ class UserSubscriptionModel @Inject constructor(
 
                     else -> {
                         _pricingPlanSubState.value = _pricingPlanSubState.value.copy(
-                            isLoading = false,
+                            isLoading = true,
                             error = null
                         )
                     }

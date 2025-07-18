@@ -47,7 +47,8 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -73,6 +74,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,6 +84,7 @@ import com.example.hodos_final_android.LocalNavController
 import com.example.hodos_final_android.R
 import com.example.hodos_final_android.Screen
 import com.example.hodos_final_android.component.AnimateImg
+import com.example.hodos_final_android.component.AnimatedTypingText
 import com.example.hodos_final_android.component.ImgWithUrl
 import com.example.hodos_final_android.di.ChatViewModelEntryPoint
 import com.example.hodos_final_android.model.ChatWithBotBody
@@ -90,12 +93,16 @@ import com.example.hodos_final_android.navigateWithAnimation
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 data class ChatMessage @RequiresApi(Build.VERSION_CODES.O) constructor(
     val message: String,
     val isFromUser: Boolean,
     val recommendations: List<Recommendation>? = emptyList(),
-    val timestamp: String = ""
+    val timestamp: String = "",
+    val reason: String? = "",
+    val description: String? = "",
+    val id :  String
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -134,6 +141,7 @@ fun ChatRoomScreen() {
             ChatMessage(
                 message = message,
                 isFromUser = true,
+                id =  UUID.randomUUID().toString()
             )
         )
     }
@@ -155,7 +163,7 @@ fun ChatRoomScreen() {
     }
 
     LaunchedEffect(message) {
-        if (chatState.data == null) {
+        if (chatState.data == null && !chatState.isLoading) {
             val chatWithBotBody = ChatWithBotBody(message = message)
             chatViewModel.chatBox(chatWithBotBody)
         }
@@ -166,7 +174,10 @@ fun ChatRoomScreen() {
             ChatMessage(
                 message = it.message,
                 isFromUser = false,
-                recommendations = chatState.data?.recommendations
+                recommendations = chatState.data?.recommendations,
+                reason = it.reason,
+                description = it.description,
+                id =  UUID.randomUUID().toString()
             )
         }?.let {
             messages.add(it)
@@ -180,6 +191,7 @@ fun ChatRoomScreen() {
                 ChatMessage(
                     message = userMessage,
                     isFromUser = true,
+                    id =  UUID.randomUUID().toString()
                 )
             )
             inputText = ""
@@ -234,7 +246,10 @@ fun ChatRoomScreen() {
                     contentPadding = PaddingValues(vertical = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(messages) { message ->
+                    items(
+                        items = messages,
+                        key = { it.id }
+                    ) { message ->
                         ModernChatMessageItem(message = message)
                     }
                     item {
@@ -385,14 +400,12 @@ private fun ModernChatHeader() {
 
 @Composable
 private fun ModernChatMessageItem(message: ChatMessage) {
-    var isVisible by remember { mutableStateOf(false) }
+    var showReason by remember { mutableStateOf(true) }
+    var showDescription by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
 
     AnimatedVisibility(
-        visible = isVisible,
+        visible = true,
         enter = slideInVertically(
             animationSpec = tween(400, easing = FastOutSlowInEasing),
             initialOffsetY = { it / 3 }
@@ -411,7 +424,7 @@ private fun ModernChatMessageItem(message: ChatMessage) {
                         // AI Avatar for bot messages
                         Surface(
                             shape = CircleShape,
-                            color = Color(0xFF667eea).copy(alpha = 0.1f),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                             modifier = Modifier.size(32.dp)
                         ) {
                             Icon(
@@ -420,7 +433,7 @@ private fun ModernChatMessageItem(message: ChatMessage) {
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(6.dp),
-                                tint = Color(0xFF667eea)
+                                tint =  MaterialTheme.colorScheme.primary
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -436,7 +449,7 @@ private fun ModernChatMessageItem(message: ChatMessage) {
                                 bottomStart = if (message.isFromUser) 20.dp else 6.dp,
                                 bottomEnd = if (message.isFromUser) 6.dp else 20.dp
                             ),
-                            color = if (message.isFromUser) Color(0xFF667eea) else Color(0xFFF1F5F9),
+                            color = if (message.isFromUser)  MaterialTheme.colorScheme.primary else  MaterialTheme.colorScheme.secondary,
                             shadowElevation = if (message.isFromUser) 8.dp else 2.dp,
                             modifier = Modifier.widthIn(max = 280.dp)
                         ) {
@@ -483,13 +496,51 @@ private fun ModernChatMessageItem(message: ChatMessage) {
                 }
             }
 
-            // Recommendations
-            if (!message.recommendations.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                ModernRecommendationsSection(recommendations = message.recommendations)
-            }
         }
     }
+
+    if(!message.isFromUser) {
+        Card(
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
+            modifier = Modifier.padding(top = 6.dp)
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                if (!message.reason.isNullOrBlank()) {
+                    AnimatedVisibility(visible = true) {
+                        AnimatedTypingText(
+                            fullText = "💡 ${message.reason}",
+                            textStyle = MaterialTheme.typography.bodySmall.copy(
+                                fontStyle = FontStyle.Italic,
+                                color = Color(0xFF555555)
+                            )
+                        )
+                    }
+
+                }
+                if (!message.description.isNullOrBlank()) {
+                    AnimatedVisibility(visible = true) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        AnimatedTypingText(
+                            fullText = message.description,
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                color = Color.DarkGray
+                            )
+                        )
+                    }
+
+                }
+            }
+        }
+
+
+        // Recommendations
+        if (!message.recommendations.isNullOrEmpty() && showDescription && showReason) {
+            Spacer(modifier = Modifier.height(12.dp))
+            ModernRecommendationsSection(recommendations = message.recommendations)
+        }
+    }
+
 }
 
 @Composable
@@ -500,7 +551,6 @@ private fun ModernRecommendationsSection(recommendations: List<Recommendation>) 
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1E293B),
-            modifier = Modifier.padding(bottom = 12.dp)
         )
 
         LazyRow(
@@ -530,7 +580,7 @@ private fun ModernRecommendationCard(recommendation: Recommendation) {
         color = Color.White,
         shadowElevation = 8.dp,
         modifier = Modifier
-            .width(200.dp)
+            .width(180.dp)
             .graphicsLayer(scaleX = scale, scaleY = scale)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -573,33 +623,6 @@ private fun ModernRecommendationCard(recommendation: Recommendation) {
                             )
                     )
 
-                    // Rating badge
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFF10B981),
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = "Rating",
-                                modifier = Modifier.size(12.dp),
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(
-                                text = "4.5",
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
                 }
             }
 
