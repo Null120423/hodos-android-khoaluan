@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.example.hodos_final_android.activity.base.FirstFragment"
+        android:name="com.hodos.hodos_final_android.activity.base.FirstFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.example.hodos_final_android.activity.base.SecondFragment"
+        android:name="com.hodos.hodos_final_android.activity.base.SecondFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 

@@ -28,7 +28,7 @@
 -keepattributes Exceptions
 
 # Retrofit API interfaces
--keep interface com.example.hodos_final_android.service.** { *; }
+-keep interface com.hodos.hodos_final_android.service.** { *; }
 
 # Gson
 -keep class com.google.gson.** { *; }
@@ -42,4 +42,4 @@
 -keep class javax.inject.** { *; }
 -dontwarn dagger.hilt.**
 -dontwarn javax.inject.**
--keep class com.example.hodos_final_android.MyApplication { *; }
+-keep class com.hodos.hodos_final_android.MyApplication { *; }

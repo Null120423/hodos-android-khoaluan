@@ -1,0 +1,220 @@
+package com.hodos.hodos_final_android.service
+
+
+import android.content.Context
+import android.content.res.AssetFileDescriptor
+import android.graphics.Bitmap
+import android.util.Log
+import android.widget.Toast
+import com.hodos.hodos_final_android.mock.getLocationByLabel
+import org.tensorflow.lite.Interpreter
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+
+class AIModelHelper(private val context: Context) {
+
+    private var interpreterLocation: Interpreter
+    private var interpreterFood: Interpreter
+
+    private val foodModelFileName = "food_model.tflite"
+    private val locationModelFileName = "location_model.tflite"
+
+    init {
+        interpreterLocation = Interpreter(loadModelFile(context, locationModelFileName))
+        interpreterFood = Interpreter(loadModelFile(context, foodModelFileName))
+    }
+
+    private fun printAllAssets(context: Context) {
+        try {
+            val assetManager = context.assets
+            val files = assetManager.list("") // Danh sách tất cả file trong thư mục assets
+            if (files != null) {
+                Log.d("ASSETS_LIST", "Files in assets folder:")
+                files.forEach { Log.d("ASSETS_LIST", it) }
+            } else {
+                Log.d("ASSETS_LIST", "No files found in assets folder.")
+            }
+        } catch (e: IOException) {
+            Log.e("ASSETS_LIST", "Error reading assets folder", e)
+        }
+    }
+
+
+    private fun loadModelFile(context: Context, modelPath: String): MappedByteBuffer {
+        printAllAssets(context)
+        val assetManager = context.assets
+        return try {
+            val fileDescriptor: AssetFileDescriptor = assetManager.openFd(modelPath)
+            val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+            val fileChannel: FileChannel = inputStream.channel
+            val startOffset = fileDescriptor.startOffset
+            val declaredLength = fileDescriptor.declaredLength
+            fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+        } catch (e: FileNotFoundException) {
+            Toast.makeText(context, "Model file not found: $modelPath", Toast.LENGTH_LONG).show()
+            throw e
+        }
+
+    }
+
+    fun classifyImg(image: Bitmap?) : String?{
+        val label = this.classifyLocation(image)
+        if(label === null) {
+            return this.classifyFood(image)
+        }
+        return label
+    }
+
+    private fun classifyLocation(image: Bitmap?): String? {
+        if (image == null) {
+            Toast.makeText(context, "Image is null", Toast.LENGTH_SHORT).show()
+            return null
+        }
+
+        val byteBuffer = preprocessImage(image)
+
+        // Adjusted outputData to match model's output shape (26 classes)
+        val outputData = Array(1) { FloatArray(26) }
+        interpreterLocation.run(byteBuffer, outputData)
+
+        val confidences = outputData[0]
+        var maxPos = 0
+        var maxConfidence = 0f
+
+        for (i in confidences.indices) {
+            if (confidences[i] > maxConfidence) {
+                maxConfidence = confidences[i]
+                maxPos = i
+            }
+        }
+        System.out.println(confidences[maxPos])
+        System.out.println(maxPos)
+//
+        val classes = arrayOf(
+            "Bao_Tang_Chung_Tich_Chien_Tranh",
+            "Bao_Tang_Lich_Su",
+            "Bao_Tang_My_Thuat",
+            "Bao_Tang_Thanh_Pho",
+            "Ben_Nha_Rong",
+            "Bitexco",
+            "Bui_Vien_Tay",
+            "Buu_Dien_TPHCM",
+            "Cau_Mong",
+            "Cho_Ben_Thanh",
+            "Cho_Binh_Tay",
+            "Chua_Ba_Thien_Hau",
+            "Chua_Buu_Long",
+            "Chua_Ngoc_Hoang",
+            "Chua_Phap_Hoa",
+            "Chua_Vinh_Nghiem",
+            "Cot_Co_Thu_Ngu",
+            "Dinh_Doc_Lap",
+            "Ho_Con_Rua",
+            "Landmark_81",
+            "Nha_Hat_Thanh_Pho",
+            "Nha_Tho_Duc_Ba",
+            "Nha_Tho_Giao_Xu_Tan_Dinh",
+            "Thao_Cam_Vien",
+            "UBND_TPHCM",
+            "Unknown"
+        )
+
+        if (maxConfidence < 0.35) {
+            Toast.makeText(context, "Can't recognize", Toast.LENGTH_SHORT).show()
+            return null
+        } else {
+            val label = classes[maxPos]
+            val location = getLocationByLabel(label)
+
+            Log.i("LABEL", label)
+
+            if(label == "Unknown") {
+                return null
+            }
+
+            return label
+        }
+    }
+
+
+    private fun classifyFood(image: Bitmap?): String? {
+        if (image == null) {
+            Toast.makeText(context, "Image is null", Toast.LENGTH_SHORT).show()
+            return null
+        }
+
+        val byteBuffer = preprocessImage(image)
+
+        // Adjusted outputData to match model's output shape (26 classes)
+        val outputData = Array(1) { FloatArray(21) }
+        interpreterFood.run(byteBuffer, outputData)
+
+        val confidences = outputData[0]
+        var maxPos = 0
+        var maxConfidence = 0f
+
+        for (i in confidences.indices) {
+            if (confidences[i] > maxConfidence) {
+                maxConfidence = confidences[i]
+                maxPos = i
+            }
+        }
+        System.out.println(confidences[maxPos])
+        System.out.println(maxPos)
+
+        val classes = arrayOf(
+            "Banh_Beo", "Banh_Can", "Banh_Gio", "Banh_Mi", "Banh_Trang_Nuong", "Banh_Xeo",
+            "Bap_Xao", "Bun_Bo", "Bun_Cha", "Bun_Dau", "Bun_Mam", "Bun_Thit_Nuong",
+            "Cao_Lau", "Chao_Long", "Com_Tam", "Goi_Cuon", "Hu_Tieu", "Mi_Quang",
+            "Pha_Lau", "Pho", "Unknown"
+        )
+
+
+        if (maxConfidence < 0.35) {
+            Toast.makeText(context, "Can't recognize", Toast.LENGTH_SHORT).show()
+            return null
+        } else {
+            val label = classes[maxPos]
+
+            if(label == "Unknown") {
+                return null
+            }
+
+            return label
+        }
+    }
+
+
+    private fun preprocessImage(bitmap: Bitmap): ByteBuffer {
+        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+
+        // Allocate a ByteBuffer for 224 * 224 * 3 channels (RGB), 4 bytes per float
+        val byteBuffer = ByteBuffer.allocateDirect(224 * 224 * 3 * 4)
+        byteBuffer.order(ByteOrder.nativeOrder())
+
+        for (y in 0 until 224) {
+            for (x in 0 until 224) {
+                val pixel = resizedBitmap.getPixel(x, y)
+
+                // Normalize RGB values to the range [0, 1] and put them into the buffer
+                byteBuffer.putFloat((pixel shr 16 and 0xFF) / 255.0f) // Red
+                byteBuffer.putFloat((pixel shr 8 and 0xFF) / 255.0f)  // Green
+                byteBuffer.putFloat((pixel and 0xFF) / 255.0f)        // Blue
+            }
+        }
+
+        byteBuffer.rewind() // Reset the buffer's position to the beginning
+        return byteBuffer
+    }
+
+    fun close() {
+        interpreterLocation.close()
+    }
+
+
+}

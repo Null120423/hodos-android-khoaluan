@@ -10,16 +10,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.hodos_final_android"
+    namespace = "com.hodos.hodos_final_android"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.hodos_final_android"
+        applicationId = "com.hodos.hodos_final_android"
         minSdk = 24
-        //noinspection OldTargetApi
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        versionCode = 9
+        versionName = "9.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -71,7 +70,6 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.play.services.maps)
-    implementation(libs.core)
     implementation(libs.litert)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.espresso.core)

@@ -64,7 +64,6 @@ androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-
 androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
 androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3Ui" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
-core = { group = "com.google.ar", name = "core", version.ref = "core" }
 tensorflow-lite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tensorflow-lite" }
 litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
