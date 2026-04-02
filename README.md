@@ -1,37 +1,60 @@
-# Navigation Example
+# HODOS_OFFLINE
 
-<p>
-  <!-- iOS -->
-  <a href="https://itunes.apple.com/app/apple-store/id982107779">
-    <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
-  </a>
-  <!-- Android -->
-  <a href="https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=blankexample">
-    <img alt="Supports Expo Android" longdesc="Supports Expo Android" src="https://img.shields.io/badge/Android-4630EB.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
-  </a>
-  <!-- Web -->
-  <a href="https://docs.expo.dev/workflow/web/">
-    <img alt="Supports Expo Web" longdesc="Supports Expo Web" src="https://img.shields.io/badge/web-4630EB.svg?style=flat-square&logo=GOOGLE-CHROME&labelColor=4285F4&logoColor=fff" />
-  </a>
-</p>
+## 1. Giới thiệu
+HODOS_OFFLINE là ứng dụng Android nhận diện địa điểm và món ăn bằng AI (TensorFlow Lite), hoạt động hoàn toàn offline. Ứng dụng cung cấp giao diện hiện đại, dễ sử dụng, tích hợp AI để phân loại hình ảnh nhanh chóng.
 
-## 🚀 How to use
+## 2. Kiến trúc hệ thống
+- **Nền tảng:** Android (Kotlin, Android SDK)
+- **Thành phần chính:**
+  - `MainActivity`: Điều phối giao diện, navigation drawer, khởi tạo AIModelHelper
+  - `Fragments`: Home, Gallery, Slideshow (quản lý UI từng màn hình)
+  - `AIModelHelper`: Nạp và chạy mô hình AI (TensorFlow Lite), xử lý ảnh, trả về kết quả
+  - `Model`: LstLocation, Location (quản lý dữ liệu)
+  - `Resource`: Layout XML, themes, navigation, assets (mô hình AI, ảnh mẫu)
 
-- Install packages with `yarn` or `npm install`.
-- Run `yarn start` or `npm run start` to start the bundler.
-- Open the project in a React runtime to try it:
-  - iOS: [Client iOS](https://itunes.apple.com/app/apple-store/id982107779)
-  - Android: [Client Android](https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=blankexample)
-  - Web: Any web browser
-- When it's time to customize your runtime, refer to the ["Adding custom native code"](https://docs.expo.dev/workflow/customizing/) guide!
+## 3. Luồng hoạt động
+1. Người dùng mở app, giao diện chính hiển thị với navigation drawer
+2. Chọn chức năng (ví dụ: nhận diện địa điểm)
+3. Chụp ảnh hoặc chọn ảnh từ thư viện
+4. Ảnh truyền vào `AIModelHelper`, xử lý qua mô hình TensorFlow Lite
+5. Kết quả phân loại hiển thị qua BottomSheetDialog hoặc UI tương ứng
+6. Xem thông tin chi tiết về địa điểm/món ăn
 
-## Publishing
+## 4. Hướng dẫn cài đặt
+### Yêu cầu
+- Android Studio (Giraffe+)
+- JDK 11 trở lên
+- Android SDK 24+
 
-- Deploy the native app to the App store and Play store using this guide: [Deployment](https://docs.expo.dev/distribution/app-stores/).
-- Deploy the website using this guide: [Web deployment](https://docs.expo.dev/distribution/publishing-websites/).
+### Cài đặt
+```bash
+git clone <repo-url>
+cd native-code
+```
+- Mở bằng Android Studio: File > Open > native-code
+- Đảm bảo đã cài Android SDK 24+ và JDK 11
+- Sync Gradle nếu được yêu cầu
 
-## 📝 Notes
+### Build
+- Build trên Android Studio: Build > Make Project hoặc Shift+F10 để chạy
+- Hoặc dùng terminal:
+```bash
+./gradlew assembleDebug
+```
 
-- Learn more about [Universal React](https://docs.expo.dev/).
-- See what API and components are [available in the React runtimes](https://docs.expo.dev/versions/latest/).
-- Find out more about developing apps and websites: [Official guides](https://docs.expo.dev/guides/).
+### Deploy
+- Kết nối thiết bị Android hoặc dùng trình giả lập
+- Nhấn Run trên Android Studio hoặc:
+```bash
+./gradlew installDebug
+```
+
+## 5. Ghi chú
+- **Mô hình AI:** Đặt file `.tflite` vào thư mục `assets` nếu muốn thay đổi mô hình
+- **ProGuard:** Đã cấu hình cơ bản, cần bổ sung nếu dùng thêm thư viện
+- **Thư viện:** TensorFlow Lite, Glide, Material Components, AndroidX, Gson
+- **Cấu hình:** Sửa trong `app/build.gradle.kts` và `gradle.properties` nếu cần tối ưu hiệu năng hoặc thêm tính năng
+- **Đóng góp:** Tạo pull request hoặc issue nếu muốn đóng góp hoặc báo lỗi
+
+---
+Nếu cần bổ sung chi tiết về kiến trúc, AI, UI, hoặc hướng dẫn sử dụng, vui lòng liên hệ hoặc tạo issue!
