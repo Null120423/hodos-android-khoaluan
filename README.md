@@ -3,6 +3,21 @@
 ## 1. Giới thiệu
 HODOS_OFFLINE là ứng dụng Android nhận diện địa điểm và món ăn bằng AI (TensorFlow Lite), hoạt động hoàn toàn offline. Ứng dụng cung cấp giao diện hiện đại, dễ sử dụng, tích hợp AI để phân loại hình ảnh nhanh chóng.
 
+## 1.1. Tính năng nổi bật: Nhận diện hình ảnh (AI Image Recognition)
+
+![AI Image Recognition](readme/ai_image_recognition.png)
+
+- **Nhận diện hình ảnh bằng AI:**
+  - Chụp ảnh hoặc chọn ảnh từ thư viện, ứng dụng sẽ tự động phân tích và nhận diện địa điểm/món ăn bằng công nghệ TensorFlow Lite.
+  - Kết quả trả về nhanh chóng, chính xác, không cần kết nối internet.
+  - Quy trình sử dụng đơn giản:
+    1. Chụp ảnh hoặc chọn ảnh từ thư viện.
+    2. AI tự động phân tích và nhận diện.
+    3. Hiển thị thông tin chi tiết về địa điểm/món ăn.
+  - **Lợi ích:** Tiện lợi khi đi du lịch, khám phá địa điểm mới, bảo mật thông tin cá nhân.
+
+> _Ảnh minh họa: Bạn có thể thay thế đường dẫn ảnh trên bằng ảnh màn hình app phần nhận diện hình ảnh._
+
 ## 2. Kiến trúc hệ thống
 - **Nền tảng:** Android (Kotlin, Android SDK)
 - **Thành phần chính:**
